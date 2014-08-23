@@ -89,9 +89,11 @@ class OglExtension
 
 class OglVersion
 {
-    public function __construct($glVersion, $glslVersion)
+    public function __construct($glName, $glVersion, $glslName, $glslVersion)
     {
+        $this->glName = $glName;
         $this->glVersion = $glVersion;
+        $this->glslName = $glslName;
         $this->glslVersion = $glslVersion;
         $this->extensions = array();
     }
@@ -104,12 +106,12 @@ class OglVersion
 
     public function addExtension($name, $status, $supportedDrivers = array())
     {
-        $this->extensions[$name] = new OglExtension($name, $status, $supportedDrivers);
+        array_push($this->extensions, new OglExtension($name, $status, $supportedDrivers));
     }
     
     public function write()
     {
-        print("<h1>GL: ".$this->glVersion." - GLSL: ".$this->glslVersion."</h1>\n");
+        print("<h1>".$this->glName." ".$this->glVersion." - ".$this->glslName." ".$this->glslVersion."</h1>\n");
         print("<table class=\"tableNoSpace\">");
         print("<tr class=\"tableHeaderLine\">\n");
         print("<th class=\"tableHeaderCell-extension\">Extension</th>\n");
@@ -131,7 +133,9 @@ class OglVersion
         print("</table>\n");
     }
 
+    private $glName;
     private $glVersion;
+    private $glslName;
     private $glslVersion;
     private $extensions;
 };
@@ -145,7 +149,7 @@ class OglMatrix
 
     public function addGlVersion($glVersion)
     {
-        $this->glVersions[$glVersion->getGlVersion()] = $glVersion;
+        array_push($this->glVersions, $glVersion);
     }
 
     public function write()
@@ -211,7 +215,7 @@ if($getLatestFileVersion)
 $handle = fopen($gl3Filename, "r")
     or exit("Can't read \"${gl3Filename}\"");
 
-$reVersion = "/^GL ([[:digit:]]+\.[[:digit:]]+), GLSL ([[:digit:]]+\.[[:digit:]]+)/";
+$reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
 $reAllDone = "/ --- all DONE: ((([[:alnum:]]+), )*([[:alnum:]]+))/";
 $reExtension = "/^  (.+) [ ]+(DONE|not started|started|in progress)( \((.+)\))?/";
 
@@ -222,7 +226,7 @@ while($line !== FALSE)
 {
     if(preg_match($reVersion, $line, $matches) === 1)
     {
-        $glVersion = new OglVersion($matches[1], $matches[2]);
+        $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6]);
 
         $allSupportedDrivers = array();
         if(preg_match($reAllDone, $line, $matches) === 1)
@@ -231,7 +235,7 @@ while($line !== FALSE)
         }
 
         do
-       {
+        {
             $line = fgets($handle);
         } while($line !== FALSE && $line === "\n");
 
