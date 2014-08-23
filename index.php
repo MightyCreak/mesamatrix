@@ -217,7 +217,7 @@ $handle = fopen($gl3Filename, "r")
 
 $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
 $reAllDone = "/ --- all DONE: ((([[:alnum:]]+), )*([[:alnum:]]+))/";
-$reExtension = "/^  (.+) [ ]+(DONE|not started|started|in progress)( \((.+)\))?/";
+$reExtension = "/^  (.+) [ ]+(DONE|not started|started|in progress|90% done)( \((.+)\))?/";
 
 $oglMatrix = new OglMatrix();
 
