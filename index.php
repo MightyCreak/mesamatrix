@@ -283,14 +283,14 @@ fclose($handle);
 <?php
 $oglMatrix->write();
 ?>
-        <h1>Source</h1>
-        <p><a href="<?php print($gl3Url); ?>"><?php print($gl3Url); ?></a></p>
+        <h1>License</h1>
+        <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
+        <h1>Sources</h1>
+        <p>GitHub: <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
+        <p>Mesa document used to generate this page: <a href="<?php print($gl3Url); ?>"><?php print($gl3Url); ?></a></p>
         <p>Last get: <?php print(date(DATE_RFC2822, $lastUpdate)); ?></p>
         <h1>Authors</h1>
         <p>Romain "Creak" Failliot</p>
-        <h1>License</h1>
-        <p></p>
-        <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
     </body>
 </html>
 
