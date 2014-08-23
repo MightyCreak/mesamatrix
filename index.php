@@ -250,7 +250,11 @@ while($line !== FALSE)
                     $supportedDrivers = array_merge($supportedDrivers, $parentDrivers);
                 }
 
-                if(isset($matches[4]))
+                if($matches[2] === "DONE" && !isset($matches[3]))
+                {
+                    $supportedDrivers = array_merge($supportedDrivers, $drivers);
+                }
+                else if(isset($matches[4]))
                 {
                     if(strncmp($matches[4], "all drivers", count("all drivers")) === 0)
                     {
