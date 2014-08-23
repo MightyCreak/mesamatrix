@@ -17,9 +17,14 @@
  * along with libbench. If not, see <http://www.gnu.org/licenses/>.
  */
 
+.tableNoSpace { border-spacing: 1px; border-collapse: separate; }
+.tableHeaderLine { background-color: #d3d7cf; }
+.tableHeaderCell { width: 90px; }
+.tableHeaderCell-extension { width: 500px; }
+
 .task { border-radius: 4px; }
 
-.isDone       { background-color: #8ae234; }
+.isDone { background-color: #8ae234; }
 .isInProgress { background-color: #f1922b; }
 .isNotStarted { background-color: #ef2929; }
 

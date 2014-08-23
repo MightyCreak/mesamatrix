@@ -110,19 +110,19 @@ class OglVersion
     public function write()
     {
         print("<h1>GL: ".$this->glVersion." - GLSL: ".$this->glslVersion."</h1>\n");
-        print("<table style=\"border: 1px solid #000\">");
-        print("<tr>\n");
-        print("<th style=\"min-width: 500px\">Extension</th>\n");
-        print("<th style=\"min-width: 90px\">mesa</th>\n");
-        print("<th style=\"min-width: 90px\">softpipe</th>\n");
-        print("<th style=\"min-width: 90px\">swrast</th>\n");
-        print("<th style=\"min-width: 90px\">llvmpipe</th>\n");
-        print("<th style=\"min-width: 90px\">i965</th>\n");
-        print("<th style=\"min-width: 90px\">nv50</th>\n");
-        print("<th style=\"min-width: 90px\">nvc0</th>\n");
-        print("<th style=\"min-width: 90px\">r300</th>\n");
-        print("<th style=\"min-width: 90px\">r600</th>\n");
-        print("<th style=\"min-width: 90px\">radeonsi</th>\n");
+        print("<table class=\"tableNoSpace\">");
+        print("<tr class=\"tableHeaderLine\">\n");
+        print("<th class=\"tableHeaderCell-extension\">Extension</th>\n");
+        print("<th class=\"tableHeaderCell\">mesa</th>\n");
+        print("<th class=\"tableHeaderCell\">softpipe</th>\n");
+        print("<th class=\"tableHeaderCell\">swrast</th>\n");
+        print("<th class=\"tableHeaderCell\">llvmpipe</th>\n");
+        print("<th class=\"tableHeaderCell\">i965</th>\n");
+        print("<th class=\"tableHeaderCell\">nv50</th>\n");
+        print("<th class=\"tableHeaderCell\">nvc0</th>\n");
+        print("<th class=\"tableHeaderCell\">r300</th>\n");
+        print("<th class=\"tableHeaderCell\">r600</th>\n");
+        print("<th class=\"tableHeaderCell\">radeonsi</th>\n");
         print("</tr>\n");
         foreach($this->extensions as &$ext)
         {
@@ -279,8 +279,9 @@ fclose($handle);
 <?php
 $oglMatrix->write();
 ?>
-        <p>Source: <a href="<?php print($gl3Url); ?>"><?php print($gl3Url); ?></a></p>
-        <p>Last update: <?php print(date(DATE_RFC2822, $lastUpdate)); ?></p>
+        <h1>Source</h1>
+        <p><a href="<?php print($gl3Url); ?>"><?php print($gl3Url); ?></a></p>
+        <p>Last get: <?php print(date(DATE_RFC2822, $lastUpdate)); ?></p>
         <h1>Authors</h1>
         <p>Romain "Creak" Failliot</p>
         <h1>License</h1>
