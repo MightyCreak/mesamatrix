@@ -67,7 +67,7 @@ class OglExtension
         $r300 = in_array("r300", $this->supportedDrivers) ? "isDone" : "isNotStarted";
         $r600 = in_array("r600", $this->supportedDrivers) ? "isDone" : "isNotStarted";
         $radeonsi = in_array("radeonsi", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        print("<tr>\n");
+        print("<tr class=\"extension\">\n");
         print("<td>".$this->name."</td>\n");
         print("<td class=\"task ".$mesa."\"></td>\n");
         print("<td class=\"task ".$softpipe."\"></td>\n");
@@ -239,11 +239,17 @@ while($line !== FALSE)
             $line = fgets($handle);
         } while($line !== FALSE && $line === "\n");
 
+        $parentDrivers = NULL;
         while($line !== FALSE && $line !== "\n")
         {
             if(preg_match($reExtension, $line, $matches) === 1)
             {
                 $supportedDrivers = $allSupportedDrivers;
+                if($matches[1][0] === "-")
+                {
+                    $supportedDrivers = array_merge($supportedDrivers, $parentDrivers);
+                }
+
                 if(isset($matches[4]))
                 {
                     if(strncmp($matches[4], "all drivers", count("all drivers")) === 0)
@@ -256,7 +262,12 @@ while($line !== FALSE)
                     }
                 }
 
-                $glVersion->addExtension(trim($matches[1]), $matches[2], $supportedDrivers);
+                if($matches[1][0] !== "-")
+                {
+                    $parentDrivers = $supportedDrivers;
+                }
+
+                $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers);
             }
 
             $line = fgets($handle);
