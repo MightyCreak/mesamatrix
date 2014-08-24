@@ -254,15 +254,21 @@ while($line !== FALSE)
                 {
                     $supportedDrivers = array_merge($supportedDrivers, $drivers);
                 }
-                else if(isset($matches[4]))
+                else if($matches[2] === "DONE" && isset($matches[4]))
                 {
-                    if(strncmp($matches[4], "all drivers", count("all drivers")) === 0)
+                    $driverFound = FALSE;
+                    $driversList = explode(", ", $matches[4]);
+                    foreach($driversList as $currentDriver)
+                    {
+                        if(in_array($currentDriver, $drivers))
+                        {
+                            $supportedDrivers[] = $currentDriver;
+                            $driverFound = TRUE;
+                        }
+                    }
+                    if (!$driverFound && !empty($matches[4]))
                     {
                         $supportedDrivers = array_merge($supportedDrivers, $drivers);
-                    }
-                    else
-                    {
-                        $supportedDrivers = array_merge($supportedDrivers, explode(", ", $matches[4]));
                     }
                 }
 
