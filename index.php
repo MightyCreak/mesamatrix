@@ -41,21 +41,17 @@ class OglExtension
 
     public function write()
     {
-        switch($this->status)
+        if (strncmp($this->status, "DONE", strlen("DONE")) === 0)
         {
-        case "DONE":
             $mesa = "isDone";
-            break;
-
-        case "started":
-        case "in progress":
-            $mesa = "isInProgress";
-            break;
-
-        case "not started":
-        default:
+        }
+        else if (strncmp($this->status, "not started", strlen("not started")) === 0)
+        {
             $mesa = "isNotStarted";
-            break;
+        }
+        else
+        {
+            $mesa = "isInProgress";
         }
 
         $softpipe = in_array("softpipe", $this->supportedDrivers) ? "isDone" : "isNotStarted";
@@ -174,12 +170,6 @@ $drivers = array(
     "r600",
     "radeonsi");
 
-$flags = array(
-    "not started",
-    "started",
-    "in progress",
-    "DONE");
-
 $gl3Filename = "GL3.txt";
 $gl3Url = "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt";
 $lastUpdate = 0;
@@ -215,15 +205,25 @@ if($getLatestFileVersion)
 $handle = fopen($gl3Filename, "r")
     or exit("Can't read \"${gl3Filename}\"");
 
+$reTableHeader = "/^Feature([ ]+)Status/";
 $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
 $reAllDone = "/ --- all DONE: ((([[:alnum:]]+), )*([[:alnum:]]+))/";
-$reExtension = "/^  (.+) [ ]+(DONE|not started|started|in progress|90% done)( \((.*)\))?/";
+$reExtension = "/^[^.]+$/";
 
 $oglMatrix = new OglMatrix();
 
 $line = fgets($handle);
 while($line !== FALSE)
 {
+    if(preg_match($reTableHeader, $line, $matches) === 1)
+    {
+        // Should be $lineWidth-2, but the file has a variable length in column 1
+        $lineWidth = strlen("Feature")+strlen($matches[1]);
+        $reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?/";
+        $line = fgets($handle);
+        continue;
+    }
+
     if(preg_match($reVersion, $line, $matches) === 1)
     {
         $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6]);
@@ -250,11 +250,11 @@ while($line !== FALSE)
                     $supportedDrivers = array_merge($supportedDrivers, $parentDrivers);
                 }
 
-                if($matches[2] === "DONE" && !isset($matches[3]))
+                if(strncmp($matches[2], "DONE", strlen("DONE")) === 0 && !isset($matches[3]))
                 {
                     $supportedDrivers = array_merge($supportedDrivers, $drivers);
                 }
-                else if($matches[2] === "DONE" && isset($matches[4]))
+                else if(strncmp($matches[2], "DONE", strlen("DONE")) === 0 && isset($matches[4]))
                 {
                     $driverFound = FALSE;
                     $driversList = explode(", ", $matches[4]);
