@@ -17,15 +17,17 @@
  * along with libbench. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.tableNoSpace { border-spacing: 1px; border-collapse: separate; }
+.tableNoSpace { border-spacing: 1px; border-collapse: collapse; }
 .tableHeaderLine { background-color: #d3d7cf; }
-.tableHeaderCell { width: 90px; }
+.tableHeaderCell { width: 90px; border: 1px solid #ffffff; }
 .tableHeaderCell-extension { width: 500px; }
 
-.extension:hover { background-color: #babdb6; }
-.task { border-radius: 4px; }
+.extension { border: 1px solid #ffffff; }
+.extension:hover { background-color: #babdb6; border: 3px solid #babdb6; }
+.task { border-radius: 5px; }
 
 .isDone { background-color: #8ae234; }
 .isInProgress { background-color: #f1922b; }
 .isNotStarted { background-color: #ef2929; }
 
+td { border-left: 1px solid #ffffff; border-right: 1px solid #ffffff; }
