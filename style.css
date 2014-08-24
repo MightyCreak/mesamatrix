@@ -30,4 +30,6 @@
 .isInProgress { background-color: #f1922b; }
 .isNotStarted { background-color: #ef2929; }
 
+.topicFrag:link { text-decoration: none; color: #DDDDDD };
+
 td { border-left: 1px solid #ffffff; border-right: 1px solid #ffffff; }
