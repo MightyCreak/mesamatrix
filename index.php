@@ -27,6 +27,21 @@ function debug_print($line)
     print("DEBUG: ".$line."<br />\n");
 }
 
+function isInDriversArray($name)
+{
+    global $drivers;
+
+    foreach($drivers as $driverName)
+    {
+        if (strncmp($name, $driverName, strlen($driverName)) === 0)
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
 class OglExtension
 {
     public function __construct($name, $status, $supportedDrivers = array())
@@ -41,8 +56,17 @@ class OglExtension
 
     public function write()
     {
+        global $hints, $drivers;
+
+        $hint = null;
+
         if (strncmp($this->status, "DONE", strlen("DONE")) === 0)
         {
+            if (strlen(trim($this->status))>strlen("DONE"))
+            {
+                $hints[] = substr(trim($this->status), strlen("DONE"));
+                $hint = count($hints);
+            }
             $mesa = "isDone";
         }
         else if (strncmp($this->status, "not started", strlen("not started")) === 0)
@@ -51,31 +75,55 @@ class OglExtension
         }
         else
         {
+            $hints[] = trim($this->status);
+            $hint = count($hints);
             $mesa = "isInProgress";
         }
 
-        $softpipe = in_array("softpipe", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        $swrast = in_array("swrast", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        $llvmpipe = in_array("llvmpipe", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        $i965 = in_array("i965", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        $nv50 = in_array("nv50", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        $nvc0 = in_array("nvc0", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        $r300 = in_array("r300", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        $r600 = in_array("r600", $this->supportedDrivers) ? "isDone" : "isNotStarted";
-        $radeonsi = in_array("radeonsi", $this->supportedDrivers) ? "isDone" : "isNotStarted";
         print("<tr class=\"extension\">\n");
-        print("<td>".$this->name."</td>\n");
-        print("<td class=\"task ".$mesa."\"></td>\n");
-        print("<td class=\"task ".$softpipe."\"></td>\n");
-        print("<td class=\"task ".$swrast."\"></td>\n");
-        print("<td class=\"task ".$llvmpipe."\"></td>\n");
-        print("<td class=\"task ".$i965."\"></td>\n");
-        print("<td class=\"task ".$nv50."\"></td>\n");
-        print("<td class=\"task ".$nvc0."\"></td>\n");
-        print("<td class=\"task ".$r300."\"></td>\n");
-        print("<td class=\"task ".$r600."\"></td>\n");
-        print("<td class=\"task ".$radeonsi."\"></td>\n");
+        print("<td id=\"Extension_".str_replace(" ", "", $this->name)."\">".$this->name." <a href=\"#Extension_".str_replace(" ", "", $this->name)."\" class=\"topicFrag\">&para;</a></td>\n");
+        if (empty($hint))
+        {
+            print("<td class=\"task ".$mesa."\"></td>\n");
+        }
+        else
+        {
+            print("<td class=\"task ".$mesa."\"><a href=\"#Footnotes_".$hint."\">".$hint."</a></td>\n");
+        }
+        foreach($drivers as $driver)
+        {
+            $this->writeDriverCell($driver);
+        }
         print("</tr>\n");
+    }
+
+    private function writeDriverCell($driverName)
+    {
+        global $hints;
+
+        $class = "isNotStarted";
+        $hint = null;
+        foreach($this->supportedDrivers as $supportedDriver)
+        {
+            if (strncmp($supportedDriver, $driverName, strlen($driverName)) === 0)
+            {
+                if (strlen(trim($supportedDriver))>strlen($driverName))
+                {
+                    $hints[] = substr(trim($supportedDriver), strlen($driverName)+1);
+                    $hint = count($hints);
+                }
+                $class = "isDone";
+            }
+        }
+
+        if (empty($hint))
+        {
+            print("<td class=\"task ".$class."\"></td>\n");
+        }
+        else
+        {
+            print("<td class=\"task ".$class."\"><a href=\"#Footnotes_".$hint."\">".$hint."</a></td>\n");
+        }
     }
 
     private $name;
@@ -104,23 +152,21 @@ class OglVersion
     {
         array_push($this->extensions, new OglExtension($name, $status, $supportedDrivers));
     }
-    
+
     public function write()
     {
-        print("<h1>".$this->glName." ".$this->glVersion." - ".$this->glslName." ".$this->glslVersion."</h1>\n");
+        global $drivers;
+
+        $text = $this->glName." ".$this->glVersion." - ".$this->glslName." ".$this->glslVersion;
+        print("<h1 id=\"Version_".str_replace(" ", "", $text)."\">".$text." <a href=\"#Version_".str_replace(" ", "", $text)."\" class=\"topicFrag\">&para;</a></h1>\n");
         print("<table class=\"tableNoSpace\">");
         print("<tr class=\"tableHeaderLine\">\n");
         print("<th class=\"tableHeaderCell-extension\">Extension</th>\n");
         print("<th class=\"tableHeaderCell\">mesa</th>\n");
-        print("<th class=\"tableHeaderCell\">softpipe</th>\n");
-        print("<th class=\"tableHeaderCell\">swrast</th>\n");
-        print("<th class=\"tableHeaderCell\">llvmpipe</th>\n");
-        print("<th class=\"tableHeaderCell\">i965</th>\n");
-        print("<th class=\"tableHeaderCell\">nv50</th>\n");
-        print("<th class=\"tableHeaderCell\">nvc0</th>\n");
-        print("<th class=\"tableHeaderCell\">r300</th>\n");
-        print("<th class=\"tableHeaderCell\">r600</th>\n");
-        print("<th class=\"tableHeaderCell\">radeonsi</th>\n");
+        foreach($drivers as $driver)
+        {
+            print("<th class=\"tableHeaderCell\">".$driver."</th>\n");
+        }
         print("</tr>\n");
         foreach($this->extensions as &$ext)
         {
@@ -169,6 +215,7 @@ $drivers = array(
     "r300",
     "r600",
     "radeonsi");
+$hints = array();
 
 $gl3Filename = "GL3.txt";
 $gl3Url = "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt";
@@ -210,6 +257,7 @@ $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:
 $reAllDone = "/ --- all DONE: ((([[:alnum:]]+), )*([[:alnum:]]+))/";
 $reExtension = "/^[^.]+$/";
 
+$ignoreHints = array("all drivers");
 $oglMatrix = new OglMatrix();
 
 $line = fgets($handle);
@@ -260,7 +308,7 @@ while($line !== FALSE)
                     $driversList = explode(", ", $matches[4]);
                     foreach($driversList as $currentDriver)
                     {
-                        if(in_array($currentDriver, $drivers))
+                        if(isInDriversArray($currentDriver))
                         {
                             $supportedDrivers[] = $currentDriver;
                             $driverFound = TRUE;
@@ -268,8 +316,16 @@ while($line !== FALSE)
                     }
                     if (!$driverFound && !empty($matches[4]))
                     {
+                        if (!in_array(trim($matches[4]), $ignoreHints))
+                        {
+                            $matches[2] = $matches[2]." ".$matches[4]."";
+                        }
                         $supportedDrivers = array_merge($supportedDrivers, $drivers);
                     }
+                }
+                else if (isset($matches[4]) && !empty($matches[4]))
+                {
+                    $matches[2] = $matches[2]." (".$matches[4].")";
                 }
 
                 if($matches[1][0] !== "-")
@@ -304,6 +360,15 @@ fclose($handle);
 <?php
 $oglMatrix->write();
 ?>
+        <h1>Footnotes</h1>
+        <p>
+<?php
+for($i=0; $i<count($hints); $i++)
+{
+    print("<sup id=\"Footnotes_".($i+1)."\">".($i+1)."</sup> ".$hints[$i]."<br/>");
+}
+?>
+        </p>
         <h1>License</h1>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
         <h1>Sources</h1>
