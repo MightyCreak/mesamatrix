@@ -122,7 +122,7 @@ class OglExtension
         }
         else
         {
-            print("<td class=\"task ".$class."\"><a href=\"#Footnotes_".$hint."\">".$hint."</a></td>\n");
+            print("<td class=\"task ".$class."\"><a href=\"#Footnotes_".$hint."\" title=\"".$hints[$hint - 1]."\">".$hint."</a></td>\n");
         }
     }
 
