@@ -286,7 +286,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 
 ?>
         <h1 id="Version_<?php print($urlText); ?>">
-            <?php print($text); ?><a href="#Version_<?php print($urlText); ?>" class="permalink">&para;</a>
+            <?php print($text); ?> <a href="#Version_<?php print($urlText); ?>" class="permalink">&para;</a>
         </h1>
         <table class="tableNoSpace">
             <tr class="tableHeaderLine">
@@ -332,7 +332,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 ?>
             <tr class="extension">
                 <td id="Extension_<?php print($extUrlName); ?>">
-                    <?php print($extName); ?><a href="#Extension_<?php print($extUrlName); ?>" class="permalink">&para;</a>
+                    <?php print($extName); ?> <a href="#Extension_<?php print($extUrlName); ?>" class="permalink">&para;</a>
                 </td>
 <?php
         if(empty($hint))
