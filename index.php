@@ -88,7 +88,7 @@ class OglExtension
         }
         else
         {
-            print("<td class=\"task ".$mesa."\"><a href=\"#Footnotes_".$hint."\">".$hint."</a></td>\n");
+            print("<td class=\"task ".$mesa."\"><a href=\"#Footnotes_".$hint."\" title=\"".$hints[$hint - 1]."\">".$hint."</a></td>\n");
         }
         foreach($drivers as $driver)
         {
@@ -109,7 +109,7 @@ class OglExtension
             {
                 if (strlen(trim($supportedDriver))>strlen($driverName))
                 {
-                    $hints[] = substr(trim($supportedDriver), strlen($driverName)+1);
+                    $hints[] = substr(trim($supportedDriver), strlen($driverName) + 1);
                     $hint = count($hints);
                 }
                 $class = "isDone";
@@ -363,9 +363,9 @@ $oglMatrix->write();
         <h1>Footnotes</h1>
         <p>
 <?php
-for($i=0; $i<count($hints); $i++)
+for($i = 0; $i < count($hints); $i++)
 {
-    print("<sup id=\"Footnotes_".($i+1)."\">".($i+1)."</sup> ".$hints[$i]."<br/>");
+    print("<sup id=\"Footnotes_".($i + 1)."\">".($i + 1)."</sup> ".$hints[$i]."<br />");
 }
 ?>
         </p>
