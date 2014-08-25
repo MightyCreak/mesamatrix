@@ -285,8 +285,8 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
     $urlText = urlencode(str_replace(" ", "", $text));
 
 ?>
-        <h1 id="Version_<?php print($urlText); ?>">
-            <?php print($text); ?> <a href="#Version_<?php print($urlText); ?>" class="permalink">&para;</a>
+        <h1 id="Version_<?= $urlText ?>">
+            <?= $text ?> <a href="#Version_<?= $urlText ?>" class="permalink">&para;</a>
         </h1>
         <table class="tableNoSpace">
             <tr class="tableHeaderLine">
@@ -296,7 +296,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
     foreach($drivers as &$driver)
     {
 ?>
-                <th class="tableHeaderCell"><?php print($driver); ?></th>
+                <th class="tableHeaderCell"><?= $driver ?></th>
 <?php
     }
 ?>
@@ -331,21 +331,21 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         $extUrlName = urlencode(str_replace(" ", "", $ext->getName()));
 ?>
             <tr class="extension">
-                <td id="Extension_<?php print($extUrlName); ?>">
-                    <?php print($extName); ?> <a href="#Extension_<?php print($extUrlName); ?>" class="permalink">&para;</a>
+                <td id="Extension_<?= $extUrlName ?>">
+                    <?= $extName ?> <a href="#Extension_<?= $extUrlName ?>" class="permalink">&para;</a>
                 </td>
 <?php
         if(empty($hint))
         {
 ?>
-                <td class="task <?php print($mesa); ?>"></td>
+                <td class="task <?= $mesa ?>"></td>
 <?php
         }
         else
         {
 ?>
-                <td class="task <?php print($mesa); ?>">
-                    <a href="#Footnotes_<?php print($hint); ?>" title="<?php print($hints[$hint - 1]); ?>"><?php print($hint); ?></a>
+                <td class="task <?= $mesa ?>">
+                    <a href="#Footnotes_<?= $hint ?>" title="<?= $hints[$hint - 1] ?>"><?= $hint ?></a>
                 </td>
 <?php
         }
@@ -370,14 +370,14 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
             if(empty($hint))
             {
 ?>
-                <td class="task <?php print($class); ?>"></td>
+                <td class="task <?= $class ?>"></td>
 <?php
             }
             else
             {
 ?>
-                <td class="task <?php print($class); ?>">
-                    <a href="#Footnotes_<?php print($hint); ?>" title="<?php print($hints[$hint - 1]); ?>"><?php print($hint); ?></a>
+                <td class="task <?= $class ?>">
+                    <a href="#Footnotes_<?= $hint ?>" title="<?= $hints[$hint - 1] ?>"><?= $hint ?></a>
                 </td>
 <?php
             }
@@ -397,7 +397,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 for($i = 0; $i < count($hints); $i++)
 {
 ?>
-            <li id="Footnotes_<?php print($i + 1); ?>"><?php print($hints[$i]); ?></li>
+            <li id="Footnotes_<?= $i + 1 ?>"><?= $hints[$i] ?></li>
 <?php
 }
 ?>
@@ -406,8 +406,8 @@ for($i = 0; $i < count($hints); $i++)
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
         <h1>Sources</h1>
         <p>GitHub: <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
-        <p>Mesa document used to generate this page: <a href="<?php print($gl3Url); ?>"><?php print($gl3Url); ?></a></p>
-        <p>Last get: <?php print(date(DATE_RFC2822, $lastUpdate)); ?></p>
+        <p>Mesa document used to generate this page: <a href="<?= $gl3Url ?>"><?= $gl3Url ?></a></p>
+        <p>Last get: <?= date(DATE_RFC2822, $lastUpdate) ?></p>
         <h1>Authors</h1>
         <ul>
             <li>Romain "Creak" Failliot</li>
