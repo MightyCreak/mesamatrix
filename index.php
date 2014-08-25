@@ -409,7 +409,10 @@ for($i = 0; $i < count($hints); $i++)
         <p>Mesa document used to generate this page: <a href="<?php print($gl3Url); ?>"><?php print($gl3Url); ?></a></p>
         <p>Last get: <?php print(date(DATE_RFC2822, $lastUpdate)); ?></p>
         <h1>Authors</h1>
-        <p>Romain "Creak" Failliot</p>
+        <ul>
+            <li>Romain "Creak" Failliot</li>
+            <li>Tobias Droste</li>
+        </ul>
     </body>
 </html>
 
