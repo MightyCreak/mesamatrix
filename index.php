@@ -354,7 +354,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         {
             $class = "isNotStarted";
             $hint = null;
-            foreach($ext->getSupportedDrivers() as &$supportedDriver)
+            foreach($ext->getSupportedDrivers() as $supportedDriver)
             {
                 if(strncmp($supportedDriver, $driver, strlen($driver)) === 0)
                 {
