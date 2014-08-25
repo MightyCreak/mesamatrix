@@ -279,7 +279,7 @@ fclose($handle);
     </head>
     <body>
 <?php
-foreach($oglMatrix->getGlVersions() as &$glVersion)
+foreach($oglMatrix->getGlVersions() as $glVersion)
 {
     $text = $glVersion->getGlName()." ".$glVersion->getGlVersion()." - ".$glVersion->getGlslName()." ".$glVersion->getGlslVersion();
     $urlText = urlencode(str_replace(" ", "", $text));
@@ -302,7 +302,7 @@ foreach($oglMatrix->getGlVersions() as &$glVersion)
 ?>
             </tr>
 <?php
-    foreach($glVersion->getExtensions() as &$ext)
+    foreach($glVersion->getExtensions() as $ext)
     {
         $hint = null;
 
