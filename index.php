@@ -392,18 +392,16 @@ foreach($oglMatrix->getGlVersions() as &$glVersion)
 }
 ?>
         <h1>Footnotes</h1>
-        <p>
-            <ol>
+        <ol>
 <?php
 for($i = 0; $i < count($hints); $i++)
 {
 ?>
-                <li id="Footnotes_<?php print($i + 1); ?>"><?php print($hints[$i]); ?></li>
+            <li id="Footnotes_<?php print($i + 1); ?>"><?php print($hints[$i]); ?></li>
 <?php
 }
 ?>
-            </ol>
-        </p>
+        </ol>
         <h1>License</h1>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
         <h1>Sources</h1>
