@@ -462,7 +462,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         $extUrlName = urlencode(str_replace(" ", "", $ext->getName()));
 ?>
             <tr class="extension">
-                <td id="Extension_<?= $extUrlName ?>">
+                <td id="Extension_<?= $extUrlName ?>"<?php if($extName[0] === "-") { echo "class=\"extension-child\""; } ?>>
                     <?= $extName ?> <a href="#Extension_<?= $extUrlName ?>" class="permalink">&para;</a>
                 </td>
 <?php

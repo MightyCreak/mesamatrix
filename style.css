@@ -24,6 +24,7 @@ p { max-width: 800px; }
 .tableHeaderCell { width: 90px; }
 .tableHeaderCell-extension { min-width: 550px; }
 
+.extension-child { padding-left: 1em; }
 .extension:hover { background-color: #babdb6; }
 .task { border-radius: 4px; padding-right: 4px; text-align: right; }
 
