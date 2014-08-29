@@ -135,7 +135,9 @@ $drivers = array(
 $hints = array();
 
 $gl3Filename = "GL3.txt";
-$gl3Url = "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt";
+$gl3PlainUrl = "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt";
+$gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
+$gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
 $lastUpdate = 0;
 
 $getLatestFileVersion = TRUE;
@@ -151,7 +153,7 @@ if(file_exists($gl3Filename))
 
 if($getLatestFileVersion)
 {
-    $distantContent = file_get_contents($gl3Url);
+    $distantContent = file_get_contents($gl3PlainUrl);
     if($distantContent !== FALSE)
     {
         $cacheHandle = fopen($gl3Filename, "w");
@@ -406,7 +408,7 @@ for($i = 0; $i < count($hints); $i++)
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
         <h1>Sources</h1>
         <p>GitHub: <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
-        <p>Mesa document used to generate this page: <a href="<?= $gl3Url ?>"><?= $gl3Url ?></a></p>
+        <p>Mesa document used to generate this page: <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</p>
         <p>Last get: <?= date(DATE_RFC2822, $lastUpdate) ?></p>
         <h1>Authors</h1>
         <ul>
