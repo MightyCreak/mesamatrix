@@ -443,11 +443,16 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 ?>
             </tr>
 <?php
+    $numExtensions = count($glVersion->getExtensions());
+    $doneByDriver = array("mesa" => 0);
+    $doneByDriver = array_merge($doneByDriver, array_combine($allDrivers, array_fill(0, count($allDrivers), 0)));
+
     foreach($glVersion->getExtensions() as $ext)
     {
         if(strncmp($ext->getStatus(), "DONE", strlen("DONE")) === 0)
         {
             $mesa = "isDone";
+            ++$doneByDriver["mesa"];
         }
         else if(strncmp($ext->getStatus(), "not started", strlen("not started")) === 0)
         {
@@ -500,6 +505,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                 // Driver found.
                 $class = "isDone";
                 $driverHintIdx = $supportedDrivers[$i]->getHintIdx();
+                ++$doneByDriver[$driver];
             }
 
             if($driverHintIdx === -1)
@@ -522,6 +528,18 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 <?php
     }
 ?>
+            <tr class="extension">
+                <td><b>Total:</b></td>
+                <td class="task"><?= $doneByDriver["mesa"]."/".$numExtensions ?></td>
+<?php
+    foreach($allDrivers as &$driver)
+    {
+?>
+                <td class="task"><?= $doneByDriver[$driver]."/".$numExtensions ?></td>
+<?php
+    }
+?>
+            </tr>
         </table>
 <?php
 }
