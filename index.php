@@ -27,11 +27,25 @@ function debug_print($line)
     print("DEBUG: ".$line."<br />\n");
 }
 
+function array_union(array $a, array $b)
+{
+    $res = $a;
+    foreach($b as $i)
+    {
+        if(!in_array($i, $res))
+        {
+            $res[] = $i;
+        }
+    }
+
+    return $res;
+}
+
 function isInDriversArray($name)
 {
-    global $drivers;
+    global $allDrivers;
 
-    foreach($drivers as $driverName)
+    foreach($allDrivers as $driverName)
     {
         if (strncmp($name, $driverName, strlen($driverName)) === 0)
         {
@@ -42,13 +56,85 @@ function isInDriversArray($name)
     return FALSE;
 }
 
+function addToHints($hint)
+{
+    global $allHints;
+
+    $idx = -1;
+    if(!empty($hint))
+    {
+        $idx = array_search($hint, $allHints);
+        if($idx === FALSE)
+        {
+            $allHints[] = $hint;
+            $idx = count($allHints) - 1;
+        }
+    }
+
+    return $idx;
+}
+
+class OglSupportedDriver
+{
+    public function __construct($name)
+    {
+        global $allDrivers;
+
+        $this->name = "<undefined>";
+        $this->hintIdx = -1;
+        foreach($allDrivers as $driver)
+        {
+            $driverLen = strlen($driver);
+            if(strncmp($name, $driver, $driverLen) === 0)
+            {
+                $this->name = $driver;
+                $this->setHint(substr($name, $driverLen + 1));
+            }
+        }
+    }
+
+    public function setName($name) { $this->name = $name; }
+    public function getName()      { return $this->name; }
+
+    public function setHint($hint) { $this->hintIdx = addToHints($hint); }
+    public function getHintIdx()   { return $this->hintIdx; }
+
+    private $name;
+    private $hintIdx;
+};
+
 class OglExtension
 {
     public function __construct($name, $status, $supportedDrivers = array())
     {
+        global $allDrivers;
+
         $this->name = $name;
         $this->status = $status;
-        $this->supportedDrivers = $supportedDrivers;
+
+        // Set the hint.
+        $hint = "";
+        if(strncmp($status, "DONE", strlen("DONE")) === 0)
+        {
+            $hint = substr($status, strlen("DONE") + 1);
+        }
+        else if(strncmp($status, "not started", strlen("not started")) === 0)
+        {
+            $hint = substr($status, strlen("not started") + 1);
+        }
+        else
+        {
+            $hint = $status;
+        }
+
+        $this->setHint($hint);
+
+        // Set the supported drivers list.
+        $this->supportedDrivers = array();
+        foreach($supportedDrivers as &$driverName)
+        {
+            $this->supportedDrivers[] = new OglSupportedDriver($driverName);
+        }
     }
 
     public function setName($name) { $this->name = $name; }
@@ -57,10 +143,15 @@ class OglExtension
     public function setStatus($status) { $this->status = $status; }
     public function getStatus()        { return $this->status; }
 
-    public function getSupportedDrivers() { return $this->supportedDrivers; }
+    public function setHint($hint) { $this->hintIdx = addToHints($hint); }
+    public function getHintIdx()   { return $this->hintIdx; }
+
+    public function addSupportedDriver($supportedDriver) { $this->supportedDrivers[] = $supportedDriver; }
+    public function getSupportedDrivers()                { return $this->supportedDrivers; }
 
     private $name;
     private $status;
+    private $hintIdx;
     private $supportedDrivers;
 };
 
@@ -90,7 +181,7 @@ class OglVersion
     /// GL/GLSL extensions.
     public function addExtension($name, $status, $supportedDrivers = array())
     {
-        array_push($this->extensions, new OglExtension($name, $status, $supportedDrivers));
+        $this->extensions[] = new OglExtension($name, $status, $supportedDrivers);
     }
 
     public function getExtensions() { return $this->extensions; }
@@ -122,7 +213,17 @@ class OglMatrix
     private $glVersions;
 };
 
-$drivers = array(
+function skipEmptyLines($curLine, $handle)
+{
+    while($curLine !== FALSE && $curLine === "\n")
+    {
+        $curLine = fgets($handle);
+    }
+
+    return $curLine;
+}
+
+$allDrivers = array(
     "softpipe",
     "swrast",
     "llvmpipe",
@@ -132,7 +233,7 @@ $drivers = array(
     "r300",
     "r600",
     "radeonsi");
-$hints = array();
+$allHints = array();
 
 $gl3Filename = "GL3.txt";
 $gl3PlainUrl = "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt";
@@ -174,8 +275,9 @@ $handle = fopen($gl3Filename, "r")
 
 $reTableHeader = "/^Feature([ ]+)Status/";
 $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
-$reAllDone = "/ --- all DONE: ((([[:alnum:]]+), )*([[:alnum:]]+))/";
+$reAllDone = "/ --- all DONE: (.*)/";
 $reExtension = "/^[^.]+$/";
+$reNote = "/^(\(.+\)) (.*)$/";
 
 $ignoreHints = array("all drivers");
 $oglMatrix = new OglMatrix();
@@ -187,7 +289,7 @@ while($line !== FALSE)
     {
         // Should be $lineWidth-2, but the file has a variable length in column 1
         $lineWidth = strlen("Feature") + strlen($matches[1]);
-        $reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?/";
+        $reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?$/";
         $line = fgets($handle);
         continue;
     }
@@ -199,13 +301,10 @@ while($line !== FALSE)
         $allSupportedDrivers = array();
         if(preg_match($reAllDone, $line, $matches) === 1)
         {
-            $allSupportedDrivers = array_merge($allSupportedDrivers, explode(", ", $matches[1]));
+            $allSupportedDrivers = array_union($allSupportedDrivers, explode(", ", $matches[1]));
         }
 
-        do
-        {
-            $line = fgets($handle);
-        } while($line !== FALSE && $line === "\n");
+        $line = skipEmptyLines(fgets($handle), $handle);
 
         $parentDrivers = NULL;
         while($line !== FALSE && $line !== "\n")
@@ -216,14 +315,16 @@ while($line !== FALSE)
                 $matches[1] = trim($matches[1]);
                 if($matches[1][0] === "-")
                 {
-                    $supportedDrivers = array_merge($supportedDrivers, $parentDrivers);
+                    $supportedDrivers = array_union($supportedDrivers, $parentDrivers);
                 }
 
-                if(strncmp($matches[2], "DONE", strlen("DONE")) === 0 && !isset($matches[3]))
+                $matches[2] = trim($matches[2]);
+                $isDone = strncmp($matches[2], "DONE", strlen("DONE")) === 0;
+                if($isDone && !isset($matches[3]))
                 {
-                    $supportedDrivers = array_merge($supportedDrivers, $drivers);
+                    $supportedDrivers = array_union($supportedDrivers, $allDrivers);
                 }
-                else if(strncmp($matches[2], "DONE", strlen("DONE")) === 0 && isset($matches[4]))
+                else if($isDone && isset($matches[4]))
                 {
                     $driverFound = FALSE;
                     $driversList = explode(", ", $matches[4]);
@@ -237,11 +338,11 @@ while($line !== FALSE)
                     }
                     if (!$driverFound && !empty($matches[4]))
                     {
-                        if (!in_array(trim($matches[4]), $ignoreHints))
+                        if (!in_array($matches[4], $ignoreHints))
                         {
                             $matches[2] = $matches[2]." ".$matches[4]."";
                         }
-                        $supportedDrivers = array_merge($supportedDrivers, $drivers);
+                        $supportedDrivers = array_union($supportedDrivers, $allDrivers);
                     }
                 }
                 else if (isset($matches[4]) && !empty($matches[4]))
@@ -261,9 +362,21 @@ while($line !== FALSE)
         }
 
         $oglMatrix->addGlVersion($glVersion);
+
+        $line = skipEmptyLines($line, $handle);
+
+        while($line !== FALSE && preg_match($reNote, $line, $matches) === 1)
+        {
+            $idx = array_search($matches[1], $allHints);
+            if($idx !== FALSE)
+            {
+                $allHints[$idx] = $matches[2];
+            }
+
+            $line = fgets($handle);
+        }
     }
-    
-    if($line !== FALSE)
+    else
     {
         $line = fgets($handle);
     }
@@ -280,6 +393,8 @@ fclose($handle);
         <link rel="stylesheet" type="text/css" href="style.css" />
     </head>
     <body>
+    <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</br>
+    <b>Last get date:</b> <?= date(DATE_RFC2822, $lastUpdate) ?></p>
 <?php
 foreach($oglMatrix->getGlVersions() as $glVersion)
 {
@@ -295,7 +410,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                 <th class="tableHeaderCell-extension">Extension</th>
                 <th class="tableHeaderCell">mesa</th>
 <?php
-    foreach($drivers as &$driver)
+    foreach($allDrivers as &$driver)
     {
 ?>
                 <th class="tableHeaderCell"><?= $driver ?></th>
@@ -306,16 +421,8 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 <?php
     foreach($glVersion->getExtensions() as $ext)
     {
-        $hint = null;
-
         if(strncmp($ext->getStatus(), "DONE", strlen("DONE")) === 0)
         {
-            if(strlen(trim($ext->getStatus())) > strlen("DONE"))
-            {
-                $hints[] = trim(substr(trim($ext->getStatus()), strlen("DONE")));
-                $hint = count($hints);
-            }
-
             $mesa = "isDone";
         }
         else if(strncmp($ext->getStatus(), "not started", strlen("not started")) === 0)
@@ -324,8 +431,6 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         }
         else
         {
-            $hints[] = trim($ext->getStatus());
-            $hint = count($hints);
             $mesa = "isInProgress";
         }
 
@@ -337,7 +442,8 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                     <?= $extName ?> <a href="#Extension_<?= $extUrlName ?>" class="permalink">&para;</a>
                 </td>
 <?php
-        if(empty($hint))
+        $extHintIdx = $ext->getHintIdx();
+        if($extHintIdx === -1)
         {
 ?>
                 <td class="task <?= $mesa ?>"></td>
@@ -347,29 +453,32 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         {
 ?>
                 <td class="task <?= $mesa ?>">
-                    <a href="#Footnotes_<?= $hint ?>" title="<?= $hints[$hint - 1] ?>"><?= $hint ?></a>
+                    <a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>"><?= $extHintIdx + 1 ?></a>
                 </td>
 <?php
         }
 
-        foreach($drivers as &$driver)
+        foreach($allDrivers as &$driver)
         {
-            $class = "isNotStarted";
-            $hint = null;
-            foreach($ext->getSupportedDrivers() as $supportedDriver)
+            // Search for the driver in the supported drivers.
+            $i = 0;
+            $supportedDrivers = $ext->getSupportedDrivers();
+            $numSupportedDrivers = count($supportedDrivers);
+            while($i < $numSupportedDrivers && strcmp($supportedDrivers[$i]->getName(), $driver) !== 0)
             {
-                if(strncmp($supportedDriver, $driver, strlen($driver)) === 0)
-                {
-                    if(strlen(trim($supportedDriver)) > strlen($driver))
-                    {
-                        $hints[] = substr(trim($supportedDriver), strlen($driver) + 1);
-                        $hint = count($hints);
-                    }
-                    $class = "isDone";
-                }
+                ++$i;
             }
 
-            if(empty($hint))
+            $class = "isNotStarted";
+            $driverHintIdx = -1;
+            if($i < $numSupportedDrivers)
+            {
+                // Driver found.
+                $class = "isDone";
+                $driverHintIdx = $supportedDrivers[$i]->getHintIdx();
+            }
+
+            if($driverHintIdx === -1)
             {
 ?>
                 <td class="task <?= $class ?>"></td>
@@ -379,7 +488,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
             {
 ?>
                 <td class="task <?= $class ?>">
-                    <a href="#Footnotes_<?= $hint ?>" title="<?= $hints[$hint - 1] ?>"><?= $hint ?></a>
+                    <a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= $allHints[$driverHintIdx] ?>"><?= $driverHintIdx + 1 ?></a>
                 </td>
 <?php
             }
@@ -396,10 +505,10 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         <h1>Footnotes</h1>
         <ol>
 <?php
-for($i = 0; $i < count($hints); $i++)
+for($i = 0; $i < count($allHints); $i++)
 {
 ?>
-            <li id="Footnotes_<?= $i + 1 ?>"><?= $hints[$i] ?></li>
+            <li id="Footnotes_<?= $i + 1 ?>"><?= $allHints[$i] ?></li>
 <?php
 }
 ?>
@@ -407,9 +516,8 @@ for($i = 0; $i < count($hints); $i++)
         <h1>License</h1>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
         <h1>Sources</h1>
-        <p>GitHub: <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
-        <p>Mesa document used to generate this page: <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</p>
-        <p>Last get: <?= date(DATE_RFC2822, $lastUpdate) ?></p>
+        <p>If you want to report a bug or simply to participate in the project, feel free to get the sources on GitHub:
+        <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
         <h1>Authors</h1>
         <ul>
             <li>Romain "Creak" Failliot</li>
