@@ -27,6 +27,18 @@ function debug_print($line)
     print("DEBUG: ".$line."<br />\n");
 }
 
+// List of all the drivers.
+$allDrivers = array(
+    "softpipe",
+    "swrast",
+    "llvmpipe",
+    "i965",
+    "nv50",
+    "nvc0",
+    "r300",
+    "r600",
+    "radeonsi");
+
 function array_union(array $a, array $b)
 {
     $res = $a;
@@ -39,39 +51,6 @@ function array_union(array $a, array $b)
     }
 
     return $res;
-}
-
-function isInDriversArray($name)
-{
-    global $allDrivers;
-
-    foreach($allDrivers as $driverName)
-    {
-        if (strncmp($name, $driverName, strlen($driverName)) === 0)
-        {
-            return TRUE;
-        }
-    }
-
-    return FALSE;
-}
-
-function addToHints($hint)
-{
-    global $allHints;
-
-    $idx = -1;
-    if(!empty($hint))
-    {
-        $idx = array_search($hint, $allHints);
-        if($idx === FALSE)
-        {
-            $allHints[] = $hint;
-            $idx = count($allHints) - 1;
-        }
-    }
-
-    return $idx;
 }
 
 class OglSupportedDriver
@@ -213,32 +192,181 @@ class OglMatrix
     private $glVersions;
 };
 
-function skipEmptyLines($curLine, $handle)
+class OglParser
 {
-    while($curLine !== FALSE && $curLine === "\n")
+    public function parse($filename)
     {
-        $curLine = fgets($handle);
+        global $allDrivers, $allHints;
+
+        $handle = fopen($filename, "r");
+        if($handle === FALSE)
+        {
+            return null;
+        }
+
+        // Regexp patterns.
+        $reTableHeader = "/^Feature([ ]+)Status/";
+        $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
+        $reAllDone = "/ --- all DONE: (.*)/";
+        $reExtension = "/^[^.]+$/";
+        $reNote = "/^(\(.+\)) (.*)$/";
+
+        $ignoreHints = array("all drivers");
+        $oglMatrix = new OglMatrix();
+
+        $line = fgets($handle);
+        while($line !== FALSE)
+        {
+            if(preg_match($reTableHeader, $line, $matches) === 1)
+            {
+                // Should be $lineWidth-2, but the file has a variable length in column 1
+                $lineWidth = strlen("Feature") + strlen($matches[1]);
+                $reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?$/";
+                $line = fgets($handle);
+                continue;
+            }
+
+            if(preg_match($reVersion, $line, $matches) === 1)
+            {
+                $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6]);
+
+                $allSupportedDrivers = array();
+                if(preg_match($reAllDone, $line, $matches) === 1)
+                {
+                    $allSupportedDrivers = array_union($allSupportedDrivers, explode(", ", $matches[1]));
+                }
+
+                $line = $this->skipEmptyLines(fgets($handle), $handle);
+
+                $parentDrivers = NULL;
+                while($line !== FALSE && $line !== "\n")
+                {
+                    if(preg_match($reExtension, $line, $matches) === 1)
+                    {
+                        $supportedDrivers = $allSupportedDrivers;
+                        $matches[1] = trim($matches[1]);
+                        if($matches[1][0] === "-")
+                        {
+                            $supportedDrivers = array_union($supportedDrivers, $parentDrivers);
+                        }
+
+                        $matches[2] = trim($matches[2]);
+                        $isDone = strncmp($matches[2], "DONE", strlen("DONE")) === 0;
+                        if($isDone && !isset($matches[3]))
+                        {
+                            $supportedDrivers = array_union($supportedDrivers, $allDrivers);
+                        }
+                        else if($isDone && isset($matches[4]))
+                        {
+                            $driverFound = FALSE;
+                            $driversList = explode(", ", $matches[4]);
+                            foreach($driversList as $currentDriver)
+                            {
+                                if($this->isInDriversArray($currentDriver))
+                                {
+                                    $supportedDrivers[] = $currentDriver;
+                                    $driverFound = TRUE;
+                                }
+                            }
+                            if (!$driverFound && !empty($matches[4]))
+                            {
+                                if (!in_array($matches[4], $ignoreHints))
+                                {
+                                    $matches[2] = $matches[2]." ".$matches[4]."";
+                                }
+                                $supportedDrivers = array_union($supportedDrivers, $allDrivers);
+                            }
+                        }
+                        else if (isset($matches[4]) && !empty($matches[4]))
+                        {
+                            $matches[2] = $matches[2]." (".$matches[4].")";
+                        }
+
+                        if($matches[1][0] !== "-")
+                        {
+                            $parentDrivers = $supportedDrivers;
+                        }
+
+                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers);
+                    }
+
+                    $line = fgets($handle);
+                }
+
+                $oglMatrix->addGlVersion($glVersion);
+
+                $line = $this->skipEmptyLines($line, $handle);
+
+                while($line !== FALSE && preg_match($reNote, $line, $matches) === 1)
+                {
+                    $idx = array_search($matches[1], $allHints);
+                    if($idx !== FALSE)
+                    {
+                        $allHints[$idx] = $matches[2];
+                    }
+
+                    $line = fgets($handle);
+                }
+            }
+            else
+            {
+                $line = fgets($handle);
+            }
+        }
+
+        fclose($handle);
+
+        return $oglMatrix;
     }
 
-    return $curLine;
-}
+    private function skipEmptyLines($curLine, $handle)
+    {
+        while($curLine !== FALSE && $curLine === "\n")
+        {
+            $curLine = fgets($handle);
+        }
 
-$allDrivers = array(
-    "softpipe",
-    "swrast",
-    "llvmpipe",
-    "i965",
-    "nv50",
-    "nvc0",
-    "r300",
-    "r600",
-    "radeonsi");
+        return $curLine;
+    }
+
+    private function isInDriversArray($name)
+    {
+        global $allDrivers;
+
+        foreach($allDrivers as $driverName)
+        {
+            if (strncmp($name, $driverName, strlen($driverName)) === 0)
+            {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+    }
+};
+
+// Hints gathered during the parsing.
 $allHints = array();
+function addToHints($hint)
+{
+    global $allHints;
+
+    $idx = -1;
+    if(!empty($hint))
+    {
+        $idx = array_search($hint, $allHints);
+        if($idx === FALSE)
+        {
+            $allHints[] = $hint;
+            $idx = count($allHints) - 1;
+        }
+    }
+
+    return $idx;
+}
 
 $gl3Filename = "GL3.txt";
 $gl3PlainUrl = "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt";
-$gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
-$gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
 $lastUpdate = 0;
 
 $getLatestFileVersion = TRUE;
@@ -269,122 +397,18 @@ if($getLatestFileVersion)
     }
 }
 
-// Parse the text file.
-$handle = fopen($gl3Filename, "r")
-    or exit("Can't read \"${gl3Filename}\"");
-
-$reTableHeader = "/^Feature([ ]+)Status/";
-$reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
-$reAllDone = "/ --- all DONE: (.*)/";
-$reExtension = "/^[^.]+$/";
-$reNote = "/^(\(.+\)) (.*)$/";
-
-$ignoreHints = array("all drivers");
-$oglMatrix = new OglMatrix();
-
-$line = fgets($handle);
-while($line !== FALSE)
+// Parse the local file.
+$parser = new OglParser();
+$oglMatrix = $parser->parse($gl3Filename);
+if(!$oglMatrix)
 {
-    if(preg_match($reTableHeader, $line, $matches) === 1)
-    {
-        // Should be $lineWidth-2, but the file has a variable length in column 1
-        $lineWidth = strlen("Feature") + strlen($matches[1]);
-        $reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?$/";
-        $line = fgets($handle);
-        continue;
-    }
-
-    if(preg_match($reVersion, $line, $matches) === 1)
-    {
-        $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6]);
-
-        $allSupportedDrivers = array();
-        if(preg_match($reAllDone, $line, $matches) === 1)
-        {
-            $allSupportedDrivers = array_union($allSupportedDrivers, explode(", ", $matches[1]));
-        }
-
-        $line = skipEmptyLines(fgets($handle), $handle);
-
-        $parentDrivers = NULL;
-        while($line !== FALSE && $line !== "\n")
-        {
-            if(preg_match($reExtension, $line, $matches) === 1)
-            {
-                $supportedDrivers = $allSupportedDrivers;
-                $matches[1] = trim($matches[1]);
-                if($matches[1][0] === "-")
-                {
-                    $supportedDrivers = array_union($supportedDrivers, $parentDrivers);
-                }
-
-                $matches[2] = trim($matches[2]);
-                $isDone = strncmp($matches[2], "DONE", strlen("DONE")) === 0;
-                if($isDone && !isset($matches[3]))
-                {
-                    $supportedDrivers = array_union($supportedDrivers, $allDrivers);
-                }
-                else if($isDone && isset($matches[4]))
-                {
-                    $driverFound = FALSE;
-                    $driversList = explode(", ", $matches[4]);
-                    foreach($driversList as $currentDriver)
-                    {
-                        if(isInDriversArray($currentDriver))
-                        {
-                            $supportedDrivers[] = $currentDriver;
-                            $driverFound = TRUE;
-                        }
-                    }
-                    if (!$driverFound && !empty($matches[4]))
-                    {
-                        if (!in_array($matches[4], $ignoreHints))
-                        {
-                            $matches[2] = $matches[2]." ".$matches[4]."";
-                        }
-                        $supportedDrivers = array_union($supportedDrivers, $allDrivers);
-                    }
-                }
-                else if (isset($matches[4]) && !empty($matches[4]))
-                {
-                    $matches[2] = $matches[2]." (".$matches[4].")";
-                }
-
-                if($matches[1][0] !== "-")
-                {
-                    $parentDrivers = $supportedDrivers;
-                }
-
-                $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers);
-            }
-
-            $line = fgets($handle);
-        }
-
-        $oglMatrix->addGlVersion($glVersion);
-
-        $line = skipEmptyLines($line, $handle);
-
-        while($line !== FALSE && preg_match($reNote, $line, $matches) === 1)
-        {
-            $idx = array_search($matches[1], $allHints);
-            if($idx !== FALSE)
-            {
-                $allHints[$idx] = $matches[2];
-            }
-
-            $line = fgets($handle);
-        }
-    }
-    else
-    {
-        $line = fgets($handle);
-    }
+    exit("Can't read \"${gl3Filename}\"");
 }
 
-fclose($handle);
+$gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
+$gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
 
-// Write the HTML file now.
+// Write the HTML code.
 ?>
 <!DOCTYPE html>
 <html>
