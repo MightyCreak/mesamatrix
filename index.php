@@ -576,7 +576,7 @@ if($config["flattr"]["enabled"])
 {
 ?>
         <p>You can also Flattr me so that I can continue to do all that!</p>
-        <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= $config["flattr"]["id"] ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= $config["page"]["title"] ?>')+'&description='+encodeURIComponent('<?= $config["page"]["description"] ?>');f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
+        <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= $config["flattr"]["id"] ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= $config["page"]["title"] ?>')+'&description='+encodeURIComponent('<?= $config["page"]["description"] ?>')+'&language='+encodeURIComponent('<?= $config["flattr"]["language"] ?>')+'&tags=<?= $config["flattr"]["tags"] ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
 <?php
 }
 ?>

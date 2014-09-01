@@ -7,5 +7,7 @@ $config["page"] = array(
 $config["flattr"] = array(
     "enabled" => FALSE,
     "id" => "your_flattr_id",
+    "language" => "en_US",
+    "tags" => "mesa,opengl",
 );
 ?>
