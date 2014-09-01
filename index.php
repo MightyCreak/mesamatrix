@@ -417,6 +417,7 @@ if(!$oglMatrix)
 
 $gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
 $gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
+$formatUpdate = date(DATE_RFC2822, $lastUpdate);
 
 // Write the HTML code.
 ?>
@@ -429,10 +430,18 @@ $gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
         <title><?= $config["page"]["title"] ?></title>
 
         <link rel="stylesheet" type="text/css" href="style.css"/>
+
+        <script>
+            function writeDate(text)
+            {
+                var dateObj = new Date(text);
+                document.write(dateObj.toString());
+            }
+        </script>
     </head>
     <body>
-    <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</br>
-    <b>Last get date:</b> <?= date(DATE_RFC2822, $lastUpdate) ?></p>
+        <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</br>
+        <b>Last get date:</b> <script>writeDate("<?= $formatUpdate ?>");</script><noscript><?= $formatUpdate ?></noscript></p>
 <?php
 foreach($oglMatrix->getGlVersions() as $glVersion)
 {
