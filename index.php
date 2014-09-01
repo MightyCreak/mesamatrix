@@ -23,10 +23,14 @@ ini_set('error_reporting', E_ALL);
 date_default_timezone_set('UTC');
 
 $configFile = "config.inc.php";
-if(file_exists($configFile))
+if(!file_exists($configFile))
 {
-    include($configFile);
+    exit("The configuration file \"config.inc.php\" doesn't exist.
+          Please copy \"example.config.inc.php\", rename it, and
+          fill it with the proper information.");
 }
+
+include($configFile);
 
 function debug_print($line)
 {
@@ -414,25 +418,17 @@ if(!$oglMatrix)
 $gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
 $gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
 
-$enableFlattr = FALSE;
-$flattrId = NULL;
-if(isset($config))
-{
-    $enableFlattr = $config["flattr"]["enabled"];
-    $flattrId = $config["flattr"]["id"];
-}
-
 // Write the HTML code.
 ?>
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <meta name="description" content="Show Mesa progress for the OpenGL implementation into an easy to read HTML page." >
+        <meta charset="utf-8"/>
+        <meta name="description" content="<?= $config["page"]["description"] ?>"/>
 
-        <title>The OpenGL vs Mesa matrix</title>
+        <title><?= $config["page"]["title"] ?></title>
 
-        <link rel="stylesheet" type="text/css" href="style.css" />
+        <link rel="stylesheet" type="text/css" href="style.css"/>
     </head>
     <body>
     <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</br>
@@ -575,12 +571,12 @@ for($i = 0; $i < count($allHints); $i++)
         </ol>
         <h1>How to help</h1>
         <p>If you find this page useful and want to help, you can report issues, or <a href="https://github.com/MightyCreak/mesamatrix">grab the code</a> and add whatever feature you want.</p>
-        <?php
-if($enableFlattr)
+<?php
+if($config["flattr"]["enabled"])
 {
 ?>
-    <p>You can also Flattr me so that I can continue to do all that!</p>
-    <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= $flattrId ?>&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
+        <p>You can also Flattr me so that I can continue to do all that!</p>
+        <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= $config["flattr"]["id"] ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= $config["page"]["title"] ?>')+'&description='+encodeURIComponent('<?= $config["page"]["description"] ?>');f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
 <?php
 }
 ?>
