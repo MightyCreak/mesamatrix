@@ -22,6 +22,12 @@ ini_set('display_errors', 1);
 ini_set('error_reporting', E_ALL);
 date_default_timezone_set('UTC');
 
+$configFile = "config.inc.php";
+if(file_exists($configFile))
+{
+    include($configFile);
+}
+
 function debug_print($line)
 {
     print("DEBUG: ".$line."<br />\n");
@@ -201,7 +207,7 @@ class OglParser
         $handle = fopen($filename, "r");
         if($handle === FALSE)
         {
-            return null;
+            return NULL;
         }
 
         // Regexp patterns.
@@ -408,12 +414,24 @@ if(!$oglMatrix)
 $gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
 $gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
 
+$enableFlattr = FALSE;
+$flattrId = NULL;
+if(isset($config))
+{
+    $enableFlattr = $config["flattr"]["enabled"];
+    $flattrId = $config["flattr"]["id"];
+}
+
 // Write the HTML code.
 ?>
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
+        <meta name="description" content="Show Mesa progress for the OpenGL implementation into an easy to read HTML page." >
+
         <title>The OpenGL vs Mesa matrix</title>
+
         <link rel="stylesheet" type="text/css" href="style.css" />
     </head>
     <body>
@@ -555,6 +573,17 @@ for($i = 0; $i < count($allHints); $i++)
 }
 ?>
         </ol>
+        <h1>How to help</h1>
+        <p>If you find this page useful and want to help, you can report issues, or <a href="https://github.com/MightyCreak/mesamatrix">grab the code</a> and add whatever feature you want.</p>
+        <?php
+if($enableFlattr)
+{
+?>
+    <p>You can also Flattr me so that I can continue to do all that!</p>
+    <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= $flattrId ?>&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
+<?php
+}
+?>
         <h1>License</h1>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
         <h1>Sources</h1>
