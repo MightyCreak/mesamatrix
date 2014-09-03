@@ -21,8 +21,8 @@ p { max-width: 800px; }
 
 .tableNoSpace { border-spacing: 1px; border-collapse: separate; }
 .tableHeaderLine { background-color: #d3d7cf; }
-.tableHeaderCell { width: 90px; }
-.tableHeaderCell-extension { min-width: 550px; }
+.tableHeaderCell { min-width: 5.1em; }
+.tableHeaderCell-extension { min-width: 33em; }
 
 .extension-child { padding-left: 1em; }
 .extension:hover { background-color: #babdb6; }
