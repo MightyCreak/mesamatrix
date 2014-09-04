@@ -92,7 +92,7 @@ $formatUpdate = date(DATE_RFC2822, $lastUpdate);
 
         <title><?= $config["page"]["title"] ?></title>
 
-        <link href="style.css" rel="stylesheet" type="text/css" media="all"/>
+        <link href="style.css?v=<?= $config["page"]["version"] ?>" rel="stylesheet" type="text/css" media="all"/>
         <script src="script.js"></script>
     </head>
     <body>
