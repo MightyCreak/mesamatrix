@@ -112,6 +112,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
             <tr class="tableHeaderLine">
                 <th class="tableHeaderCell-extension">Extension</th>
                 <th class="tableHeaderCell">mesa</th>
+                <th class="tableHeaderCell-separator"></th>
 <?php
     foreach($allDrivers as &$driver)
     {
@@ -144,27 +145,15 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 
         $extName = $ext->getName();
         $extUrlName = urlencode(str_replace(" ", "", $ext->getName()));
+        $extHintIdx = $ext->getHintIdx();
 ?>
             <tr class="extension">
-                <td id="Extension_<?= $extUrlName ?>"<?php if($extName[0] === "-") { echo "class=\"extension-child\""; } ?>>
+                <td id="Extension_<?= $extUrlName ?>"<?php if($extName[0] === "-") { ?>class="extension-child"<?php } ?>>
                     <?= $extName ?> <a href="#Extension_<?= $extUrlName ?>" class="permalink">&para;</a>
                 </td>
+                <td class="task <?= $mesa ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>"><?= $extHintIdx + 1 ?></a><?php } ?></td>
+                <td></td>
 <?php
-        $extHintIdx = $ext->getHintIdx();
-        if($extHintIdx === -1)
-        {
-?>
-                <td class="task <?= $mesa ?>"></td>
-<?php
-        }
-        else
-        {
-?>
-                <td class="task <?= $mesa ?>">
-                    <a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>"><?= $extHintIdx + 1 ?></a>
-                </td>
-<?php
-        }
 
         foreach($allDrivers as &$driver)
         {
@@ -187,20 +176,9 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                 ++$doneByDriver[$driver];
             }
 
-            if($driverHintIdx === -1)
-            {
 ?>
-                <td class="task <?= $class ?>"></td>
+                <td class="task <?= $class ?>"><?php if($driverHintIdx !== -1) { ?><a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= $allHints[$driverHintIdx] ?>"><?= $driverHintIdx + 1 ?></a><?php } ?></td>
 <?php
-            }
-            else
-            {
-?>
-                <td class="task <?= $class ?>">
-                    <a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= $allHints[$driverHintIdx] ?>"><?= $driverHintIdx + 1 ?></a>
-                </td>
-<?php
-            }
         }
 ?>
             </tr>
@@ -210,6 +188,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
             <tr class="extension">
                 <td><b>Total:</b></td>
                 <td class="task"><?= $doneByDriver["mesa"]."/".$numExtensions ?></td>
+                <td></td>
 <?php
     foreach($allDrivers as &$driver)
     {

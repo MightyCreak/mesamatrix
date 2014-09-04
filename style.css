@@ -23,6 +23,7 @@ p { max-width: 800px; }
 .tableHeaderLine { background-color: #d3d7cf; }
 .tableHeaderCell { min-width: 5.1em; }
 .tableHeaderCell-extension { min-width: 33em; }
+.tableHeaderCell-separator { width: 0.5em; }
 
 .extension-child { padding-left: 1em; }
 .extension:hover { background-color: #babdb6; }
