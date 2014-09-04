@@ -30,6 +30,13 @@ $allDrivers = array(
     "r600",
     "radeonsi");
 
+$allDriversVendors = array(
+    "Software"  => array($allDrivers[0], $allDrivers[1], $allDrivers[2]),
+    "Intel"     => array($allDrivers[3]),
+    "nVidia"    => array($allDrivers[4], $allDrivers[5]),
+    "AMD"       => array($allDrivers[6], $allDrivers[7], $allDrivers[8]),
+);
+
 // Hints gathered during the parsing.
 $allHints = array();
 function addToHints($hint)

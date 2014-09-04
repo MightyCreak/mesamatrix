@@ -82,6 +82,20 @@ $gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
 $gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
 $formatUpdate = date(DATE_RFC2822, $lastUpdate);
 
+$vendors = array_keys($allDriversVendors);
+$vendorsClasses = array();
+foreach($vendors as &$vendor)
+{
+    switch($vendor)
+    {
+    case "Software":    $vendorsClasses[$vendor] = "hCellVendor-soft"; break;
+    case "Intel":       $vendorsClasses[$vendor] = "hCellVendor-intel"; break;
+    case "nVidia":      $vendorsClasses[$vendor] = "hCellVendor-nvidia"; break;
+    case "AMD":         $vendorsClasses[$vendor] = "hCellVendor-amd"; break;
+    default:            $vendorsClasses[$vendor] = "hCellVendor-default"; break;
+    }
+}
+
 // Write the HTML code.
 ?>
 <!DOCTYPE html>
@@ -109,19 +123,38 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
             <?= $text ?> <a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
         </h1>
         <table class="tableNoSpace">
-            <tr class="tableHeaderLine">
-                <th class="tableHeaderCell-extension">Extension</th>
-                <th class="tableHeaderCell">mesa</th>
-                <th class="tableHeaderCell-separator"></th>
+            <thead class="tableHeaderLine">
+                <tr>
+                    <th colspan="2"></th>
 <?php
-    foreach($allDrivers as &$driver)
+    foreach($vendors as &$vendor)
     {
 ?>
-                <th class="tableHeaderCell"><?= $driver ?></th>
+                    <th></th>
+                    <th class="<?= $vendorsClasses[$vendor] ?>" colspan="<?= count($allDriversVendors[$vendor]) ?>"><?= $vendor ?></th>
 <?php
     }
 ?>
-            </tr>
+                </tr>
+                <tr>
+                    <th class="hCellVendor-default hCell-ext">Extension</th>
+                    <th class="hCellVendor-default hCell-driver">mesa</th>
+<?php
+    foreach($vendors as &$vendor)
+    {
+?>
+                    <th class="hCell-sep"></th>
+<?php
+        foreach($allDriversVendors[$vendor] as &$driver)
+        {
+?>
+                    <th class="<?= $vendorsClasses[$vendor] ?> hCell-driver"><?= $driver ?></th>
+<?php
+        }
+    }
+?>
+                </tr>
+            </thead>
 <?php
     $numExtensions = count($glVersion->getExtensions());
     $doneByDriver = array("mesa" => 0);
@@ -152,52 +185,61 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                     <?= $extName ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                 </td>
                 <td class="task <?= $mesa ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>"><?= $extHintIdx + 1 ?></a><?php } ?></td>
-                <td></td>
 <?php
 
-        foreach($allDrivers as &$driver)
+        foreach($vendors as &$vendor)
         {
-            // Search for the driver in the supported drivers.
-            $i = 0;
-            $supportedDrivers = $ext->getSupportedDrivers();
-            $numSupportedDrivers = count($supportedDrivers);
-            while($i < $numSupportedDrivers && strcmp($supportedDrivers[$i]->getName(), $driver) !== 0)
+?>
+                <td></td>
+<?php
+            foreach($allDriversVendors[$vendor] as &$driver)
             {
-                ++$i;
-            }
+                // Search for the driver in the supported drivers.
+                $i = 0;
+                $supportedDrivers = $ext->getSupportedDrivers();
+                $numSupportedDrivers = count($supportedDrivers);
+                while($i < $numSupportedDrivers && strcmp($supportedDrivers[$i]->getName(), $driver) !== 0)
+                {
+                    ++$i;
+                }
 
-            $class = "isNotStarted";
-            $driverHintIdx = -1;
-            if($i < $numSupportedDrivers)
-            {
-                // Driver found.
-                $class = "isDone";
-                $driverHintIdx = $supportedDrivers[$i]->getHintIdx();
-                ++$doneByDriver[$driver];
-            }
-
+                $class = "isNotStarted";
+                $driverHintIdx = -1;
+                if($i < $numSupportedDrivers)
+                {
+                    // Driver found.
+                    $class = "isDone";
+                    $driverHintIdx = $supportedDrivers[$i]->getHintIdx();
+                    ++$doneByDriver[$driver];
+                }
 ?>
                 <td class="task <?= $class ?>"><?php if($driverHintIdx !== -1) { ?><a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= $allHints[$driverHintIdx] ?>"><?= $driverHintIdx + 1 ?></a><?php } ?></td>
 <?php
-        }
+            }
+    }
 ?>
             </tr>
 <?php
     }
 ?>
-            <tr class="extension">
+            <tfoot class="extension">
                 <td><b>Total:</b></td>
-                <td class="task"><?= $doneByDriver["mesa"]."/".$numExtensions ?></td>
-                <td></td>
+                <td class="hCellVendor-default task"><?= $doneByDriver["mesa"]."/".$numExtensions ?></td>
 <?php
-    foreach($allDrivers as &$driver)
+    foreach($vendors as &$vendor)
     {
 ?>
-                <td class="task"><?= $doneByDriver[$driver]."/".$numExtensions ?></td>
+                <td></td>
 <?php
+        foreach($allDriversVendors[$vendor] as &$driver)
+        {
+?>
+                <td class="<?= $vendorsClasses[$vendor] ?> task"><?= $doneByDriver[$driver]."/".$numExtensions ?></td>
+<?php
+        }
     }
 ?>
-            </tr>
+            </tfoot>
         </table>
 <?php
 }

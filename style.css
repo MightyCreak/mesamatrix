@@ -19,11 +19,17 @@
 
 p { max-width: 800px; }
 
-.tableNoSpace { border-spacing: 1px; border-collapse: separate; }
-.tableHeaderLine { background-color: #d3d7cf; }
-.tableHeaderCell { min-width: 5.1em; }
-.tableHeaderCell-extension { min-width: 33em; }
-.tableHeaderCell-separator { width: 0.5em; }
+.tableNoSpace    { border-spacing: 1px; border-collapse: separate; }
+
+.hCellVendor-default { background-color: #d3d7cf; }
+.hCellVendor-soft    { background-color: #d1b4ce; }
+.hCellVendor-intel   { background-color: #b9cee4; }
+.hCellVendor-nvidia  { background-color: #fcf3ad; }
+.hCellVendor-amd     { background-color: #f4cbbe; }
+
+.hCell-ext       { min-width: 33em; }
+.hCell-sep       { width: 0.3em; }
+.hCell-driver    { min-width: 5.1em; }
 
 .extension-child { padding-left: 1em; }
 .extension:hover { background-color: #babdb6; }
