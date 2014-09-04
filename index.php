@@ -155,6 +155,7 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 ?>
                 </tr>
             </thead>
+            <tbody>
 <?php
     $numExtensions = count($glVersion->getExtensions());
     $doneByDriver = array("mesa" => 0);
@@ -180,17 +181,17 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext->getName()));
         $extHintIdx = $ext->getHintIdx();
 ?>
-            <tr class="extension">
-                <td id="<?= $extUrlId ?>"<?php if($extName[0] === "-") { ?> class="extension-child"<?php } ?>>
-                    <?= $extName ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
-                </td>
-                <td class="task <?= $mesa ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>"><?= $extHintIdx + 1 ?></a><?php } ?></td>
+                <tr class="extension">
+                    <td id="<?= $extUrlId ?>"<?php if($extName[0] === "-") { ?> class="extension-child"<?php } ?>>
+                        <?= $extName ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
+                    </td>
+                    <td class="task <?= $mesa ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>"><?= $extHintIdx + 1 ?></a><?php } ?></td>
 <?php
 
         foreach($vendors as &$vendor)
         {
 ?>
-                <td></td>
+                    <td></td>
 <?php
             foreach($allDriversVendors[$vendor] as &$driver)
             {
@@ -213,32 +214,35 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                     ++$doneByDriver[$driver];
                 }
 ?>
-                <td class="task <?= $class ?>"><?php if($driverHintIdx !== -1) { ?><a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= $allHints[$driverHintIdx] ?>"><?= $driverHintIdx + 1 ?></a><?php } ?></td>
+                    <td class="task <?= $class ?>"><?php if($driverHintIdx !== -1) { ?><a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= $allHints[$driverHintIdx] ?>"><?= $driverHintIdx + 1 ?></a><?php } ?></td>
 <?php
             }
     }
 ?>
-            </tr>
+                </tr>
 <?php
     }
 ?>
-            <tfoot class="extension">
-                <td><b>Total:</b></td>
-                <td class="hCellVendor-default task"><?= $doneByDriver["mesa"]."/".$numExtensions ?></td>
+            </tbody>
+            <tfoot>
+                <tr class="extension">
+                    <td><b>Total:</b></td>
+                    <td class="hCellVendor-default task"><?= $doneByDriver["mesa"]."/".$numExtensions ?></td>
 <?php
     foreach($vendors as &$vendor)
     {
 ?>
-                <td></td>
+                    <td></td>
 <?php
         foreach($allDriversVendors[$vendor] as &$driver)
         {
 ?>
-                <td class="<?= $vendorsClasses[$vendor] ?> task"><?= $doneByDriver[$driver]."/".$numExtensions ?></td>
+                    <td class="<?= $vendorsClasses[$vendor] ?> task"><?= $doneByDriver[$driver]."/".$numExtensions ?></td>
 <?php
         }
     }
 ?>
+                </tr>
             </tfoot>
         </table>
 <?php
