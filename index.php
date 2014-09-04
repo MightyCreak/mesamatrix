@@ -92,21 +92,21 @@ $formatUpdate = date(DATE_RFC2822, $lastUpdate);
 
         <title><?= $config["page"]["title"] ?></title>
 
-        <link href="style.css" rel="stylesheet" type="text/css" media="all">
+        <link href="style.css" rel="stylesheet" type="text/css" media="all"/>
         <script src="script.js"></script>
     </head>
     <body>
-        <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</br>
+        <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)<br/>
         <b>Last get date:</b> <script>writeDate("<?= $formatUpdate ?>");</script><noscript><?= $formatUpdate ?></noscript></p>
 <?php
 foreach($oglMatrix->getGlVersions() as $glVersion)
 {
     $text = $glVersion->getGlName()." ".$glVersion->getGlVersion()." - ".$glVersion->getGlslName()." ".$glVersion->getGlslVersion();
-    $urlText = urlencode(str_replace(" ", "", $text));
+    $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
 
 ?>
-        <h1 id="Version_<?= $urlText ?>">
-            <?= $text ?> <a href="#Version_<?= $urlText ?>" class="permalink">&para;</a>
+        <h1 id="<?= $glUrlId ?>">
+            <?= $text ?> <a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
         </h1>
         <table class="tableNoSpace">
             <tr class="tableHeaderLine">
@@ -144,12 +144,12 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         }
 
         $extName = $ext->getName();
-        $extUrlName = urlencode(str_replace(" ", "", $ext->getName()));
+        $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext->getName()));
         $extHintIdx = $ext->getHintIdx();
 ?>
             <tr class="extension">
-                <td id="Extension_<?= $extUrlName ?>"<?php if($extName[0] === "-") { ?>class="extension-child"<?php } ?>>
-                    <?= $extName ?> <a href="#Extension_<?= $extUrlName ?>" class="permalink">&para;</a>
+                <td id="<?= $extUrlId ?>"<?php if($extName[0] === "-") { ?> class="extension-child"<?php } ?>>
+                    <?= $extName ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                 </td>
                 <td class="task <?= $mesa ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>"><?= $extHintIdx + 1 ?></a><?php } ?></td>
                 <td></td>
@@ -225,7 +225,7 @@ if($config["flattr"]["enabled"])
 }
 ?>
         <h1>License</h1>
-        <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" /></a></p>
+        <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
         <h1>Sources</h1>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources on GitHub:
         <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
