@@ -11,8 +11,8 @@ $config["info"] = array(
 );
 
 $config["auto_fetch"] = array(
-    "enabled" => FALSE,
-    "timeout" => -1,
+    "enabled" => TRUE,
+    "timeout" => 3600,
     "url" => "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt",
 );
 
