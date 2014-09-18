@@ -46,7 +46,7 @@ if($config["auto_fetch"]["enabled"])
     if(file_exists($gl3Filename))
     {
         $mtime = filemtime($gl3Filename);
-        if($mtime + $config["auto_fetch"]["timeout"] > time())
+        if(time() < $mtime + $config["auto_fetch"]["timeout"])
         {
             $getLatestFileVersion = FALSE;
             $lastUpdate = $mtime;
@@ -70,8 +70,15 @@ if($config["auto_fetch"]["enabled"])
         }
     }
 }
+else
+{
+    if(file_exists($gl3Filename))
+    {
+        $lastUpdate = filemtime($gl3Filename);
+    }
+}
 
-if(!file_exists($gl3Filename))
+if($lastUpdate === 0)
 {
     exit("File \"${gl3Filename}\" doesn't exist.");
 }
