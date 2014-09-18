@@ -1,8 +1,19 @@
 <?php
-$config["page"] = array(
-    "version" => "2.0",
+///////////////////////////////////////
+// Config.
+
+$config["info"] = array(
+    "debug" => FALSE,
+    "version" => "1.0",
     "title" => "The OpenGL vs Mesa matrix",
     "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",
+    "gl3_file" => "src/GL3.txt",
+);
+
+$config["auto_fetch"] = array(
+    "enabled" => FALSE,
+    "timeout" => -1,
+    "url" => "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt",
 );
 
 $config["flattr"] = array(
@@ -11,4 +22,24 @@ $config["flattr"] = array(
     "language" => "en_US",
     "tags" => "mesa,opengl",
 );
+
+///////////////////////////////////////
+// Common code for all pages.
+
+date_default_timezone_set('UTC');
+
+if($config["info"]["debug"])
+{
+    ini_set('display_errors', 1);
+    ini_set('error_reporting', E_ALL);
+}
+
+function debug_print($line)
+{
+    if($config["info"]["debug"])
+    {
+        print("DEBUG: ".$line."<br />\n");
+    }
+}
 ?>
+

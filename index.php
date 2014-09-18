@@ -18,9 +18,8 @@
  * along with libbench. If not, see <http://www.gnu.org/licenses/>.
  */
 
-ini_set('display_errors', 1);
-ini_set('error_reporting', E_ALL);
-date_default_timezone_set('UTC');
+///////////////////////////////////////
+// Common code.
 
 $configFile = "config.inc.php";
 if(!file_exists($configFile))
@@ -31,43 +30,50 @@ if(!file_exists($configFile))
 }
 
 include($configFile);
+unset($configFile);
+
+///////////////////////////////////////
+// File code.
+
 include("parser.inc.php");
 
-function debug_print($line)
-{
-    print("DEBUG: ".$line."<br />\n");
-}
-
-$gl3Filename = "GL3.txt";
-$gl3PlainUrl = "http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt";
+$gl3Filename = $config["info"]["gl3_file"];
 $lastUpdate = 0;
 
-$getLatestFileVersion = TRUE;
-if(file_exists($gl3Filename))
+if($config["auto_fetch"]["enabled"])
 {
-    $mtime = filemtime($gl3Filename);
-    if($mtime + 3600 > time())
+    $getLatestFileVersion = TRUE;
+    if(file_exists($gl3Filename))
     {
-        $getLatestFileVersion = FALSE;
-        $lastUpdate = $mtime;
+        $mtime = filemtime($gl3Filename);
+        if($mtime + $config["auto_fetch"]["timeout"] > time())
+        {
+            $getLatestFileVersion = FALSE;
+            $lastUpdate = $mtime;
+        }
+    }
+
+    if($getLatestFileVersion)
+    {
+        $distantContent = file_get_contents($config["auto_fetch"]["url"]);
+        if($distantContent !== FALSE)
+        {
+            $cacheHandle = fopen($gl3Filename, "w");
+            if($cacheHandle !== FALSE)
+            {
+                fwrite($cacheHandle, $distantContent);
+                fclose($cacheHandle);
+                $lastUpdate = time();
+            }
+
+            unset($distantContent);
+        }
     }
 }
 
-if($getLatestFileVersion)
+if(!file_exists($gl3Filename))
 {
-    $distantContent = file_get_contents($gl3PlainUrl);
-    if($distantContent !== FALSE)
-    {
-        $cacheHandle = fopen($gl3Filename, "w");
-        if($cacheHandle !== FALSE)
-        {
-            fwrite($cacheHandle, $distantContent);
-            fclose($cacheHandle);
-            $lastUpdate = time();
-        }
-
-        unset($distantContent);
-    }
+    exit("File \"${gl3Filename}\" doesn't exist.");
 }
 
 // Parse the local file.
@@ -75,7 +81,7 @@ $parser = new OglParser();
 $oglMatrix = $parser->parse($gl3Filename);
 if(!$oglMatrix)
 {
-    exit("Can't read \"${gl3Filename}\"");
+    exit("Can't read \"${gl3Filename}\".");
 }
 
 $gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
@@ -102,11 +108,11 @@ foreach($vendors as &$vendor)
 <html>
     <head>
         <meta charset="utf-8"/>
-        <meta name="description" content="<?= $config["page"]["description"] ?>"/>
+        <meta name="description" content="<?= $config["info"]["description"] ?>"/>
 
-        <title><?= $config["page"]["title"] ?></title>
+        <title><?= $config["info"]["title"] ?></title>
 
-        <link href="style.css?v=<?= $config["page"]["version"] ?>" rel="stylesheet" type="text/css" media="all"/>
+        <link href="style.css?v=<?= $config["info"]["version"] ?>" rel="stylesheet" type="text/css" media="all"/>
         <script src="script.js"></script>
     </head>
     <body>
@@ -266,7 +272,7 @@ if($config["flattr"]["enabled"])
 {
 ?>
         <p>You can click here too, if you want to Flattr me:</p>
-        <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= $config["flattr"]["id"] ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= $config["page"]["title"] ?>')+'&description='+encodeURIComponent('<?= $config["page"]["description"] ?>')+'&language='+encodeURIComponent('<?= $config["flattr"]["language"] ?>')+'&tags=<?= $config["flattr"]["tags"] ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
+        <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= $config["flattr"]["id"] ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= $config["info"]["title"] ?>')+'&description='+encodeURIComponent('<?= $config["info"]["description"] ?>')+'&language='+encodeURIComponent('<?= $config["flattr"]["language"] ?>')+'&tags=<?= $config["flattr"]["tags"] ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
 <?php
 }
 ?>
