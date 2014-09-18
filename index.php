@@ -35,7 +35,7 @@ unset($configFile);
 ///////////////////////////////////////
 // File code.
 
-include("parser.inc.php");
+include("oglparser.inc.php");
 
 $gl3Filename = $config["info"]["gl3_file"];
 $lastUpdate = 0;
