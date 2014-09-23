@@ -21,6 +21,10 @@ body { font-size: 85%; font-family: sans-serif; }
 
 p { max-width: 800px; }
 
+.commitDate { margin-top: 0.3em; }
+.commitDate::first-letter { text-transform: uppercase; }
+.commitText { padding-left: 2em; }
+
 .tableNoSpace    { border-spacing: 1px; border-collapse: separate; }
 
 .hCellVendor-default { background-color: #d3d7cf; }

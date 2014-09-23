@@ -7,7 +7,9 @@ $config["info"] = array(
     "version" => "1.0",
     "title" => "The OpenGL vs Mesa matrix",
     "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",
+    "git_url" => "http://cgit.freedesktop.org/mesa/mesa",
     "gl3_file" => "src/gl3.txt",
+    "log_file" => "src/gl3_log.txt",
 );
 
 $config["auto_fetch"] = array(

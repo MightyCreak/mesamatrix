@@ -36,6 +36,7 @@ unset($configFile);
 // File code.
 
 include("oglparser.inc.php");
+include("commitsparser.inc.php");
 
 $gl3Filename = $config["info"]["gl3_file"];
 $lastUpdate = 0;
@@ -83,7 +84,7 @@ if($lastUpdate === 0)
     exit("File \"${gl3Filename}\" doesn't exist.");
 }
 
-// Parse the local file.
+// Parse "gl3_file".
 $parser = new OglParser();
 $oglMatrix = $parser->parse($gl3Filename);
 if(!$oglMatrix)
@@ -91,9 +92,17 @@ if(!$oglMatrix)
     exit("Can't read \"${gl3Filename}\".");
 }
 
-$gl3TreeUrl = "http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt";
-$gl3LogUrl = "http://cgit.freedesktop.org/mesa/mesa/log/docs/GL3.txt";
-$formatUpdate = date(DATE_RFC2822, $lastUpdate);
+unset($parser, $lastUpdate);
+
+// Parse "log_file".
+$parser = new CommitsParser();
+$commits = $parser->parse($config["info"]["log_file"]);
+unset($parser);
+
+$gl3TreeUrl = $config["info"]["git_url"]."/tree/docs/GL3.txt";
+$gl3LogUrl = $config["info"]["git_url"]."/log/docs/GL3.txt";
+$gl3CommitUrl = $config["info"]["git_url"]."/commit/docs/GL3.txt";
+$lastGitUpdate = date(DATE_RFC2822, $commits[0]["timestamp"]);
 
 $vendors = array_keys($allDriversVendors);
 $vendorsClasses = array();
@@ -123,9 +132,18 @@ foreach($vendors as &$vendor)
         <script src="script.js"></script>
     </head>
     <body>
-        <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)<br/>
-        <b>Last get date:</b> <script>writeDate("<?= $formatUpdate ?>");</script><noscript><?= $formatUpdate ?></noscript></p>
+        <h1>Last commits</h1>
+        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript></p>
 <?php
+foreach($commits as $commit)
+{
+    $commitDate = date(DATE_RFC2822, $commit["timestamp"]);
+?>
+        <div class="commitDate"><script>document.write(getRelativeDate("<?= $commitDate ?>"));</script><noscript><?= $commitDate ?></noscript>:</div>
+        <div class="commitText"><a href="<?= $gl3CommitUrl ?>?id=<?= $commit["hash"] ?>"><?= $commit["subject"] ?></a></div>
+<?php
+}
+
 foreach($oglMatrix->getGlVersions() as $glVersion)
 {
     $text = $glVersion->getGlName()." ".$glVersion->getGlVersion()." - ".$glVersion->getGlslName()." ".$glVersion->getGlslVersion();
@@ -286,6 +304,7 @@ if($config["flattr"]["enabled"])
         <h1>License</h1>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
         <h1>Sources</h1>
+        <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</p>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources on GitHub:
         <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
         <h1>Authors</h1>
