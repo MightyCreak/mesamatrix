@@ -156,7 +156,7 @@ class OglVersion
 {
     public function __construct($glName, $glVersion, $glslName, $glslVersion)
     {
-        $this->glName = $glName;
+        $this->glName = setGlName($glName);
         $this->glVersion = $glVersion;
         $this->glslName = $glslName;
         $this->glslVersion = $glslVersion;
@@ -164,7 +164,7 @@ class OglVersion
     }
 
     /// GL name and version.
-    public function setGlName($name)       { $this->glName = $name; }
+    public function setGlName($name)       { $this->glName = "Open".$name; }
     public function getGlName()            { return $this->glName; }
     public function setGlVersion($version) { $this->glVersion = $version; }
     public function getGlVersion()         { return $this->glVersion; }
