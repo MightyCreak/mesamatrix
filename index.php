@@ -133,7 +133,7 @@ foreach($vendors as &$vendor)
     </head>
     <body>
         <h1>Last commits</h1>
-        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript></p>
+        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= $gl3LogUrl ?>">see the log</a>)</p>
 <?php
 foreach($commits as $commit)
 {
@@ -304,7 +304,7 @@ if($config["flattr"]["enabled"])
         <h1>License</h1>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
         <h1>Sources</h1>
-        <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a> (<a href="<?= $gl3LogUrl ?>">log</a>)</p>
+        <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a></p>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources on GitHub:
         <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
         <h1>Authors</h1>
