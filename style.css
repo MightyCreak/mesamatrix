@@ -17,6 +17,8 @@
  * along with libbench. If not, see <http://www.gnu.org/licenses/>.
  */
 
+body { font-size: 85%; font-family: sans-serif; }
+
 p { max-width: 800px; }
 
 .tableNoSpace    { border-spacing: 1px; border-collapse: separate; }
