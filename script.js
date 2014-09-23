@@ -19,8 +19,13 @@
 
 function fillZeros(number, size)
 {
-    var numStrLen = number.toString().length;
-    return "0".repeat(size - numStrLen) + number;
+    var absNum = Math.abs(number);
+    var numZeros = size - absNum.toString().length;
+    var res = "";
+    if(number < 0)
+        res = "-";
+    res += "0".repeat(numZeros) + absNum;
+    return res;
 }
 
 function getLocalDate(text)
@@ -32,10 +37,15 @@ function getLocalDate(text)
     var hours = fillZeros(eventDate.getHours(), 2);
     var minutes = fillZeros(eventDate.getMinutes(), 2);
     var seconds = fillZeros(eventDate.getSeconds(), 2);
-    var timezone = fillZeros(eventDate.getTimezoneOffset() / 60, 3);
-    if(timezone >= 0)
-        timezone = "+" + timezone;
-    return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds + " (GMT " + timezone + ")";
+    var timezoneOffset = -eventDate.getTimezoneOffset();
+    var timezoneMinutes = Math.abs(timezoneOffset);
+    var timezoneHours = Math.floor(timezoneMinutes / 60);
+    timezoneMinutes -= timezoneHours * 60;
+    timezoneHours = fillZeros(timezoneHours, 2);
+    timezoneMinutes = fillZeros(timezoneMinutes, 2);
+    if(timezoneMinutes >= 0)
+        timezoneHours = "+" + timezoneHours;
+    return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds + " (GMT " + timezoneHours + timezoneMinutes + ")";
 }
 
 function getRelativeDate(text)
