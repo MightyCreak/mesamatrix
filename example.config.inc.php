@@ -7,7 +7,7 @@ $config["info"] = array(
     "version" => "1.0",
     "title" => "The OpenGL vs Mesa matrix",
     "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",
-    "gl3_file" => "src/GL3.txt",
+    "gl3_file" => "src/gl3.txt",
 );
 
 $config["auto_fetch"] = array(

@@ -1,2 +1,4 @@
-GL3.txt
+src/
 config.inc.php
+*.swp
+*~
