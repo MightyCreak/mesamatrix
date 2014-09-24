@@ -1,6 +1,7 @@
 # About
 
 Mesamatrix is a PHP script that parse the text file from the mesa git tree and format it in HTML.
+
 Here is the official website: http://mesamatrix.net/
 
 # Installation
@@ -45,8 +46,7 @@ Then, edit the cron script `mesamatrix_update.sh` to verify that `gitpath` and `
 
 ## Setup cron
 
-Last step, edit your crontab.
-Type this command:
+Last step, edit your crontab. Type this command:
 
     $ crontab -e
 
