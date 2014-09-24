@@ -31,7 +31,7 @@ class CommitsParser
         $commits = array();
 
         // Regexp patterns.
-        $reCommitHash = "/^[[:alnum:]]{40}$/";
+        $reCommitHash = "/^([[:alnum:]]{40})$/";
         $reCommitInfo = "/^  ([[:alnum:]]+): (.+)$/";
 
         $line = fgets($handle);
@@ -39,7 +39,7 @@ class CommitsParser
         {
             if(preg_match($reCommitHash, $line, $matches) === 1)
             {
-                $hash = $line;
+                $hash = $matches[1];
                 $timestamp = 0;
                 $author = "";
                 $subject = "";
@@ -74,4 +74,3 @@ class CommitsParser
     }
 };
 ?>
-

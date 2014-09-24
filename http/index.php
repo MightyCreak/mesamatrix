@@ -139,8 +139,13 @@ foreach($commits as $commit)
 {
     $commitDate = date(DATE_RFC2822, $commit["timestamp"]);
 ?>
-        <div class="commitDate"><script>document.write(getRelativeDate("<?= $commitDate ?>"));</script><noscript><?= $commitDate ?></noscript>:</div>
-        <div class="commitText"><a href="<?= $gl3CommitUrl ?>?id=<?= $commit["hash"] ?>"><?= $commit["subject"] ?></a></div>
+        <div class="commitDate">
+            <script>document.write(getRelativeDate("<?= $commitDate ?>"));</script>
+            <noscript><?= $commitDate ?></noscript>:
+        </div>
+        <div class="commitText">
+            <a href="<?= $gl3CommitUrl ?>?id=<?= $commit["hash"] ?>"><?= $commit["subject"] ?></a>
+        </div>
 <?php
 }
 
@@ -194,33 +199,35 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 
     foreach($glVersion->getExtensions() as $ext)
     {
+        $taskClasses = "task";
         if(strncmp($ext->getStatus(), "DONE", strlen("DONE")) === 0)
         {
-            $mesa = "isDone";
+            $taskClasses .= " isDone";
             ++$doneByDriver["mesa"];
         }
         else if(strncmp($ext->getStatus(), "not started", strlen("not started")) === 0)
         {
-            $mesa = "isNotStarted";
+            $taskClasses .= " isNotStarted";
         }
         else
         {
-            $mesa = "isInProgress";
+            $taskClasses .= " isInProgress";
         }
 
         $extName = $ext->getName();
         $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext->getName()));
         $extHintIdx = $ext->getHintIdx();
+        if($extHintIdx !== -1)
+        {
+            $taskClasses .= " footnote";
+        }
+
 ?>
                 <tr class="extension">
                     <td id="<?= $extUrlId ?>"<?php if($extName[0] === "-") { ?> class="extension-child"<?php } ?>>
                         <?= $extName ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <?php if($extHintIdx !== -1) {
-                        echo '<td class="task footnote '.$mesa.'" title="'.$allHints[$extHintIdx].'"><a href="#Footnotes_'.($extHintIdx+1).'">&nbsp;</a></td>';
-                    } else {
-                        echo '<td class="task '.$mesa.'"></td>';
-                    } ?>
+                    <td class="<?= $taskClasses ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>">&nbsp;</a><?php } ?></td>
 <?php
 
         foreach($vendors as &$vendor)
@@ -239,21 +246,26 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                     ++$i;
                 }
 
-                $class = "isNotStarted";
+                $taskClasses = "task";
                 $driverHintIdx = -1;
                 if($i < $numSupportedDrivers)
                 {
                     // Driver found.
-                    $class = "isDone";
+                    $taskClasses .= " isDone";
                     $driverHintIdx = $supportedDrivers[$i]->getHintIdx();
                     ++$doneByDriver[$driver];
                 }
+                else
+                {
+                    $taskClasses .= " isNotStarted";
+                }
+
+                if($driverHintIdx !== -1)
+                {
+                    $taskClasses .= " footnote";
+                }
 ?>
-                <?php if($driverHintIdx !== -1) {
-                    echo '<td class="task footnote '.$class.'" title="'.$allHints[$driverHintIdx].'"><a href="#Footnotes_'.($driverHintIdx+1).'">&nbsp;</a></td>';
-                } else {
-                    echo '<td class="task '.$class.'"></td>';
-                } ?>
+                    <td class="<?= $taskClasses ?>"><?php if($driverHintIdx !== -1) { ?><a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= $allHints[$driverHintIdx] ?>">&nbsp;</a><?php } ?></td>
 <?php
             }
     }
