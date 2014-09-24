@@ -216,7 +216,11 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                     <td id="<?= $extUrlId ?>"<?php if($extName[0] === "-") { ?> class="extension-child"<?php } ?>>
                         <?= $extName ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <td class="task <?= $mesa ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= $allHints[$extHintIdx] ?>"><?= $extHintIdx + 1 ?></a><?php } ?></td>
+                    <?php if($extHintIdx !== -1) {
+                        echo '<td class="task footnote '.$mesa.'" title="'.$allHints[$extHintIdx].'"><a href="#Footnotes_'.($extHintIdx+1).'">&nbsp;</a></td>';
+                    } else {
+                        echo '<td class="task '.$mesa.'"></td>';
+                    } ?>
 <?php
 
         foreach($vendors as &$vendor)
@@ -245,7 +249,11 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                     ++$doneByDriver[$driver];
                 }
 ?>
-                    <td class="task <?= $class ?>"><?php if($driverHintIdx !== -1) { ?><a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= $allHints[$driverHintIdx] ?>"><?= $driverHintIdx + 1 ?></a><?php } ?></td>
+                <?php if($driverHintIdx !== -1) {
+                    echo '<td class="task footnote '.$class.'" title="'.$allHints[$driverHintIdx].'"><a href="#Footnotes_'.($driverHintIdx+1).'">&nbsp;</a></td>';
+                } else {
+                    echo '<td class="task '.$class.'"></td>';
+                } ?>
 <?php
             }
     }
