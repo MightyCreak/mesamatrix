@@ -57,18 +57,46 @@ function addToHints($hint)
     return $idx;
 }
 
-function array_union(array $a, array $b)
+function getDriverName($name)
 {
-    $res = $a;
-    foreach($b as $i)
+    global $allDrivers;
+
+    foreach($allDrivers as $driver)
     {
-        if(!in_array($i, $res))
+        $driverLen = strlen($driver);
+        if(strncmp($name, $driver, $driverLen) === 0)
         {
-            $res[] = $i;
+            return $driver;
         }
     }
 
-    return $res;
+    return NULL;
+}
+
+function mergeDrivers(array &$dst, array $src)
+{
+    foreach($src as $srcDriver)
+    {
+        $driverName = getDriverName($srcDriver);
+
+        $i = 0;
+        $numDstDrivers = count($dst);
+        while($i < $numDstDrivers && strncmp($dst[$i], $driverName, strlen($driverName)) !== 0)
+        {
+            $i++;
+        }
+
+        if($i < $numDstDrivers)
+        {
+            $dst[$i] = $srcDriver;
+        }
+        else
+        {
+            $dst[] = $srcDriver;
+        }
+    }
+
+    return $dst;
 }
 
 class OglSupportedDriver
@@ -214,13 +242,30 @@ class OglParser
 {
     public function parse($filename)
     {
-        global $allDrivers, $allHints;
-
         $handle = fopen($filename, "r");
         if($handle === FALSE)
         {
             return NULL;
         }
+
+        $ret = $this->parse_stream($handle);
+        fclose($handle);
+        return $ret;
+    }
+
+    public function parse_content($content)
+    {
+        $handle = fopen("php://memory", "r+");
+        fwrite($handle, $content);
+        rewind($handle);
+        $ret = $this->parse_stream($handle);
+        fclose($handle);
+        return $ret;
+    }
+
+    public function parse_stream($handle)
+    {
+        global $allDrivers, $allHints;
 
         // Regexp patterns.
         $reTableHeader = "/^Feature([ ]+)Status/";
@@ -251,7 +296,7 @@ class OglParser
                 $allSupportedDrivers = array();
                 if(preg_match($reAllDone, $line, $matches) === 1)
                 {
-                    $allSupportedDrivers = array_union($allSupportedDrivers, explode(", ", $matches[1]));
+                    mergeDrivers($allSupportedDrivers, explode(", ", $matches[1]));
                 }
 
                 $line = $this->skipEmptyLines(fgets($handle), $handle);
@@ -265,14 +310,14 @@ class OglParser
                         $matches[1] = trim($matches[1]);
                         if($matches[1][0] === "-")
                         {
-                            $supportedDrivers = array_union($supportedDrivers, $parentDrivers);
+                            mergeDrivers($supportedDrivers, $parentDrivers);
                         }
 
                         $matches[2] = trim($matches[2]);
                         $isDone = strncmp($matches[2], "DONE", strlen("DONE")) === 0;
                         if($isDone && !isset($matches[3]))
                         {
-                            $supportedDrivers = array_union($supportedDrivers, $allDrivers);
+                            mergeDrivers($supportedDrivers, $allDrivers);
                         }
                         else if($isDone && isset($matches[4]))
                         {
@@ -282,7 +327,7 @@ class OglParser
                             {
                                 if($this->isInDriversArray($currentDriver))
                                 {
-                                    $supportedDrivers[] = $currentDriver;
+                                    mergeDrivers($supportedDrivers, [$currentDriver]);
                                     $driverFound = TRUE;
                                 }
                             }
@@ -292,7 +337,7 @@ class OglParser
                                 {
                                     $matches[2] = $matches[2]." ".$matches[4]."";
                                 }
-                                $supportedDrivers = array_union($supportedDrivers, $allDrivers);
+                                mergeDrivers($supportedDrivers, $allDrivers);
                             }
                         }
                         else if (isset($matches[4]) && !empty($matches[4]))
@@ -331,8 +376,6 @@ class OglParser
                 $line = fgets($handle);
             }
         }
-
-        fclose($handle);
 
         return $oglMatrix;
     }

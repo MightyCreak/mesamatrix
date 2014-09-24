@@ -21,7 +21,7 @@
 ///////////////////////////////////////
 // Common code.
 
-$configFile = "config.inc.php";
+$configFile = "../config.inc.php";
 if(!file_exists($configFile))
 {
     exit("The configuration file \"config.inc.php\" doesn't exist.
@@ -29,92 +29,67 @@ if(!file_exists($configFile))
           fill it with the proper information.");
 }
 
-include($configFile);
+require_once $configFile;
 unset($configFile);
+
+require_once "http/incs/hints.inc.php";
 
 ///////////////////////////////////////
 // File code.
 
-include("oglparser.inc.php");
-include("commitsparser.inc.php");
+$gl3Path = $config["info"]["xml_file"];
 
-$gl3Filename = $config["info"]["gl3_file"];
-$lastUpdate = 0;
-
-if($config["auto_fetch"]["enabled"])
+// Read "xml_file".
+$xml = simplexml_load_file($gl3Path);
+if(!$xml)
 {
-    $getLatestFileVersion = TRUE;
-    if(file_exists($gl3Filename))
-    {
-        $mtime = filemtime($gl3Filename);
-        if(time() < $mtime + $config["auto_fetch"]["timeout"])
-        {
-            $getLatestFileVersion = FALSE;
-            $lastUpdate = $mtime;
-        }
-    }
+    exit("Can't read '".$gl3Path."'");
+}
 
-    if($getLatestFileVersion)
+$hints = new Hints();
+foreach($xml->gl as $glVersion)
+{
+    foreach($glVersion->extension as $ext)
     {
-        $distantContent = file_get_contents($config["auto_fetch"]["url"]);
-        if($distantContent !== FALSE)
+        if($ext->mesa["hint"])
         {
-            $cacheHandle = fopen($gl3Filename, "w");
-            if($cacheHandle !== FALSE)
+            $hints->addHint((string) $ext->mesa["hint"]);
+        }
+
+        foreach($xml->drivers->vendor as $vendor)
+        {
+            foreach($vendor->driver as $driver)
             {
-                fwrite($cacheHandle, $distantContent);
-                fclose($cacheHandle);
-                $lastUpdate = time();
+                $driverNode = $ext->supported->{$driver["name"]};
+                if($driverNode)
+                {
+                    // Driver found.
+                    if($driverNode["hint"])
+                    {
+                        $hints->addHint((string) $driverNode["hint"]);
+                    }
+                }
             }
-
-            unset($distantContent);
         }
     }
 }
-else
+
+$updateTime = filemtime($gl3Path);
+$lastGitUpdate = "No commit found";
+if(count($xml->commits->commit) > 0)
 {
-    if(file_exists($gl3Filename))
+    $lastGitUpdate = date(DATE_RFC2822, (int) $xml->commits->commit[0]["timestamp"]);
+}
+
+foreach($xml->drivers->vendor as $vendor)
+{
+    switch($vendor["name"])
     {
-        $lastUpdate = filemtime($gl3Filename);
-    }
-}
-
-if($lastUpdate === 0)
-{
-    exit("File \"${gl3Filename}\" doesn't exist.");
-}
-
-// Parse "gl3_file".
-$parser = new OglParser();
-$oglMatrix = $parser->parse($gl3Filename);
-if(!$oglMatrix)
-{
-    exit("Can't read \"${gl3Filename}\".");
-}
-
-unset($parser, $lastUpdate);
-
-// Parse "log_file".
-$parser = new CommitsParser();
-$commits = $parser->parse($config["info"]["log_file"]);
-unset($parser);
-
-$gl3TreeUrl = $config["info"]["git_url"]."/tree/docs/GL3.txt";
-$gl3LogUrl = $config["info"]["git_url"]."/log/docs/GL3.txt";
-$gl3CommitUrl = $config["info"]["git_url"]."/commit/docs/GL3.txt";
-$lastGitUpdate = date(DATE_RFC2822, $commits[0]["timestamp"]);
-
-$vendors = array_keys($allDriversVendors);
-$vendorsClasses = array();
-foreach($vendors as &$vendor)
-{
-    switch($vendor)
-    {
-    case "Software":    $vendorsClasses[$vendor] = "hCellVendor-soft"; break;
-    case "Intel":       $vendorsClasses[$vendor] = "hCellVendor-intel"; break;
-    case "nVidia":      $vendorsClasses[$vendor] = "hCellVendor-nvidia"; break;
-    case "AMD":         $vendorsClasses[$vendor] = "hCellVendor-amd"; break;
-    default:            $vendorsClasses[$vendor] = "hCellVendor-default"; break;
+    case "Software": $vendor->addAttribute("class", "hCellVendor-soft"); break;
+    case "Intel":    $vendor->addAttribute("class", "hCellVendor-intel"); break;
+    case "nVidia":   $vendor->addAttribute("class", "hCellVendor-nvidia"); break;
+    case "AMD":      $vendor->addAttribute("class", "hCellVendor-amd"); break;
+    default:         $vendor->addAttribute("class", "hCellVendor-default"); break;
     }
 }
 
@@ -137,25 +112,25 @@ foreach($vendors as &$vendor)
     </head>
     <body>
         <h1>Last commits</h1>
-        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= $gl3LogUrl ?>">see the log</a>)</p>
+        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= $config["git"]["web"]."/log/docs/GL3.txt" ?>">see the log</a>)</p>
 <?php
-foreach($commits as $commit)
-{
-    $commitDate = date(DATE_RFC2822, $commit["timestamp"]);
+foreach($xml->commits->commit as $commit) {
+    $commitDate = date(DATE_RFC2822, (int) $commit["timestamp"]);
 ?>
         <div class="commitDate">
             <script>document.write(getRelativeDate("<?= $commitDate ?>"));</script>
             <noscript><?= $commitDate ?></noscript>:
         </div>
         <div class="commitText">
-            <a href="<?= $gl3CommitUrl ?>?id=<?= $commit["hash"] ?>"><?= $commit["subject"] ?></a>
+            <a href="<?= $config["git"]["web"]."/commit/".$config["git"]["gl3"]
+                ?>?id=<?= $commit["hash"] ?>"><?= $commit["subject"] ?></a>
         </div>
 <?php
 }
 
-foreach($oglMatrix->getGlVersions() as $glVersion)
+foreach($xml->gl as $glVersion)
 {
-    $text = $glVersion->getGlName()." ".$glVersion->getGlVersion()." - ".$glVersion->getGlslName()." ".$glVersion->getGlslVersion();
+    $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
     $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
 
 ?>
@@ -167,11 +142,11 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                 <tr>
                     <th colspan="2"></th>
 <?php
-    foreach($vendors as &$vendor)
+    foreach($xml->drivers->vendor as $vendor)
     {
 ?>
                     <th></th>
-                    <th class="<?= $vendorsClasses[$vendor] ?>" colspan="<?= count($allDriversVendors[$vendor]) ?>"><?= $vendor ?></th>
+                    <th class="<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></th>
 <?php
     }
 ?>
@@ -180,15 +155,17 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
                     <th class="hCellVendor-default hCell-ext">Extension</th>
                     <th class="hCellVendor-default hCell-driver">mesa</th>
 <?php
-    foreach($vendors as &$vendor)
+    $doneForMesa = 0;
+    foreach($xml->drivers->vendor as $vendor)
     {
 ?>
                     <th class="hCell-sep"></th>
 <?php
-        foreach($allDriversVendors[$vendor] as &$driver)
+        foreach($vendor->driver as $driver)
         {
+            $driver["done"] = 0;
 ?>
-                    <th class="<?= $vendorsClasses[$vendor] ?> hCell-driver"><?= $driver ?></th>
+                    <th class="<?= $vendor["class"] ?> hCell-driver"><?= $driver["name"] ?></th>
 <?php
         }
     }
@@ -197,19 +174,17 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
             </thead>
             <tbody>
 <?php
-    $numExtensions = count($glVersion->getExtensions());
-    $doneByDriver = array("mesa" => 0);
-    $doneByDriver = array_merge($doneByDriver, array_combine($allDrivers, array_fill(0, count($allDrivers), 0)));
+    $numExtensions = count($glVersion->extension);
 
-    foreach($glVersion->getExtensions() as $ext)
+    foreach($glVersion->extension as $ext)
     {
         $taskClasses = "task";
-        if(strncmp($ext->getStatus(), "DONE", strlen("DONE")) === 0)
+        if($ext->mesa["status"] == "complete")
         {
             $taskClasses .= " isDone";
-            ++$doneByDriver["mesa"];
+            $doneForMesa += 1;
         }
-        else if(strncmp($ext->getStatus(), "not started", strlen("not started")) === 0)
+        else if($ext->mesa["status"] == "incomplete")
         {
             $taskClasses .= " isNotStarted";
         }
@@ -218,9 +193,8 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
             $taskClasses .= " isInProgress";
         }
 
-        $extName = $ext->getName();
-        $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext->getName()));
-        $extHintIdx = $ext->getHintIdx();
+        $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext["name"]));
+        $extHintIdx = $hints->findHint($ext->mesa["hint"]);
         if($extHintIdx !== -1)
         {
             $taskClasses .= " footnote";
@@ -228,51 +202,42 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
 
 ?>
                 <tr class="extension">
-                    <td id="<?= $extUrlId ?>"<?php if($extName[0] === "-") { ?> class="extension-child"<?php } ?>>
-                        <?= $extName ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
+                    <td id="<?= $extUrlId ?>"<?php if(strncmp($ext["name"], "-", 1) === 0) { ?> class="extension-child"<?php } ?>>
+                        <?= $ext["name"] ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <td class="<?= $taskClasses ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$allHints[$extHintIdx] ?>">&nbsp;</a><?php } ?></td>
+                    <td class="<?= $taskClasses ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>">&nbsp;</a><?php } ?></td>
 <?php
 
-        foreach($vendors as &$vendor)
+        foreach($xml->drivers->vendor as $vendor)
         {
 ?>
                     <td></td>
 <?php
-            foreach($allDriversVendors[$vendor] as &$driver)
+            foreach($vendor->driver as $driver)
             {
-                // Search for the driver in the supported drivers.
-                $i = 0;
-                $supportedDrivers = $ext->getSupportedDrivers();
-                $numSupportedDrivers = count($supportedDrivers);
-                while($i < $numSupportedDrivers && strcmp($supportedDrivers[$i]->getName(), $driver) !== 0)
-                {
-                    ++$i;
-                }
-
+                $driverNode = $ext->supported->{$driver["name"]};
+                $extHintIdx = -1;
                 $taskClasses = "task";
-                $driverHintIdx = -1;
-                if($i < $numSupportedDrivers)
+                if($driverNode)
                 {
                     // Driver found.
                     $taskClasses .= " isDone";
-                    $driverHintIdx = $supportedDrivers[$i]->getHintIdx();
-                    ++$doneByDriver[$driver];
+                    $driver["done"] += 1;
+                    $extHintIdx = $hints->findHint($driverNode["hint"]);
+                    if($extHintIdx !== -1)
+                    {
+                        $taskClasses .= " footnote";
+                    }
                 }
                 else
                 {
                     $taskClasses .= " isNotStarted";
                 }
-
-                if($driverHintIdx !== -1)
-                {
-                    $taskClasses .= " footnote";
-                }
 ?>
-                    <td class="<?= $taskClasses ?>"><?php if($driverHintIdx !== -1) { ?><a href="#Footnotes_<?= $driverHintIdx + 1 ?>" title="<?= ($driverHintIdx + 1).". ".$allHints[$driverHintIdx] ?>">&nbsp;</a><?php } ?></td>
+                    <td class="<?= $taskClasses ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>">&nbsp;</a><?php } ?></td>
 <?php
             }
-    }
+        }
 ?>
                 </tr>
 <?php
@@ -282,17 +247,17 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
             <tfoot>
                 <tr class="extension">
                     <td><b>Total:</b></td>
-                    <td class="hCellVendor-default task"><?= $doneByDriver["mesa"]."/".$numExtensions ?></td>
+                    <td class="hCellVendor-default task"><?= $doneForMesa."/".$numExtensions ?></td>
 <?php
-    foreach($vendors as &$vendor)
+    foreach($xml->drivers->vendor as $vendor)
     {
 ?>
                     <td></td>
 <?php
-        foreach($allDriversVendors[$vendor] as &$driver)
+        foreach($vendor->driver as $driver)
         {
 ?>
-                    <td class="<?= $vendorsClasses[$vendor] ?> task"><?= $doneByDriver[$driver]."/".$numExtensions ?></td>
+                    <td class="<?= $vendor["class"] ?> task"><?= $driver["done"]."/".$numExtensions ?></td>
 <?php
         }
     }
@@ -306,10 +271,11 @@ foreach($oglMatrix->getGlVersions() as $glVersion)
         <h1>Footnotes</h1>
         <ol>
 <?php
-for($i = 0; $i < count($allHints); $i++)
+$numHints = $hints->getNumHints();
+for($i = 0; $i < $numHints; $i++)
 {
 ?>
-            <li id="Footnotes_<?= $i + 1 ?>"><?= $allHints[$i] ?></li>
+            <li id="Footnotes_<?= $i + 1 ?>"><?= $hints->getHint($i) ?></li>
 <?php
 }
 ?>
@@ -334,7 +300,7 @@ if($config["flattr"]["enabled"])
             <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
         </ul>
         <h1>Sources</h1>
-        <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a></p>
+        <p><b>This page is generated from:</b> <a href="<?= $config["git"]["web"]."/tree/".$config["git"]["gl3"] ?>"><?= $config["git"]["web"]."/tree/".$config["git"]["gl3"] ?></a></p>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources on GitHub:
         <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>

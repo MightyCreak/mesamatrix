@@ -1,4 +1,5 @@
-/http/src/
-config.inc.php
+/mesa.git/
+/config.inc.php
+/http/gl3.xml
 *.swp
 *~
