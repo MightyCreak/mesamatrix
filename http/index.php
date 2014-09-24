@@ -321,12 +321,19 @@ if($config["flattr"]["enabled"])
 <?php
 }
 ?>
-        <h1>License</h1>
-        <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
+        <h1>Learn more</h1>
+        <p>Here are few links to learn more about the Linux graphics drivers:</p>
+        <ul>
+            <li>Freedesktop.org: <a href="http://xorg.freedesktop.org/wiki/RadeonFeature/#index5h2">Radeon GPUs</a></li>
+            <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Mesa_%28computer_graphics%29" title="Mesa (computer graphics)">Mesa (computer graphics)</a></li>
+            <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Radeon" title="Radeon">Radeon</a></li>
+            <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
+        </ul>
         <h1>Sources</h1>
         <p><b>This page is generated from:</b> <a href="<?= $gl3TreeUrl ?>"><?= $gl3TreeUrl ?></a></p>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources on GitHub:
         <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
+        <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
         <h1>Authors</h1>
         <ul>
             <li>Romain "Creak" Failliot</li>
