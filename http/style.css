@@ -47,20 +47,20 @@ p { max-width: 800px; }
 
 .permalink:link { text-decoration: none; color: #DDDDDD; }
 
-.isDone.footnote {
+.footnote a {
+    display: block;
+    text-decoration: none;
+}
+.footnote.task {
+    padding:0;
+}
+.footnote.isDone {
     background: repeating-linear-gradient(45deg, #8ae234, #8ae234 10px, #6ac214 10px, #6ac214 20px);
 }
-.isInProgress.footnote {
+.footnote.isInProgress {
     background: repeating-linear-gradient(45deg, #f1922b, #f1922b 10px, #d1720b 10px, #d1720b 20px);
 }
-.isNotStarted.footnote {
+.footnote.isNotStarted {
     background: repeating-linear-gradient(45deg, #ef2929, #ef2929 10px, #cf0909 10px, #cf0909 20px);
 }
 
-.task.footnote {
-	padding:0;
-}
-.footnote a {
-	display: block;
-	text-decoration: none;
-}
