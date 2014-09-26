@@ -19,12 +19,12 @@
 
 function fillZeros(number, size)
 {
-    var absNum = Math.abs(number);
-    var numZeros = size - absNum.toString().length;
+    var absNum = String(Math.abs(number));
+    var numZeros = size - absNum.length;
     var res = "";
     if(number < 0)
         res = "-";
-    res += "0".repeat(numZeros) + absNum;
+    res += Array(numZeros + 1).join("0") + absNum;
     return res;
 }
 
