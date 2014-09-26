@@ -60,15 +60,15 @@ function getRelativeDate(text)
         return "an hour ago";
     if(relTimeInMin <= 1440)            // Less than a day ago (60 * 24)
         return Math.round(relTimeInMin / 60) + " hours ago";
-    if(relTimeInMin <= 2879)            // Less (strictly) than two days ago
+    if(relTimeInMin <= 2160)            // Less than a day and a half ago (60 * 24 * 1.5)
         return "a day ago";
     if(relTimeInMin <= 10080)           // Less than a week ago (60 * 24 * 7)
         return Math.round(relTimeInMin / 1440) + " days";
-    if(relTimeInMin <= 20159)           // Less (strictly) than two weeks ago (60 * 24 * 7 * 2)
+    if(relTimeInMin <= 15120)           // Less than a week and a half ago (60 * 24 * 7 * 1.5)
         return "a week ago";
     if(relTimeInMin <= 43200)           // Less than a month ago (60 * 24 * 30)
         return Math.round(relTimeInMin / 10080) + " weeks ago";
-    if(relTimeInMin <= 86399)           // Less (strictly) than two months ago (60 * 24 * 30 * 2)
+    if(relTimeInMin <= 64800)           // Less than a month and a half ago (60 * 24 * 30 * 1.5)
         return "a month ago";
     if(relTimeInMin <= 259200)          // Less than six months ago (60 * 24 * 30 * 6)
         return Math.round(relTimeInMin / 43200) + " months ago";
