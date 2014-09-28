@@ -3,20 +3,18 @@
 
 #set -x
 
-gitpath=$HOME/code/c++/mesa
-srcpath=$HOME/code/web/mesamatrix/http/src
+# Get script directory
+DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-cd $gitpath
+# git parameters
+outputdir="$DIR/../http/src"
+gitdir="$outputdir/mesa.git"
+gitgl3path="docs/GL3.txt"
+gitlog_depth=10
+gitlog_format="%H%n  timestamp: %ct%n  author: %an%n  subject: %s%n"
 
-# Sparse checkout
-#git init mesa
-#cd mesa
-#git remote add -f origin git://anongit.freedesktop.org/mesa/mesa
-#git config core.sparsecheckout true
-#echo "docs/GL3.txt" >> .git/info/sparse-checkout
-#git branch --track master origin/master
-#git checkout
+cd $gitdir
 
-git pull #origin master
-cp docs/GL3.txt $srcpath/gl3.txt
-git log -n 10 --pretty=format:"%H%n  timestamp: %ct%n  author: %an%n  subject: %s%n" docs/GL3.txt > $srcpath/gl3_log.txt
+git fetch
+git cat-file blob HEAD:$gitgl3path > $outputdir/gl3.txt
+git log -n $gitlog_depth --pretty=format:"$gitlog_format" -- $gitgl3path > $outputdir/gl3_log.txt
