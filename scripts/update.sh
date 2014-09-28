@@ -4,7 +4,7 @@
 #set -x
 
 # Get script directory
-DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+DIR=$(cd "$(dirname "$0")" && pwd)
 
 # git parameters
 outputdir="$DIR/../http/src"
