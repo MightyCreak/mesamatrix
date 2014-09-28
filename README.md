@@ -14,35 +14,25 @@ In order to install this project, you'll also need these:
 * git
 * cron
 * apache or nginx
-* php
+* php 5
 
 ## Setup mesa repository
 
-Follow these steps to create a repository that only gets `docs/GL3.txt`:
+Because the scripts just need to get the content of the repository and they don't need to have a branch of their own, the `setup.sh` script will create a *bare* clone (which is basically only the content of the `.git` directory).
 
-    ## Initialize the local mesa repository.
-    $ git init mesa
-    $ cd mesa
-    
-    ## Connect to the mesa repository.
-    $ git remote add -f origin git://anongit.freedesktop.org/mesa/mesa
-    
-    ## Activate sparse checkout only for "docs/GL3.txt".
-    $ git config core.sparsecheckout true
-    $ echo "docs/GL3.txt" >> .git/info/sparse-checkout
-    
-    ## Select the remote branch and checkout.
-    $ git branch --track master origin/master
-    $ git checkout
+If you don't want the repository directory to be in `/http/src/mesa.git`, edit the `outputdir` and `gitdir` variables in both `setup.sh` and `update.sh`.
+
+And to set up mesamatrix, simply run from the project base directory:
+
+    $ ./scripts/setup.sh
 
 ## Setup the web interface
 
-First, make a config file and create a `src` directory:
+Create your config file:
 
     $ cp example.config.inc.php config.inc.php
-    $ mkdir src
 
-Then, edit the cron script `mesamatrix_update.sh` to verify that `gitpath` and `srcpath` points respectively to the mesa repository and `src` directory we just created above.
+If you've changed the output directory in the scripts, change it also in your `conifg.inc.php` for the `gl3_file` and `log_file` entries in the `info` section.
 
 ## Setup cron
 
@@ -52,4 +42,4 @@ Last step, edit your crontab. Type this command:
 
 And add this line at the end (it will sync the repository every 30 minutes):
 
-    */30 * * * *         /path/to/mesamatrix_update.sh
+    */30 * * * *         /path/to/scripts/update.sh
