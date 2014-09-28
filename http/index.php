@@ -128,6 +128,7 @@ foreach($vendors as &$vendor)
 
         <title><?= $config["info"]["title"] ?></title>
 
+        <link rel="shortcut icon" href="images/gears.png" />
         <link href="style.css?v=<?= $config["info"]["version"] ?>" rel="stylesheet" type="text/css" media="all"/>
         <script src="script.js"></script>
     </head>
