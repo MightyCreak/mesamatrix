@@ -11,6 +11,12 @@ $config["info"] = array(
     "title" => "The OpenGL vs Mesa matrix",
     "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",
     "xml_file" => "http/gl3.xml",
+    "project_url" => "https://github.com/MightyCreak/mesamatrix",
+    // Either '$author' or '$author => $website'
+    "authors" => array(
+        "Romain 'Creak' Failliot",
+        "Tobias Droste",
+    ),
 );
 
 $config["flattr"] = array(

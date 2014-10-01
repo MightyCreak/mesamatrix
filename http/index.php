@@ -301,13 +301,18 @@ if($config["flattr"]["enabled"])
         </ul>
         <h1>Sources</h1>
         <p><b>This page is generated from:</b> <a href="<?= $config["git"]["web"]."/tree/".$config["git"]["gl3"] ?>"><?= $config["git"]["web"]."/tree/".$config["git"]["gl3"] ?></a></p>
-        <p>If you want to report a bug or simply to participate in the project, feel free to get the sources on GitHub:
-        <a href="https://github.com/MightyCreak/mesamatrix">https://github.com/MightyCreak/mesamatrix</a></p>
+        <p>If you want to report a bug or simply to participate in the project, feel free to get the sources:
+        <a href="<?= $config["info"]["project_url"] ?>"><?= $config["info"]["project_url"] ?></a></p>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
         <h1>Authors</h1>
         <ul>
-            <li>Romain "Creak" Failliot</li>
-            <li>Tobias Droste</li>
+<?php foreach ($config["info"]["authors"] as $k => $v) {
+    if (is_string($k)) { ?>
+            <li><a href="<?= $v ?>"><?= $k ?></a></li>
+<?php } else { ?>
+            <li><?= $v ?></li>
+<?php }
+} ?>
         </ul>
     </body>
 </html>
