@@ -129,8 +129,11 @@ foreach($vendors as &$vendor)
         <title><?= $config["info"]["title"] ?></title>
 
         <link rel="shortcut icon" href="images/gears.png" />
-        <link href="style.css?v=<?= $config["info"]["version"] ?>" rel="stylesheet" type="text/css" media="all"/>
-        <script src="script.js"></script>
+        <link href="css/style.css?v=<?= $config["info"]["version"] ?>" rel="stylesheet" type="text/css" media="all"/>
+        <link href="css/tipsy.css" rel="stylesheet" type="text/css" media="all" />
+        <script src="js/jquery-1.11.1.min.js"></script>
+        <script src="js/jquery.tipsy.js"></script>
+        <script src="js/script.js"></script>
     </head>
     <body>
         <h1>Last commits</h1>

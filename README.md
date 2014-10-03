@@ -43,3 +43,12 @@ Last step, edit your crontab. Type this command:
 And add this line at the end (it will sync the repository every 30 minutes):
 
     */30 * * * *         /path/to/scripts/update.sh
+
+## License
+
+MesaMatrix is available under the GPLv3, a copy of which is available in
+LICENSE.
+
+jQuery is available under the MIT License.
+
+jQuery Tipsy is available under the MIT License.
