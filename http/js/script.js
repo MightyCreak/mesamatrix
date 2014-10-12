@@ -78,3 +78,13 @@ function getRelativeDate(text)
     return year + "-" + month + "-" + day;
 }
 
+$(document).ready(function() {
+    $(".footnote a").tipsy({gravity: "w"});
+//    $(".footnote a").on("click", function(e) {
+//        if ($(".tipsy").length === 0) {
+//            $(this).tipsy("show");
+//        } else {
+//            $(this).tipsy("hide");
+//        }
+//    });
+});
