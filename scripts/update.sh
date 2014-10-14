@@ -15,6 +15,6 @@ gitlog_format="%H%n  timestamp: %ct%n  author: %an%n  subject: %s%n"
 
 cd $gitdir
 
-git fetch
+git fetch origin master:master
 git cat-file blob HEAD:$gitgl3path > $outputdir/gl3.txt
 git log -n $gitlog_depth --pretty=format:"$gitlog_format" -- $gitgl3path > $outputdir/gl3_log.txt
