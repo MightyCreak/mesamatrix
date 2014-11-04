@@ -6,12 +6,12 @@ require_once "scripts/commitsparser.inc.php";
 require_once "scripts/git.inc.php";
 
 $gitFetch = exec_git("fetch origin master:master", $stream);
-if($config["info"]["debug"] === TRUE)
+if(MesaMatrix::$config["info"]["debug"] === TRUE)
 {
     $output = stream_get_contents($stream);
     if(!empty($output))
     {
-        debug_print(stream_get_contents($stream));
+        MesaMatrix::debug_print(stream_get_contents($stream));
     }
 }
 

@@ -37,7 +37,7 @@ require_once "http/incs/hints.inc.php";
 ///////////////////////////////////////
 // File code.
 
-$gl3Path = $config["info"]["xml_file"];
+$gl3Path = MesaMatrix::$config["info"]["xml_file"];
 
 // Read "xml_file".
 $xml = simplexml_load_file($gl3Path);
@@ -99,12 +99,12 @@ foreach($xml->drivers->vendor as $vendor)
 <html>
     <head>
         <meta charset="utf-8"/>
-        <meta name="description" content="<?= $config["info"]["description"] ?>"/>
+        <meta name="description" content="<?= MesaMatrix::$config["info"]["description"] ?>"/>
 
-        <title><?= $config["info"]["title"] ?></title>
+        <title><?= MesaMatrix::$config["info"]["title"] ?></title>
 
         <link rel="shortcut icon" href="images/gears.png" />
-        <link href="css/style.css?v=<?= $config["info"]["version"] ?>" rel="stylesheet" type="text/css" media="all"/>
+        <link href="css/style.css?v=<?= MesaMatrix::$config["info"]["version"] ?>" rel="stylesheet" type="text/css" media="all"/>
         <link href="css/tipsy.css" rel="stylesheet" type="text/css" media="all" />
         <script src="js/jquery-1.11.1.min.js"></script>
         <script src="js/jquery.tipsy.js"></script>
@@ -112,7 +112,7 @@ foreach($xml->drivers->vendor as $vendor)
     </head>
     <body>
         <h1>Last commits</h1>
-        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= $config["git"]["web"]."/log/docs/GL3.txt" ?>">see the log</a>)</p>
+        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= MesaMatrix::$config["git"]["web"]."/log/docs/GL3.txt" ?>">see the log</a>)</p>
 <?php
 foreach($xml->commits->commit as $commit) {
     $commitDate = date(DATE_RFC2822, (int) $commit["timestamp"]);
@@ -122,7 +122,7 @@ foreach($xml->commits->commit as $commit) {
             <noscript><?= $commitDate ?></noscript>:
         </div>
         <div class="commitText">
-            <a href="<?= $config["git"]["web"]."/commit/".$config["git"]["gl3"]
+            <a href="<?= MesaMatrix::$config["git"]["web"]."/commit/".MesaMatrix::$config["git"]["gl3"]
                 ?>?id=<?= $commit["hash"] ?>"><?= $commit["subject"] ?></a>
         </div>
 <?php
@@ -283,11 +283,11 @@ for($i = 0; $i < $numHints; $i++)
         <h1>How to help</h1>
         <p>If you find this page useful and want to help, you can report issues, or <a href="https://github.com/MightyCreak/mesamatrix">grab the code</a> and add whatever feature you want.</p>
 <?php
-if($config["flattr"]["enabled"])
+if(MesaMatrix::$config["flattr"]["enabled"])
 {
 ?>
         <p>You can click here too, if you want to Flattr me:</p>
-        <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= $config["flattr"]["id"] ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= $config["info"]["title"] ?>')+'&description='+encodeURIComponent('<?= $config["info"]["description"] ?>')+'&language='+encodeURIComponent('<?= $config["flattr"]["language"] ?>')+'&tags=<?= $config["flattr"]["tags"] ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
+        <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= MesaMatrix::$config["flattr"]["id"] ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= MesaMatrix::$config["info"]["title"] ?>')+'&description='+encodeURIComponent('<?= MesaMatrix::$config["info"]["description"] ?>')+'&language='+encodeURIComponent('<?= MesaMatrix::$config["flattr"]["language"] ?>')+'&tags=<?= MesaMatrix::$config["flattr"]["tags"] ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
 <?php
 }
 ?>
@@ -300,13 +300,13 @@ if($config["flattr"]["enabled"])
             <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
         </ul>
         <h1>Sources</h1>
-        <p><b>This page is generated from:</b> <a href="<?= $config["git"]["web"]."/tree/".$config["git"]["gl3"] ?>"><?= $config["git"]["web"]."/tree/".$config["git"]["gl3"] ?></a></p>
+        <p><b>This page is generated from:</b> <a href="<?= MesaMatrix::$config["git"]["web"]."/tree/".MesaMatrix::$config["git"]["gl3"] ?>"><?= MesaMatrix::$config["git"]["web"]."/tree/".MesaMatrix::$config["git"]["gl3"] ?></a></p>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources:
-        <a href="<?= $config["info"]["project_url"] ?>"><?= $config["info"]["project_url"] ?></a></p>
+        <a href="<?= MesaMatrix::$config["info"]["project_url"] ?>"><?= MesaMatrix::$config["info"]["project_url"] ?></a></p>
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
         <h1>Authors</h1>
         <ul>
-<?php foreach ($config["info"]["authors"] as $k => $v) {
+<?php foreach (MesaMatrix::$config["info"]["authors"] as $k => $v) {
     if (is_string($k)) { ?>
             <li><a href="<?= $v ?>"><?= $k ?></a></li>
 <?php } else { ?>

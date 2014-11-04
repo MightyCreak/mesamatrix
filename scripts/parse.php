@@ -6,11 +6,11 @@ require_once "scripts/commitsparser.inc.php";
 require_once "scripts/git.inc.php";
 
 //$gitLog = exec_git("log --pretty=format:%H --reverse " .
-//    $config["git"]["oldest_commit"].".. -- ".$config["git"]["gl3"], $log);
+//    MesaMatrix::$config["git"]["oldest_commit"].".. -- ".MesaMatrix::$config["git"]["gl3"], $log);
 //$initialCommit = rtrim(fgets($log));
 $initialCommit = "master";
 
-$gitCat = exec_git("show ".$initialCommit.":".$config["git"]["gl3"], $stream);
+$gitCat = exec_git("show ".$initialCommit.":".MesaMatrix::$config["git"]["gl3"], $stream);
 $parser = new OglParser();
 $matrix = $parser->parse_stream($stream);
 fclose($stream);
@@ -31,8 +31,8 @@ foreach ($allDriversVendors as $glVendor => $glDrivers) {
 
 // commits log
 $gitLogFormat = "%H%n  timestamp: %ct%n  author: %an%n  subject: %s%n";
-$gitCommits = exec_git("log -n ".$config["git"]["commitparser_depth"].
-    " --pretty=format:'".$gitLogFormat."' -- ".$config["git"]["gl3"],
+$gitCommits = exec_git("log -n ".MesaMatrix::$config["git"]["commitparser_depth"].
+    " --pretty=format:'".$gitLogFormat."' -- ".MesaMatrix::$config["git"]["gl3"],
     $commitsStream);
 $commitsParser = new CommitsParser();
 $commits = $commitsParser->parse_stream($commitsStream);
@@ -104,7 +104,7 @@ foreach ($matrix->getGlVersions() as $glVersion) {
 $dom = dom_import_simplexml($xml)->ownerDocument;
 $dom->formatOutput = true;
 
-file_put_contents($config["info"]["xml_file"], $dom->saveXML());
-//$xml->asXML($config["info"]["xml_file"]);
+file_put_contents(MesaMatrix::$config["info"]["xml_file"], $dom->saveXML());
+//$xml->asXML(MesaMatrix::$config["info"]["xml_file"]);
 
 ?>

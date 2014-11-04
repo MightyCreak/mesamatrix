@@ -3,11 +3,9 @@
 require_once __DIR__."/../config.inc.php";
 
 function exec_git($cmd, &$pipe) {
-    global $config;
+    $gitDir = MesaMatrix::$config["git"]["dir"];
 
-    $gitDir = $config["git"]["dir"];
-
-    debug_print("git ".$cmd);
+    MesaMatrix::debug_print("git ".$cmd);
     $process = proc_open(
         "git ".$cmd,
         array(1 => array("pipe", "w")),
