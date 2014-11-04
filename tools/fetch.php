@@ -1,9 +1,9 @@
 <?php
 
-require_once __DIR__."/../config.inc.php";
-require_once "scripts/oglparser.inc.php";
-require_once "scripts/commitsparser.inc.php";
-require_once "scripts/git.inc.php";
+require_once __DIR__."/../config.php";
+require_once "lib/oglparser.php";
+require_once "lib/commitsparser.php";
+require_once "lib/git.php";
 
 $gitFetch = exec_git("fetch origin master:master", $stream);
 if(MesaMatrix::$config["info"]["debug"] === TRUE)

@@ -21,18 +21,8 @@
 ///////////////////////////////////////
 // Common code.
 
-$configFile = "../config.inc.php";
-if(!file_exists($configFile))
-{
-    exit("The configuration file \"config.inc.php\" doesn't exist.
-          Please copy \"example.config.inc.php\", rename it, and
-          fill it with the proper information.");
-}
-
-require_once $configFile;
-unset($configFile);
-
-require_once "http/incs/hints.inc.php";
+require_once "../config.php";
+require_once "lib/hints.php";
 
 ///////////////////////////////////////
 // File code.

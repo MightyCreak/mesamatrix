@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__."/../config.inc.php";
+require_once __DIR__."/../config.php";
 
 $gitCmd = "git clone --bare --depth ".MesaMatrix::$config["git"]["depth"]." ".
         MesaMatrix::$config["git"]["url"]." ".MesaMatrix::$config["git"]["dir"];

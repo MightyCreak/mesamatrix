@@ -405,4 +405,3 @@ class OglParser
         return FALSE;
     }
 };
-?>

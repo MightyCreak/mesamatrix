@@ -69,4 +69,3 @@ class Hints
     private $list;
 };
 
-?>

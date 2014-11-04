@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__."/../config.inc.php";
-
 function exec_git($cmd, &$pipe) {
     $gitDir = MesaMatrix::$config["git"]["dir"];
 
@@ -19,4 +17,3 @@ function exec_git($cmd, &$pipe) {
     return $process;
 }
 
-?>
