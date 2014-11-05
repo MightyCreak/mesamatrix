@@ -19,6 +19,7 @@ class MesaMatrix
             "authors" => array(
                 "Romain 'Creak' Failliot",
                 "Tobias Droste",
+                "Robin McCorkell" => "mailto:rmccorkell@karoshi.org.uk",
             ),
         ),
 
