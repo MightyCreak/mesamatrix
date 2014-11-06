@@ -20,14 +20,21 @@
 
 class CommitsParser
 {
-    public function parse($filename)
-    {
+    public function parse($filename) {
         $handle = fopen($filename, "r");
         if($handle === FALSE)
         {
             return NULL;
         }
 
+        $ret = parse_stream($handle);
+
+        fclose($handle);
+        return $ret;
+    }
+
+    public function parse_stream($handle)
+    {
         $commits = array();
 
         // Regexp patterns.
@@ -68,9 +75,6 @@ class CommitsParser
             $line = fgets($handle);
         }
 
-        fclose($handle);
-
         return $commits;
     }
 };
-?>
