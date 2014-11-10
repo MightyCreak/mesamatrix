@@ -1,12 +1,12 @@
 <?php
 
-require_once __DIR__."/../config.php";
-require_once "lib/oglparser.php";
-require_once "lib/commitsparser.php";
-require_once "lib/git.php";
+require_once __DIR__."/../lib/base.php";
+require_once "oglparser.php";
+require_once "commitsparser.php";
+require_once "git.php";
 
 $gitFetch = exec_git("fetch origin master:master", $stream);
-if(MesaMatrix::$config["info"]["debug"] === TRUE)
+if(MesaMatrix::$config->getValue("info", "debug") === TRUE)
 {
     $output = stream_get_contents($stream);
     if(!empty($output))

@@ -1,16 +1,16 @@
 <?php
 
-require_once __DIR__."/../config.php";
-require_once "lib/oglparser.php";
-require_once "lib/commitsparser.php";
-require_once "lib/git.php";
+require_once __DIR__."/../lib/base.php";
+require_once "oglparser.php";
+require_once "commitsparser.php";
+require_once "git.php";
 
 //$gitLog = exec_git("log --pretty=format:%H --reverse " .
-//    MesaMatrix::$config["git"]["oldest_commit"].".. -- ".MesaMatrix::$config["git"]["gl3"], $log);
+//    MesaMatrix::$config->getValue("git", "oldest_commit").".. -- ".MesaMatrix::$config->getValue("git", "gl3"), $log);
 //$initialCommit = rtrim(fgets($log));
 $initialCommit = "master";
 
-$gitCat = exec_git("show ".$initialCommit.":".MesaMatrix::$config["git"]["gl3"], $stream);
+$gitCat = exec_git("show ".$initialCommit.":".MesaMatrix::$config->getValue("git", "gl3"), $stream);
 $parser = new OglParser();
 $matrix = $parser->parse_stream($stream);
 fclose($stream);
@@ -31,8 +31,8 @@ foreach ($allDriversVendors as $glVendor => $glDrivers) {
 
 // commits log
 $gitLogFormat = "%H%n  timestamp: %ct%n  author: %an%n  subject: %s%n";
-$gitCommits = exec_git("log -n ".MesaMatrix::$config["git"]["commitparser_depth"].
-    " --pretty=format:'".$gitLogFormat."' -- ".MesaMatrix::$config["git"]["gl3"],
+$gitCommits = exec_git("log -n ".MesaMatrix::$config->getValue("git", "commitparser_depth").
+    " --pretty=format:'".$gitLogFormat."' -- ".MesaMatrix::$config->getValue("git", "gl3"),
     $commitsStream);
 $commitsParser = new CommitsParser();
 $commits = $commitsParser->parse_stream($commitsStream);
@@ -72,16 +72,16 @@ foreach ($matrix->getGlVersions() as $glVersion) {
         $ext = $gl->addChild("extension");
         $ext->addAttribute("name", $glExt->getName());
 
-        if(MesaMatrix::$config["opengl_links"]["enabled"]) {
+        if(MesaMatrix::$config->getValue("opengl_links", "enabled", false)) {
             if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
                 if ($matches[1] === "GL") {
                     // Found a GL_TYPE_extension.
-                    $openglUrl = MesaMatrix::$config["opengl_links"]["url"].urlencode($matches[2])."/".urlencode($matches[3]).".txt";
+                    $openglUrl = MesaMatrix::$config->getValue("opengl_links", "url").urlencode($matches[2])."/".urlencode($matches[3]).".txt";
                     $urlHeader = get_headers($openglUrl);
                 }
                 else {
                     // Found a GLX_TYPE_Extension.
-                    $openglUrl = MesaMatrix::$config["opengl_links"]["url"].urlencode($matches[2])."/glx_".urlencode($matches[3]).".txt";
+                    $openglUrl = MesaMatrix::$config->getValue("opengl_links", "url").urlencode($matches[2])."/glx_".urlencode($matches[3]).".txt";
                     $urlHeader = get_headers($openglUrl);
                 }
 
@@ -124,10 +124,12 @@ foreach ($matrix->getGlVersions() as $glVersion) {
 //fclose($log);
 //proc_close($gitLog);
 
+$xmlPath = MesaMatrix::path(MesaMatrix::$config->getValue("info", "xml_file"));
+
 $dom = dom_import_simplexml($xml)->ownerDocument;
 $dom->formatOutput = true;
 
-file_put_contents(MesaMatrix::$config["info"]["xml_file"], $dom->saveXML());
-//$xml->asXML(MesaMatrix::$config["info"]["xml_file"]);
+file_put_contents($xmlPath, $dom->saveXML());
+//$xml->asXML($xmlPath);
 
 ?>
