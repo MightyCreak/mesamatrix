@@ -36,8 +36,37 @@ if(!$xml)
     exit("Can't read '".$gl3Path."'");
 }
 
-$hints = new Hints();
+// Set all the versions in an array so that it can be sorted out.
+$glVersions = array();
 foreach($xml->gl as $glVersion)
+{
+    $glVersions[] = $glVersion;
+}
+
+// Sort the versions.
+usort($glVersions, function($a, $b)
+    {
+        // Sort OpenGL before OpenGLES and higher versions before lower ones.
+        if((string) $a["name"] === (string) $b["name"])
+        {
+            $diff = (float) $b["version"] - (float) $a["version"];
+            if($diff === 0)
+                return 0;
+            else
+                return $diff < 0 ? -1 : 1;
+        }
+        else if((string) $a["name"] === "OpenGL")
+        {
+            return 1;
+        }
+        else
+        {
+            return 1;
+        }
+    });
+
+$hints = new Hints();
+foreach($glVersions as $glVersion)
 {
     foreach($glVersion->extension as $ext)
     {
@@ -118,7 +147,7 @@ foreach($xml->commits->commit as $commit) {
 <?php
 }
 
-foreach($xml->gl as $glVersion)
+foreach($glVersions as $glVersion)
 {
     $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
     $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
