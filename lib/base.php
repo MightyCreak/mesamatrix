@@ -18,24 +18,30 @@
  * along with mesamatrix. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class MesaMatrix
+require_once 'autoloader.php';
+
+class Mesamatrix
 {
     public static $serverRoot; // Path to root of installation
     public static $configDir; // Path to configuration directory
-    public static $config; // \Config object
+    public static $config; // Config object
+    public static $autoloader; // Autoloader object
 
     public static function init()
     {
-        self::$serverRoot = str_replace("\\", '/', substr(__DIR__, 0, -4));
+        $dir = str_replace("\\", '/', __DIR__);
+        self::$serverRoot = implode('/', array_slice(explode('/', $dir), 0, -1));
 
         set_include_path(
           self::$serverRoot.'/lib' . PATH_SEPARATOR .
           get_include_path()
         );
 
-        require_once 'config.php';
+        self::$autoloader = new \Mesamatrix\Autoloader();
+        spl_autoload_register(array(self::$autoloader, 'load'));
+
         self::$configDir = self::$serverRoot.'/config';
-        self::$config = new \Config(self::$configDir);
+        self::$config = new \Mesamatrix\Config(self::$configDir);
 
         date_default_timezone_set('UTC');
     }
@@ -54,4 +60,4 @@ class MesaMatrix
     }
 }
 
-MesaMatrix::init();
+\Mesamatrix::init();

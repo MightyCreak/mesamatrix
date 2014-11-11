@@ -18,6 +18,8 @@
  * along with mesamatrix. If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace Mesamatrix;
+
 class Config
 {
     protected $debugMode;

@@ -1,11 +1,10 @@
 <?php
 
 require_once __DIR__."/../lib/base.php";
-require_once "git.php";
 
-$git = exec_git(
-  "clone --bare --depth ".MesaMatrix::$config->getValue("git", "depth")." ".
-  MesaMatrix::$config->getValue("git", "url")." @gitDir@"
+$git = Mesamatrix\Git\Util::exec(
+  "clone --bare --depth ".Mesamatrix::$config->getValue("git", "depth")." ".
+  Mesamatrix::$config->getValue("git", "url")." @gitDir@"
 );
 
 proc_close($git);

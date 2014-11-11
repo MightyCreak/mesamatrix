@@ -18,56 +18,26 @@
  * along with mesamatrix. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Mesamatrix;
+namespace Mesamatrix\Parser;
 
+// Hints gathered during the parsing.
 class Hints
 {
-    public function __construct()
-    {
-        $this->list = array();
-    }
+    public $allHints = array();
 
-    public function findHint($hint)
+    public function addToHints($hint)
     {
         $idx = -1;
         if(!empty($hint))
         {
-            $key = array_search($hint, $this->list);
-            if($key !== FALSE)
-            {
-                $idx = $key;
-            }
-        }
-
-        return $idx;
-     }
-
-    public function addHint($hint)
-    {
-        $idx = -1;
-        if(!empty($hint))
-        {
-            $idx = array_search($hint, $this->list);
+            $idx = array_search($hint, $this->allHints);
             if($idx === FALSE)
             {
-                $this->list[] = $hint;
-                $idx = count($this->list) - 1;
+                $this->allHints[] = $hint;
+                $idx = count($this->allHints) - 1;
             }
         }
 
         return $idx;
     }
-
-    public function getNumHints()
-    {
-        return count($this->list);
-    }
-
-    public function getHint($idx)
-    {
-        return $this->list[$idx];
-    }
-
-    private $list;
-};
-
+}

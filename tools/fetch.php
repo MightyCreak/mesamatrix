@@ -1,17 +1,14 @@
 <?php
 
 require_once __DIR__."/../lib/base.php";
-require_once "oglparser.php";
-require_once "commitsparser.php";
-require_once "git.php";
 
-$gitFetch = exec_git("fetch origin master:master", $stream);
-if(MesaMatrix::$config->getValue("info", "debug") === TRUE)
+$gitFetch = Mesamatrix\Git\Util::exec("fetch origin master:master", $stream);
+if(Mesamatrix::$config->getValue("info", "debug") === TRUE)
 {
     $output = stream_get_contents($stream);
     if(!empty($output))
     {
-        MesaMatrix::debug_print(stream_get_contents($stream));
+        Mesamatrix::debug_print(stream_get_contents($stream));
     }
 }
 
