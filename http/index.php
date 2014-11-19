@@ -219,10 +219,15 @@ foreach($glVersions as $glVersion)
             $taskClasses .= " footnote";
         }
 
+        $extNameText = $ext["name"];
+        if(isset($ext->link))
+        {
+            $extNameText = str_replace($ext->link, "<a href=\"".$ext->link["href"]."\">".$ext->link."</a>", $extNameText);
+        }
 ?>
                 <tr class="extension">
                     <td id="<?= $extUrlId ?>"<?php if(strncmp($ext["name"], "-", 1) === 0) { ?> class="extension-child"<?php } ?>>
-                        <?= $ext["name"] ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
+                        <?= $extNameText ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
                     <td class="<?= $taskClasses ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>">&nbsp;</a><?php } ?></td>
 <?php
