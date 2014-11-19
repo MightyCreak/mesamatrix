@@ -15,13 +15,18 @@ class MesaMatrix
             "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",
             "xml_file" => "http/gl3.xml",
             "project_url" => "https://github.com/MightyCreak/mesamatrix",
-            "opengl_url" => "https://www.opengl.org/registry/specs/",
+
             // Either '$author' or '$author => $website'
             "authors" => array(
                 "Romain 'Creak' Failliot",
                 "Tobias Droste",
                 "Robin McCorkell" => "mailto:rmccorkell@karoshi.org.uk",
             ),
+        ),
+
+        "opengl_links" => array(
+            "enabled" => TRUE,
+            "url" => "https://www.opengl.org/registry/specs/",
         ),
 
         "flattr" => array(

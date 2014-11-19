@@ -72,23 +72,25 @@ foreach ($matrix->getGlVersions() as $glVersion) {
         $ext = $gl->addChild("extension");
         $ext->addAttribute("name", $glExt->getName());
 
-        if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
-            if ($matches[1] === "GL") {
-                // Found a GL_TYPE_extension.
-                $openglUrl = MesaMatrix::$config["info"]["opengl_url"].urlencode($matches[2])."/".urlencode($matches[3]).".txt";
-                $urlHeader = get_headers($openglUrl);
-            }
-            else {
-                // Found a GLX_TYPE_Extension.
-                $openglUrl = MesaMatrix::$config["info"]["opengl_url"].urlencode($matches[2])."/glx_".urlencode($matches[3]).".txt";
-                $urlHeader = get_headers($openglUrl);
-            }
+        if(MesaMatrix::$config["opengl_links"]["enabled"]) {
+            if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
+                if ($matches[1] === "GL") {
+                    // Found a GL_TYPE_extension.
+                    $openglUrl = MesaMatrix::$config["opengl_links"]["url"].urlencode($matches[2])."/".urlencode($matches[3]).".txt";
+                    $urlHeader = get_headers($openglUrl);
+                }
+                else {
+                    // Found a GLX_TYPE_Extension.
+                    $openglUrl = MesaMatrix::$config["opengl_links"]["url"].urlencode($matches[2])."/glx_".urlencode($matches[3]).".txt";
+                    $urlHeader = get_headers($openglUrl);
+                }
 
-            if ($urlHeader !== FALSE) {
-                MesaMatrix::debug_print("Try URL \"".$openglUrl."\". Result: \"".$urlHeader[0]."\".");
-                if ($urlHeader[0] === "HTTP/1.1 200 OK") {
-                    $linkNode = $ext->addChild("link", $matches[0]);
-                    $linkNode->addAttribute("href", $openglUrl);
+                if ($urlHeader !== FALSE) {
+                    MesaMatrix::debug_print("Try URL \"".$openglUrl."\". Result: \"".$urlHeader[0]."\".");
+                    if ($urlHeader[0] === "HTTP/1.1 200 OK") {
+                        $linkNode = $ext->addChild("link", $matches[0]);
+                        $linkNode->addAttribute("href", $openglUrl);
+                    }
                 }
             }
         }
