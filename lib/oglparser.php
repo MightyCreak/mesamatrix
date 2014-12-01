@@ -20,8 +20,8 @@
 
 // List of all the drivers.
 $allDrivers = array(
-    "softpipe",
     "swrast",
+    "softpipe",
     "llvmpipe",
     "i965",
     "nv50",
