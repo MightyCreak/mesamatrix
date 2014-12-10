@@ -34,20 +34,20 @@ section. Examples are written in PHP.
 Examples:
 
 ```php
-namespace MyProject\Utils;            // PascalCase for namespaces.
+namespace MyProject\Utils;                  // PascalCase for namespaces.
 
-$myVariable = 0;                      // camelCase for variables.
+$myVariable = 0;                            // camelCase for variables.
 
-function getSomething($a, $b) {       // camelCase for functions.
+function getSomething($a, $b) {             // camelCase for functions.
     // code here...
 }
 
-class MyClass {                               // PascalCase for classes.
-    public function getSomething($a, $b) {    // camelCase for methods.
+class MyClass {                             // PascalCase for classes.
+    public function getSomething($a, $b) {  // camelCase for methods.
         // code here...
     }
 
-    private $awesomeMember;                   // camelCase for members.
+    private $awesomeMember;                 // camelCase for members.
 }
 ```
 
@@ -72,17 +72,17 @@ $c = getSomething($a, $b);
 **Don't**
 
 ```php
-function doSomething($a, $b){     // No space before '{'.
+function doSomething($a, $b){               // No space before '{'.
     // code here...
 }
-function doSomething($a, $b)      // '{' is not on the same line.
+function doSomething($a, $b)                // '{' is not on the same line.
 {
     // code here...
 }
-function doSomething($a, $b) { /* code */ }    // Definition on one line.
+function doSomething($a, $b) { /* code */ } // Definition on one line.
 
-$c = getSomething( $a, $b );      // Bad: spaces after '(' and before ')'.
-$c = getSomething($a,$b);         // Bad: no space after ','.
+$c = getSomething( $a, $b );                // Spaces after '(' and before ')'.
+$c = getSomething($a,$b);                   // No space after ','.
 ```
 
 #### Control blocks
@@ -126,9 +126,9 @@ default:
 **Don't**
 
 ```php
-if($a === $b) {             // No space after 'if'.
+if($a === $b) {                     // No space after 'if'.
     // code here...
-} else {                    // 'else' is not on a new line.
+} else {                            // 'else' is not on a new line.
     // code here...
 }
 
@@ -140,7 +140,7 @@ for ($i = 0 ; $i < 10 ; $i++) {     // Spaces before ';'.
 }
 
 switch ($condition) {
-    case 1:                 // 'case' is indented.
+    case 1:                         // 'case' is indented.
         break;
 }
 ```
@@ -154,10 +154,10 @@ switch ($condition) {
 **Do**
 
 ```php
-$a = 10;.
-$a = $a / 2 + 1;.
-$a = $isUsed ? 1 : 2;.
-$a = -$b;.
+$a = 10;
+$a = $a / 2 + 1;
+$a = $isUsed ? 1 : 2;
+$a = -$b;
 ```
 
 **Don't**
