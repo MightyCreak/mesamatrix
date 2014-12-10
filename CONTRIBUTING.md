@@ -27,15 +27,14 @@ section. Examples are written in PHP.
 
 #### Case
 
-- Use `lowercase` for namespaces
-- Use `PascalCase` for classes and structures
+- Use `PascalCase` for classes, structures and namespaces
 - Use `camelCase` for variables, members, functions and methods
 - No prefix and no suffix for the members
 
 Examples:
 
 ```php
-namespace myproject\utils;            // lowercase for namespaces.
+namespace MyProject\Utils;            // PascalCase for namespaces.
 
 $myVariable = 0;                      // camelCase for variables.
 
