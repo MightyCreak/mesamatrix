@@ -28,11 +28,7 @@ And to set up mesamatrix, simply run from the project base directory:
 
 ## Setup the web interface
 
-Create your config file:
-
-    $ cp example.config.inc.php config.inc.php
-
-If you've changed the output directory in the scripts, change it also in your `conifg.inc.php` for the `gl3_file` and `log_file` entries in the `info` section.
+The default configuration is stored in `config/config.default.php`. To apply your own settings, create `config/config.php` or any file of the format `config/*.config.php`. These settings will override those in `config/config.default.php`.
 
 ## Setup cron
 

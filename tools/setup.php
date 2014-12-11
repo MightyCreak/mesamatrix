@@ -1,11 +1,12 @@
 <?php
 
-require_once __DIR__."/../config.php";
+require_once __DIR__."/../lib/base.php";
 
-$gitCmd = "git clone --bare --depth ".MesaMatrix::$config["git"]["depth"]." ".
-        MesaMatrix::$config["git"]["url"]." ".MesaMatrix::$config["git"]["dir"];
+$git = Mesamatrix\Git\Util::exec(
+  "clone --bare --depth ".Mesamatrix::$config->getValue("git", "depth")." ".
+  Mesamatrix::$config->getValue("git", "url")." @gitDir@"
+);
 
-MesaMatrix::debug_print($gitCmd);
-system($gitCmd);
+proc_close($git);
 
 ?>
