@@ -18,13 +18,10 @@
  * along with mesamatrix. If not, see <http://www.gnu.org/licenses/>.
  */
 
-///////////////////////////////////////
-// Common code.
-
 require_once "../lib/base.php";
 
-///////////////////////////////////////
-// File code.
+/////////////////////////////////////////////////
+// Load XML.
 
 $gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
 
@@ -58,6 +55,9 @@ usort($glVersions, function($a, $b) {
         }
     });
 
+/////////////////////////////////////////////////
+// Hints.
+//
 $hints = new Mesamatrix\Hints();
 foreach ($glVersions as $glVersion) {
     foreach ($glVersion->extension as $ext) {
@@ -79,12 +79,26 @@ foreach ($glVersions as $glVersion) {
     }
 }
 
+/////////////////////////////////////////////////
+// Leaderboard.
+//
+$leaderboard = new Mesamatrix\Leaderboard();
+$leaderboard->load($xml);
+$driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
+$numTotalExts = $leaderboard->getNumTotalExts();
+
+/////////////////////////////////////////////////
+// Update times.
+//
 $updateTime = filemtime($gl3Path);
 $lastGitUpdate = "No commit found";
 if (count($xml->commits->commit) > 0) {
     $lastGitUpdate = date(DATE_RFC2822, (int) $xml->commits->commit[0]["timestamp"]);
 }
 
+/////////////////////////////////////////////////
+// Drivers CSS classes.
+//
 foreach ($xml->drivers->vendor as $vendor) {
     switch($vendor["name"]) {
     case "Software": $vendor->addAttribute("class", "hCellVendor-soft"); break;
@@ -95,6 +109,7 @@ foreach ($xml->drivers->vendor as $vendor) {
     }
 }
 
+/////////////////////////////////////////////////
 // Write the HTML code.
 ?>
 <!DOCTYPE html>
@@ -129,6 +144,38 @@ foreach ($xml->commits->commit as $commit) {
         </div>
 <?php
 }
+?>
+        <h1>Leaderboard</h1>
+        <table class="lb">
+            <tr>
+                <th>#</th>
+                <th>Driver</th>
+                <th>Score</th>
+                <th>Completion</th>
+            </tr>
+<?php
+$rank = 1;
+foreach($driversExtsDone as $drivername => $numExtsDone)
+{
+    $extraClass = "";
+    switch($rank) {
+    case 1: $extraClass = "lbRow-1st"; break;
+    case 2: $extraClass = "lbRow-2nd"; break;
+    case 3: $extraClass = "lbRow-3rd"; break;
+    }
+?>
+            <tr>
+                <th class="lbCol-rank"><?= $rank ?></td>
+                <td class="lbCol-driver <?= $extraClass ?>"><?= $drivername ?></td>
+                <td class="lbCol-score <?= $extraClass ?>"><?= $numExtsDone." / ".$numTotalExts ?></td>
+                <td class="lbCol-score <?= $extraClass ?>"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
+            </tr>
+<?php
+    $rank++;
+}
+?>
+        </table>
+<?php
 
 foreach ($glVersions as $glVersion) {
     $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
@@ -155,13 +202,11 @@ foreach ($glVersions as $glVersion) {
                     <th class="hCellVendor-default hCell-ext">Extension</th>
                     <th class="hCellVendor-default hCell-driver">mesa</th>
 <?php
-    $doneForMesa = 0;
     foreach ($xml->drivers->vendor as $vendor) {
 ?>
                     <th class="hCell-sep"></th>
 <?php
         foreach ($vendor->driver as $driver) {
-            $driver["done"] = 0;
 ?>
                     <th class="<?= $vendor["class"] ?> hCell-driver"><?= $driver["name"] ?></th>
 <?php
@@ -172,13 +217,10 @@ foreach ($glVersions as $glVersion) {
             </thead>
             <tbody>
 <?php
-    $numExtensions = count($glVersion->extension);
-
     foreach ($glVersion->extension as $ext) {
         $taskClasses = "task";
         if ($ext->mesa["status"] == "complete") {
             $taskClasses .= " isDone";
-            $doneForMesa += 1;
         }
         elseif ($ext->mesa["status"] == "incomplete") {
             $taskClasses .= " isNotStarted";
@@ -234,28 +276,34 @@ foreach ($glVersions as $glVersion) {
                 </tr>
 <?php
     }
+
+    $lbGlVersion = $leaderboard->findGlVersion($glVersion["name"].$glVersion["version"]);
+    if ($lbGlVersion !== NULL) {
+        $numGlVersionExts = $lbGlVersion->getNumExts();
 ?>
             </tbody>
             <tfoot>
                 <tr class="extension">
                     <td><b>Total:</b></td>
-                    <td class="hCellVendor-default task"><?= $doneForMesa."/".$numExtensions ?></td>
+                    <td class="hCellVendor-default task"><?= $lbGlVersion->getNumDriverExtsDone("mesa")."/".$numGlVersionExts ?></td>
 <?php
-    foreach ($xml->drivers->vendor as $vendor) {
+        foreach ($xml->drivers->vendor as $vendor) {
 ?>
                     <td></td>
 <?php
-        foreach ($vendor->driver as $driver) {
+            foreach ($vendor->driver as $driver) {
+	        $driverName = (string) $driver["name"];
 ?>
-                    <td class="<?= $vendor["class"] ?> task"><?= $driver["done"]."/".$numExtensions ?></td>
+                    <td class="<?= $vendor["class"] ?> task"><?= $lbGlVersion->getNumDriverExtsDone($driverName)."/".$numGlVersionExts ?></td>
 <?php
+            }
         }
-    }
 ?>
                 </tr>
             </tfoot>
         </table>
 <?php
+    }
 }
 ?>
         <h1>Footnotes</h1>
