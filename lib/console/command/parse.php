@@ -97,6 +97,14 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $inProgressStatus = $statuses->addChild("started");
         $inProgressStatus->addChild("match", "*");
 
+        // Need URL cache?
+        $urlCache = NULL;
+        if(\Mesamatrix::$config->getValue("opengl_links", "enabled", false)) {
+            // Load URL cache.
+            $urlCache = new \Mesamatrix\Parser\UrlCache();
+            $urlCache->load();
+        }
+
         // extensions
         foreach ($matrix->getGlVersions() as $glVersion) {
             $gl = $xml->addChild("gl");
@@ -110,25 +118,21 @@ class Parse extends \Symfony\Component\Console\Command\Command
                 $ext = $gl->addChild("extension");
                 $ext->addAttribute("name", $glExt->getName());
 
-                if(\Mesamatrix::$config->getValue("opengl_links", "enabled", false)) {
+                if ($urlCache) {
                     if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
+                        $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url").urlencode($matches[2])."/";
                         if ($matches[1] === "GL") {
                             // Found a GL_TYPE_extension.
-                            $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url").urlencode($matches[2])."/".urlencode($matches[3]).".txt";
-                            $urlHeader = get_headers($openglUrl);
+                            $openglUrl .= urlencode($matches[3]).".txt";
                         }
                         else {
                             // Found a GLX_TYPE_Extension.
-                            $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url").urlencode($matches[2])."/glx_".urlencode($matches[3]).".txt";
-                            $urlHeader = get_headers($openglUrl);
+                            $openglUrl .= "glx_".urlencode($matches[3]).".txt";
                         }
 
-                        if ($urlHeader !== FALSE) {
-                            $logger->info("Try URL \"".$openglUrl."\". Result: \"".$urlHeader[0]."\".");
-                            if ($urlHeader[0] === "HTTP/1.1 200 OK") {
-                                $linkNode = $ext->addChild("link", $matches[0]);
-                                $linkNode->addAttribute("href", $openglUrl);
-                            }
+                        if ($urlCache->isValid($openglUrl)) {
+                            $linkNode = $ext->addChild("link", $matches[0]);
+                            $linkNode->addAttribute("href", $openglUrl);
                         }
                     }
                 }
@@ -157,6 +161,10 @@ class Parse extends \Symfony\Component\Console\Command\Command
                     }
                 }
             }
+        }
+        
+        if ($urlCache) {
+            $urlCache->save();
         }
 
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));

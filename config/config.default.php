@@ -17,11 +17,13 @@ $CONFIG = array(
             "Tobias Droste",
             "Robin McCorkell" => "mailto:rmccorkell@karoshi.org.uk",
         ),
+        "private_dir" => "private",
     ),
 
     "opengl_links" => array(
         "enabled" => TRUE,
         "url" => "https://www.opengl.org/registry/specs/",
+        "cache_file" => "urlcache.json",
     ),
 
     "flattr" => array(
