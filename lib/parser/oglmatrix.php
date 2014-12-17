@@ -22,18 +22,15 @@ namespace Mesamatrix\Parser;
 
 class OglMatrix
 {
-    public function __construct()
-    {
+    public function __construct() {
         $this->glVersions = array();
     }
 
-    public function addGlVersion($glVersion)
-    {
+    public function addGlVersion($glVersion) {
         array_push($this->glVersions, $glVersion);
     }
 
-    public function getGlVersions()
-    {
+    public function getGlVersions() {
         return $this->glVersions;
     }
 

@@ -24,16 +24,13 @@ class OglParser
 {
     private $hints;
 
-    public function __construct($hints)
-    {
+    public function __construct($hints) {
         $this->hints = $hints;
     }
 
-    public function parse($filename)
-    {
+    public function parse($filename) {
         $handle = fopen($filename, "r");
-        if($handle === FALSE)
-        {
+        if ($handle === FALSE) {
             return NULL;
         }
 
@@ -42,8 +39,7 @@ class OglParser
         return $ret;
     }
 
-    public function parse_content($content)
-    {
+    public function parse_content($content) {
         $handle = fopen("php://memory", "r+");
         fwrite($handle, $content);
         rewind($handle);
@@ -52,8 +48,7 @@ class OglParser
         return $ret;
     }
 
-    public function parse_stream($handle)
-    {
+    public function parse_stream($handle) {
         // Regexp patterns.
         $reTableHeader = "/^Feature([ ]+)Status/";
         $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
@@ -65,10 +60,8 @@ class OglParser
         $oglMatrix = new OglMatrix();
 
         $line = fgets($handle);
-        while($line !== FALSE)
-        {
-            if(preg_match($reTableHeader, $line, $matches) === 1)
-            {
+        while ($line !== FALSE) {
+            if (preg_match($reTableHeader, $line, $matches) === 1) {
                 // Should be $lineWidth-2, but the file has a variable length in column 1
                 $lineWidth = strlen("Feature") + strlen($matches[1]);
                 $reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?$/";
@@ -76,64 +69,51 @@ class OglParser
                 continue;
             }
 
-            if(preg_match($reVersion, $line, $matches) === 1)
-            {
+            if (preg_match($reVersion, $line, $matches) === 1) {
                 $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6], $this->hints);
 
                 $allSupportedDrivers = array();
-                if(preg_match($reAllDone, $line, $matches) === 1)
-                {
+                if (preg_match($reAllDone, $line, $matches) === 1) {
                     $this->mergeDrivers($allSupportedDrivers, explode(", ", $matches[1]));
                 }
 
                 $line = $this->skipEmptyLines(fgets($handle), $handle);
 
                 $parentDrivers = NULL;
-                while($line !== FALSE && $line !== "\n")
-                {
-                    if(preg_match($reExtension, $line, $matches) === 1)
-                    {
+                while ($line !== FALSE && $line !== "\n") {
+                    if (preg_match($reExtension, $line, $matches) === 1) {
                         $supportedDrivers = $allSupportedDrivers;
                         $matches[1] = trim($matches[1]);
-                        if($matches[1][0] === "-")
-                        {
+                        if ($matches[1][0] === "-") {
                             $this->mergeDrivers($supportedDrivers, $parentDrivers);
                         }
 
                         $matches[2] = trim($matches[2]);
                         $isDone = strncmp($matches[2], "DONE", strlen("DONE")) === 0;
-                        if($isDone && !isset($matches[3]))
-                        {
+                        if ($isDone && !isset($matches[3])) {
                             $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
                         }
-                        else if($isDone && isset($matches[4]))
-                        {
+                        elseif ($isDone && isset($matches[4])) {
                             $driverFound = FALSE;
                             $driversList = explode(", ", $matches[4]);
-                            foreach($driversList as $currentDriver)
-                            {
-                                if($this->isInDriversArray($currentDriver))
-                                {
+                            foreach ($driversList as $currentDriver) {
+                                if ($this->isInDriversArray($currentDriver)) {
                                     $this->mergeDrivers($supportedDrivers, [$currentDriver]);
                                     $driverFound = TRUE;
                                 }
                             }
-                            if (!$driverFound && !empty($matches[4]))
-                            {
-                                if (!in_array($matches[4], $ignoreHints))
-                                {
+                            if (!$driverFound && !empty($matches[4])) {
+                                if (!in_array($matches[4], $ignoreHints)) {
                                     $matches[2] = $matches[2]." ".$matches[4]."";
                                 }
                                 $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
                             }
                         }
-                        else if (isset($matches[4]) && !empty($matches[4]))
-                        {
+                        elseif (isset($matches[4]) && !empty($matches[4])) {
                             $matches[2] = $matches[2]." (".$matches[4].")";
                         }
 
-                        if($matches[1][0] !== "-")
-                        {
+                        if ($matches[1][0] !== "-") {
                             $parentDrivers = $supportedDrivers;
                         }
 
@@ -147,19 +127,16 @@ class OglParser
 
                 $line = $this->skipEmptyLines($line, $handle);
 
-                while($line !== FALSE && preg_match($reNote, $line, $matches) === 1)
-                {
+                while ($line !== FALSE && preg_match($reNote, $line, $matches) === 1) {
                     $idx = array_search($matches[1], $this->hints->allHints);
-                    if($idx !== FALSE)
-                    {
+                    if ($idx !== FALSE) {
                         $this->hints->allHints[$idx] = $matches[2];
                     }
 
                     $line = fgets($handle);
                 }
             }
-            else
-            {
+            else {
                 $line = fgets($handle);
             }
         }
@@ -167,22 +144,17 @@ class OglParser
         return $oglMatrix;
     }
 
-    private function skipEmptyLines($curLine, $handle)
-    {
-        while($curLine !== FALSE && $curLine === "\n")
-        {
+    private function skipEmptyLines($curLine, $handle) {
+        while ($curLine !== FALSE && $curLine === "\n") {
             $curLine = fgets($handle);
         }
 
         return $curLine;
     }
 
-    private function isInDriversArray($name)
-    {
-        foreach(Constants::$allDrivers as $driverName)
-        {
-            if (strncmp($name, $driverName, strlen($driverName)) === 0)
-            {
+    private function isInDriversArray($name) {
+        foreach (Constants::$allDrivers as $driverName) {
+            if (strncmp($name, $driverName, strlen($driverName)) === 0) {
                 return TRUE;
             }
         }
@@ -190,13 +162,10 @@ class OglParser
         return FALSE;
     }
 
-    private function getDriverName($name)
-    {
-        foreach(Constants::$allDrivers as $driver)
-        {
+    private function getDriverName($name) {
+        foreach (Constants::$allDrivers as $driver) {
             $driverLen = strlen($driver);
-            if(strncmp($name, $driver, $driverLen) === 0)
-            {
+            if (strncmp($name, $driver, $driverLen) === 0) {
                 return $driver;
             }
         }
@@ -204,25 +173,20 @@ class OglParser
         return NULL;
     }
 
-    private function mergeDrivers(array &$dst, array $src)
-    {
-        foreach($src as $srcDriver)
-        {
+    private function mergeDrivers(array &$dst, array $src) {
+        foreach ($src as $srcDriver) {
             $driverName = $this->getDriverName($srcDriver);
 
             $i = 0;
             $numDstDrivers = count($dst);
-            while($i < $numDstDrivers && strncmp($dst[$i], $driverName, strlen($driverName)) !== 0)
-            {
+            while ($i < $numDstDrivers && strncmp($dst[$i], $driverName, strlen($driverName)) !== 0) {
                 $i++;
             }
 
-            if($i < $numDstDrivers)
-            {
+            if ($i < $numDstDrivers) {
                 $dst[$i] = $srcDriver;
             }
-            else
-            {
+            else {
                 $dst[] = $srcDriver;
             }
         }

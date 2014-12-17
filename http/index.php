@@ -30,60 +30,47 @@ $gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
 
 // Read "xml_file".
 $xml = simplexml_load_file($gl3Path);
-if(!$xml)
-{
+if (!$xml) {
     exit("Can't read '".$gl3Path."'");
 }
 
 // Set all the versions in an array so that it can be sorted out.
 $glVersions = array();
-foreach($xml->gl as $glVersion)
-{
+foreach ($xml->gl as $glVersion) {
     $glVersions[] = $glVersion;
 }
 
 // Sort the versions.
-usort($glVersions, function($a, $b)
-    {
+usort($glVersions, function($a, $b) {
         // Sort OpenGL before OpenGLES and higher versions before lower ones.
-        if((string) $a["name"] === (string) $b["name"])
-        {
+        if ((string) $a["name"] === (string) $b["name"]) {
             $diff = (float) $b["version"] - (float) $a["version"];
-            if($diff === 0)
+            if ($diff === 0)
                 return 0;
             else
                 return $diff < 0 ? -1 : 1;
         }
-        else if((string) $a["name"] === "OpenGL")
-        {
+        elseif ((string) $a["name"] === "OpenGL") {
             return 1;
         }
-        else
-        {
+        else {
             return 1;
         }
     });
 
 $hints = new Mesamatrix\Hints();
-foreach($glVersions as $glVersion)
-{
-    foreach($glVersion->extension as $ext)
-    {
-        if($ext->mesa["hint"])
-        {
+foreach ($glVersions as $glVersion) {
+    foreach ($glVersion->extension as $ext) {
+        if ($ext->mesa["hint"]) {
             $hints->addHint((string) $ext->mesa["hint"]);
         }
 
-        foreach($xml->drivers->vendor as $vendor)
-        {
-            foreach($vendor->driver as $driver)
-            {
+        foreach ($xml->drivers->vendor as $vendor) {
+            foreach ($vendor->driver as $driver) {
                 $driverNode = $ext->supported->{$driver["name"]};
-                if($driverNode)
-                {
+                if ($driverNode) {
                     // Driver found.
-                    if($driverNode["hint"])
-                    {
+                    if ($driverNode["hint"]) {
                         $hints->addHint((string) $driverNode["hint"]);
                     }
                 }
@@ -94,15 +81,12 @@ foreach($glVersions as $glVersion)
 
 $updateTime = filemtime($gl3Path);
 $lastGitUpdate = "No commit found";
-if(count($xml->commits->commit) > 0)
-{
+if (count($xml->commits->commit) > 0) {
     $lastGitUpdate = date(DATE_RFC2822, (int) $xml->commits->commit[0]["timestamp"]);
 }
 
-foreach($xml->drivers->vendor as $vendor)
-{
-    switch($vendor["name"])
-    {
+foreach ($xml->drivers->vendor as $vendor) {
+    switch($vendor["name"]) {
     case "Software": $vendor->addAttribute("class", "hCellVendor-soft"); break;
     case "Intel":    $vendor->addAttribute("class", "hCellVendor-intel"); break;
     case "nVidia":   $vendor->addAttribute("class", "hCellVendor-nvidia"); break;
@@ -132,7 +116,7 @@ foreach($xml->drivers->vendor as $vendor)
         <h1>Last commits</h1>
         <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= Mesamatrix::$config->getValue("git", "web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
 <?php
-foreach($xml->commits->commit as $commit) {
+foreach ($xml->commits->commit as $commit) {
     $commitDate = date(DATE_RFC2822, (int) $commit["timestamp"]);
 ?>
         <div class="commitDate">
@@ -146,8 +130,7 @@ foreach($xml->commits->commit as $commit) {
 <?php
 }
 
-foreach($glVersions as $glVersion)
-{
+foreach ($glVersions as $glVersion) {
     $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
     $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
 
@@ -160,8 +143,7 @@ foreach($glVersions as $glVersion)
                 <tr>
                     <th colspan="2"></th>
 <?php
-    foreach($xml->drivers->vendor as $vendor)
-    {
+    foreach ($xml->drivers->vendor as $vendor) {
 ?>
                     <th></th>
                     <th class="<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></th>
@@ -174,13 +156,11 @@ foreach($glVersions as $glVersion)
                     <th class="hCellVendor-default hCell-driver">mesa</th>
 <?php
     $doneForMesa = 0;
-    foreach($xml->drivers->vendor as $vendor)
-    {
+    foreach ($xml->drivers->vendor as $vendor) {
 ?>
                     <th class="hCell-sep"></th>
 <?php
-        foreach($vendor->driver as $driver)
-        {
+        foreach ($vendor->driver as $driver) {
             $driver["done"] = 0;
 ?>
                     <th class="<?= $vendor["class"] ?> hCell-driver"><?= $driver["name"] ?></th>
@@ -194,70 +174,59 @@ foreach($glVersions as $glVersion)
 <?php
     $numExtensions = count($glVersion->extension);
 
-    foreach($glVersion->extension as $ext)
-    {
+    foreach ($glVersion->extension as $ext) {
         $taskClasses = "task";
-        if($ext->mesa["status"] == "complete")
-        {
+        if ($ext->mesa["status"] == "complete") {
             $taskClasses .= " isDone";
             $doneForMesa += 1;
         }
-        else if($ext->mesa["status"] == "incomplete")
-        {
+        elseif ($ext->mesa["status"] == "incomplete") {
             $taskClasses .= " isNotStarted";
         }
-        else
-        {
+        else {
             $taskClasses .= " isInProgress";
         }
 
         $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext["name"]));
         $extHintIdx = $hints->findHint($ext->mesa["hint"]);
-        if($extHintIdx !== -1)
-        {
+        if ($extHintIdx !== -1) {
             $taskClasses .= " footnote";
         }
 
         $extNameText = $ext["name"];
-        if(isset($ext->link))
-        {
+        if (isset($ext->link)) {
             $extNameText = str_replace($ext->link, "<a href=\"".$ext->link["href"]."\">".$ext->link."</a>", $extNameText);
         }
 ?>
                 <tr class="extension">
-                    <td id="<?= $extUrlId ?>"<?php if(strncmp($ext["name"], "-", 1) === 0) { ?> class="extension-child"<?php } ?>>
+                    <td id="<?= $extUrlId ?>"<?php if (strncmp($ext["name"], "-", 1) === 0) { ?> class="extension-child"<?php } ?>>
                         <?= $extNameText ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <td class="<?= $taskClasses ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>">&nbsp;</a><?php } ?></td>
+                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>">&nbsp;</a><?php } ?></td>
 <?php
 
-        foreach($xml->drivers->vendor as $vendor)
-        {
+        foreach ($xml->drivers->vendor as $vendor) {
 ?>
                     <td></td>
 <?php
-            foreach($vendor->driver as $driver)
-            {
+            foreach ($vendor->driver as $driver) {
                 $driverNode = $ext->supported->{$driver["name"]};
                 $extHintIdx = -1;
                 $taskClasses = "task";
-                if($driverNode)
-                {
+                if ($driverNode) {
                     // Driver found.
                     $taskClasses .= " isDone";
                     $driver["done"] += 1;
                     $extHintIdx = $hints->findHint($driverNode["hint"]);
-                    if($extHintIdx !== -1)
-                    {
+                    if ($extHintIdx !== -1) {
                         $taskClasses .= " footnote";
                     }
                 }
-                else
-                {
+                else {
                     $taskClasses .= " isNotStarted";
                 }
 ?>
-                    <td class="<?= $taskClasses ?>"><?php if($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>">&nbsp;</a><?php } ?></td>
+                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>">&nbsp;</a><?php } ?></td>
 <?php
             }
         }
@@ -272,13 +241,11 @@ foreach($glVersions as $glVersion)
                     <td><b>Total:</b></td>
                     <td class="hCellVendor-default task"><?= $doneForMesa."/".$numExtensions ?></td>
 <?php
-    foreach($xml->drivers->vendor as $vendor)
-    {
+    foreach ($xml->drivers->vendor as $vendor) {
 ?>
                     <td></td>
 <?php
-        foreach($vendor->driver as $driver)
-        {
+        foreach ($vendor->driver as $driver) {
 ?>
                     <td class="<?= $vendor["class"] ?> task"><?= $driver["done"]."/".$numExtensions ?></td>
 <?php
@@ -295,8 +262,7 @@ foreach($glVersions as $glVersion)
         <ol>
 <?php
 $numHints = $hints->getNumHints();
-for($i = 0; $i < $numHints; $i++)
-{
+for($i = 0; $i < $numHints; $i++) {
 ?>
             <li id="Footnotes_<?= $i + 1 ?>"><?= $hints->getHint($i) ?></li>
 <?php
@@ -306,8 +272,7 @@ for($i = 0; $i < $numHints; $i++)
         <h1>How to help</h1>
         <p>If you find this page useful and want to help, you can report issues, or <a href="https://github.com/MightyCreak/mesamatrix">grab the code</a> and add whatever feature you want.</p>
 <?php
-if(Mesamatrix::$config->getValue("flattr", "enabled"))
-{
+if (Mesamatrix::$config->getValue("flattr", "enabled")) {
 ?>
         <p>You can click here too, if you want to Flattr me:</p>
         <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= Mesamatrix::$config->getValue("flattr", "id") ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= Mesamatrix::$config->getValue("info", "title") ?>')+'&description='+encodeURIComponent('<?= Mesamatrix::$config->getValue("info", "description") ?>')+'&language='+encodeURIComponent('<?= Mesamatrix::$config->getValue("flattr", "language") ?>')+'&tags=<?= Mesamatrix::$config->getValue("flattr", "tags") ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
@@ -329,13 +294,20 @@ if(Mesamatrix::$config->getValue("flattr", "enabled"))
         <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
         <h1>Authors</h1>
         <ul>
-<?php foreach (Mesamatrix::$config->getValue("info", "authors") as $k => $v) {
-    if (is_string($k)) { ?>
+<?php
+foreach (Mesamatrix::$config->getValue("info", "authors") as $k => $v) {
+    if (is_string($k)) {
+?>
             <li><a href="<?= $v ?>"><?= $k ?></a></li>
-<?php } else { ?>
+<?php
+    }
+    else {
+?>
             <li><?= $v ?></li>
-<?php }
-} ?>
+<?php
+    }
+}
+?>
         </ul>
     </body>
 </html>

@@ -22,19 +22,15 @@ namespace Mesamatrix;
 
 class Hints
 {
-    public function __construct()
-    {
+    public function __construct() {
         $this->list = array();
     }
 
-    public function findHint($hint)
-    {
+    public function findHint($hint) {
         $idx = -1;
-        if(!empty($hint))
-        {
+        if (!empty($hint)) {
             $key = array_search($hint, $this->list);
-            if($key !== FALSE)
-            {
+            if ($key !== FALSE) {
                 $idx = $key;
             }
         }
@@ -42,14 +38,11 @@ class Hints
         return $idx;
      }
 
-    public function addHint($hint)
-    {
+    public function addHint($hint) {
         $idx = -1;
-        if(!empty($hint))
-        {
+        if (!empty($hint)) {
             $idx = array_search($hint, $this->list);
-            if($idx === FALSE)
-            {
+            if ($idx === FALSE) {
                 $this->list[] = $hint;
                 $idx = count($this->list) - 1;
             }
@@ -58,13 +51,11 @@ class Hints
         return $idx;
     }
 
-    public function getNumHints()
-    {
+    public function getNumHints() {
         return count($this->list);
     }
 
-    public function getHint($idx)
-    {
+    public function getHint($idx) {
         return $this->list[$idx];
     }
 

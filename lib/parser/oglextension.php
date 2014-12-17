@@ -22,24 +22,20 @@ namespace Mesamatrix\Parser;
 
 class OglExtension
 {
-    public function __construct($name, $status, $hints, $supportedDrivers = array())
-    {
+    public function __construct($name, $status, $hints, $supportedDrivers = array()) {
         $this->name = $name;
         $this->status = $status;
         $this->hints = $hints;
 
         // Set the hint.
         $hint = "";
-        if(strncmp($status, "DONE", strlen("DONE")) === 0)
-        {
+        if (strncmp($status, "DONE", strlen("DONE")) === 0) {
             $hint = substr($status, strlen("DONE") + 1);
         }
-        else if(strncmp($status, "not started", strlen("not started")) === 0)
-        {
+        elseif (strncmp($status, "not started", strlen("not started")) === 0) {
             $hint = substr($status, strlen("not started") + 1);
         }
-        else
-        {
+        else {
             $hint = $status;
         }
 
@@ -47,8 +43,7 @@ class OglExtension
 
         // Set the supported drivers list.
         $this->supportedDrivers = array();
-        foreach($supportedDrivers as &$driverName)
-        {
+        foreach ($supportedDrivers as &$driverName) {
             $this->supportedDrivers[] = new OglSupportedDriver($driverName, $this->hints);
         }
     }

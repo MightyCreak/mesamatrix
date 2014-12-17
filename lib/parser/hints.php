@@ -25,14 +25,11 @@ class Hints
 {
     public $allHints = array();
 
-    public function addToHints($hint)
-    {
+    public function addToHints($hint) {
         $idx = -1;
-        if(!empty($hint))
-        {
+        if (!empty($hint)) {
             $idx = array_search($hint, $this->allHints);
-            if($idx === FALSE)
-            {
+            if ($idx === FALSE) {
                 $this->allHints[] = $hint;
                 $idx = count($this->allHints) - 1;
             }

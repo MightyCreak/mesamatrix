@@ -27,8 +27,7 @@ class Mesamatrix
     public static $config; // Config object
     public static $autoloader; // Autoloader object
 
-    public static function init()
-    {
+    public static function init() {
         $dir = str_replace("\\", '/', __DIR__);
         self::$serverRoot = implode('/', array_slice(explode('/', $dir), 0, -1));
 
@@ -46,16 +45,13 @@ class Mesamatrix
         date_default_timezone_set('UTC');
     }
 
-    public static function debug_print($line)
-    {
-        if(self::$config->debug())
-        {
+    public static function debug_print($line) {
+        if (self::$config->debug()) {
             print("DEBUG: ".$line."<br />\n");
         }
     }
 
-    public static function path($path)
-    {
+    public static function path($path) {
         return self::$serverRoot.'/'.$path;
     }
 }

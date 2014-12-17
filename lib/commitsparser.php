@@ -24,8 +24,7 @@ class CommitsParser
 {
     public function parse($filename) {
         $handle = fopen($filename, "r");
-        if($handle === FALSE)
-        {
+        if ($handle === FALSE) {
             return NULL;
         }
 
@@ -35,8 +34,7 @@ class CommitsParser
         return $ret;
     }
 
-    public function parse_stream($handle)
-    {
+    public function parse_stream($handle) {
         $commits = array();
 
         // Regexp patterns.
@@ -44,20 +42,16 @@ class CommitsParser
         $reCommitInfo = "/^  ([[:alnum:]]+): (.+)$/";
 
         $line = fgets($handle);
-        while($line !== FALSE)
-        {
-            if(preg_match($reCommitHash, $line, $matches) === 1)
-            {
+        while ($line !== FALSE) {
+            if (preg_match($reCommitHash, $line, $matches) === 1) {
                 $hash = $matches[1];
                 $timestamp = 0;
                 $author = "";
                 $subject = "";
 
                 $line = fgets($handle);
-                while($line !== FALSE && preg_match($reCommitInfo, $line, $matches) === 1)
-                {
-                    switch($matches[1])
-                    {
+                while ($line !== FALSE && preg_match($reCommitInfo, $line, $matches) === 1) {
+                    switch($matches[1]) {
                     case "timestamp":   $timestamp = $matches[2]; break;
                     case "author":      $author = $matches[2]; break;
                     case "subject":     $subject = $matches[2]; break;

@@ -22,8 +22,7 @@ namespace Mesamatrix\Parser;
 
 class OglVersion
 {
-    public function __construct($glName, $glVersion, $glslName, $glslVersion, $hints)
-    {
+    public function __construct($glName, $glVersion, $glslName, $glslVersion, $hints) {
         $this->setGlName($glName);
         $this->glVersion = $glVersion;
         $this->glslName = $glslName;
@@ -45,8 +44,7 @@ class OglVersion
     public function getGlslVersion()         { return $this->glslVersion; }
 
     /// GL/GLSL extensions.
-    public function addExtension($name, $status, $supportedDrivers = array())
-    {
+    public function addExtension($name, $status, $supportedDrivers = array()) {
         $this->extensions[] = new OglExtension($name, $status, $this->hints, $supportedDrivers);
     }
 

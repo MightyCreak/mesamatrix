@@ -25,29 +25,24 @@ class Autoloader
     private $classPaths = array();
     private $prefixPaths = array();
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->registerPrefix('Mesamatrix', '');
     }
 
-    public function registerClass($class, $path)
-    {
+    public function registerClass($class, $path) {
         $this->classPaths[$class] = $path;
     }
-    public function registerPrefix($prefix, $path)
-    {
+
+    public function registerPrefix($prefix, $path) {
         // Ensure path ends in slash if not empty
-        if (substr($path, -1) !== '/' && $path !== "")
-        {
+        if (substr($path, -1) !== '/' && $path !== "") {
             $path .= '/';
         }
         $components = explode('\\', $prefix);
 
         $prefixPaths = &$this->prefixPaths;
-        foreach ($components as $component)
-        {
-            if (!array_key_exists($component, $prefixPaths))
-            {
+        foreach ($components as $component) {
+            if (!array_key_exists($component, $prefixPaths)) {
                 $prefixPaths[$component] = array();
             }
             $prefixPaths = &$prefixPaths[$component];
@@ -55,12 +50,10 @@ class Autoloader
         $prefixPaths['\\'] = $path;
     }
 
-    public function findClass($class)
-    {
+    public function findClass($class) {
         $class = trim($class, '\\');
 
-        if (array_key_exists($class, $this->classPaths))
-        {
+        if (array_key_exists($class, $this->classPaths)) {
             return $this->classPaths[$class];
         }
 
@@ -68,19 +61,15 @@ class Autoloader
         return $this->findPrefix($components, $this->prefixPaths);
     }
 
-    private function findPrefix($components, $prefix)
-    {
-        if (!empty($components) && array_key_exists($components[0], $prefix))
-        {
+    private function findPrefix($components, $prefix) {
+        if (!empty($components) && array_key_exists($components[0], $prefix)) {
             $prefixComponent = $prefix[$components[0]];
             // Try to get more specific prefix
             $result = $this->findPrefix(array_shift($components), $prefixComponent);
-            if ($result !== false)
-            {
+            if ($result !== false) {
                 return $result;
             }
-            elseif (array_key_exists('\\', $prefixComponent))
-            {
+            elseif (array_key_exists('\\', $prefixComponent)) {
                 $suffix = implode('/', $components);
                 $suffix = str_replace('_', '/', $suffix);
                 return $prefixComponent['\\'] . strtolower($suffix) . '.php';
@@ -89,11 +78,9 @@ class Autoloader
         return false;
     }
 
-    public function load($class)
-    {
+    public function load($class) {
         $path = stream_resolve_include_path($this->findClass($class));
-        if ($path)
-        {
+        if ($path) {
             require_once $path;
         }
         return $path;

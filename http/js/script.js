@@ -17,8 +17,7 @@
  * along with mesamatrix. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function fillZeros(number, size)
-{
+function fillZeros(number, size) {
     var absNum = String(Math.abs(number));
     var numZeros = size - absNum.length;
     var res = "";
@@ -28,8 +27,7 @@ function fillZeros(number, size)
     return res;
 }
 
-function getLocalDate(text)
-{
+function getLocalDate(text) {
     var eventDate = new Date(text);
     var year = eventDate.getFullYear();
     var month = fillZeros(eventDate.getMonth() + 1, 2);
@@ -48,8 +46,7 @@ function getLocalDate(text)
     return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds + " (GMT " + timezoneHours + timezoneMinutes + ")";
 }
 
-function getRelativeDate(text)
-{
+function getRelativeDate(text) {
     var eventDate = new Date(text);
     var relTimeInMin = (Date.now() - eventDate.getTime()) / (1000 * 60);
     if(relTimeInMin <= 5)               // Less than 5 minutes ago
@@ -83,7 +80,8 @@ $(document).ready(function() {
 //    $(".footnote a").on("click", function(e) {
 //        if ($(".tipsy").length === 0) {
 //            $(this).tipsy("show");
-//        } else {
+//        }
+//        else {
 //            $(this).tipsy("hide");
 //        }
 //    });

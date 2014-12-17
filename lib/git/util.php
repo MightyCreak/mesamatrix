@@ -31,8 +31,7 @@ class Util
           1 => STDOUT,
           2 => STDERR
         );
-        if ($pipe !== false)
-        {
+        if ($pipe !== false) {
             $pipeArray[1] = array("pipe", "w");
         }
 
@@ -46,8 +45,7 @@ class Util
         if (!is_resource($process)) {
             die("Unable to execute git");
         }
-        if ($pipe !== false)
-        {
+        if ($pipe !== false) {
             $pipe = $pipes[1];
         }
         return $process;

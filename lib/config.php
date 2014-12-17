@@ -25,17 +25,14 @@ class Config
     protected $debugMode;
     protected $cache = array();
 
-    public function __construct($configDir)
-    {
+    public function __construct($configDir) {
         $this->readData($configDir.'/config.default.php');
         $this->readData($configDir.'/config.php');
 
         $extraConfigs = glob($configDir.'/*.config.php');
-        if (is_array($extraConfigs))
-        {
+        if (is_array($extraConfigs)) {
             natsort($extraConfigs);
-            foreach ($extraConfigs as $config)
-            {
+            foreach ($extraConfigs as $config) {
                 $this->readData($config);
             }
         }
@@ -43,14 +40,11 @@ class Config
         $this->debug($this->getValue('info', 'debug', false));
     }
 
-    public function debug($set = null)
-    {
-        if (is_null($set))
-        {
+    public function debug($set = null) {
+        if (is_null($set)) {
             return $this->debugMode;
         }
-        elseif ($set)
-        {
+        elseif ($set) {
             ini_set('display_errors', 1);
             ini_set('error_reporting', E_ALL);
             $this->debugMode = true;
@@ -63,34 +57,25 @@ class Config
         }
     }
 
-    public function getValue($section, $key, $default = null)
-    {
-        if (isset($this->cache[$section]))
-        {
-            if (isset($this->cache[$section][$key]))
-            {
+    public function getValue($section, $key, $default = null) {
+        if (isset($this->cache[$section])) {
+            if (isset($this->cache[$section][$key])) {
                 return $this->cache[$section][$key];
             }
         }
         return $default;
     }
 
-    public function readData($configFile)
-    {
-        if (file_exists($configFile))
-        {
+    public function readData($configFile) {
+        if (file_exists($configFile)) {
             @include $configFile;
-            if (isset($CONFIG) && is_array($CONFIG))
-            {
-                foreach ($CONFIG as $section => $sectionConfig)
-                {
-                    if (array_key_exists($section, $this->cache))
-                    {
+            if (isset($CONFIG) && is_array($CONFIG)) {
+                foreach ($CONFIG as $section => $sectionConfig) {
+                    if (array_key_exists($section, $this->cache)) {
                         $this->cache[$section] =
                           array_merge($this->cache[$section], $sectionConfig);
                     }
-                    else
-                    {
+                    else {
                         $this->cache[$section] = $sectionConfig;
                     }
                 }
