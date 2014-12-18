@@ -21,9 +21,9 @@ body { font-size: 85%; font-family: sans-serif; }
 
 p { max-width: 800px; }
 
-.commitDate { margin-top: 0.3em; }
-.commitDate::first-letter { text-transform: uppercase; }
-.commitText { padding-left: 2em; }
+.commits th                         { text-align: left; }
+.commits .commitsAge                { padding-right: 2em; }
+.commits .commitsAge::first-letter  { text-transform: uppercase; }
 
 .lb             { border-collapse: collapse; border-spacing: 0; }
 .lb th, .lb td  { padding: 0.1em 0.5em; }

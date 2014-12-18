@@ -130,21 +130,28 @@ foreach ($xml->drivers->vendor as $vendor) {
     <body>
         <h1>Last commits</h1>
         <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= Mesamatrix::$config->getValue("git", "web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
+        <table class="commits">
+            <thead>
+                <tr>
+                    <th>Age</th>
+                    <th>Commit message</th>
+                </tr>
+            </thead>
+           <tbody>
 <?php
 foreach ($xml->commits->commit as $commit) {
     $commitDate = date(DATE_RFC2822, (int) $commit["timestamp"]);
+    $commitUrl = Mesamatrix::$config->getValue("git", "web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
-        <div class="commitDate">
-            <script>document.write(getRelativeDate("<?= $commitDate ?>"));</script>
-            <noscript><?= $commitDate ?></noscript>:
-        </div>
-        <div class="commitText">
-            <a href="<?= Mesamatrix::$config->getValue("git", "web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")
-                ?>?id=<?= $commit["hash"] ?>"><?= $commit["subject"] ?></a>
-        </div>
+                <tr>
+                    <td class="commitsAge"><script>document.write(getRelativeDate('<?= $commitDate ?>'));</script><noscript><?= $commitDate ?></noscript></td>
+                    <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
+                </tr>
 <?php
 }
 ?>
+            </tbody>
+        </table>
         <h1>Leaderboard</h1>
         <table class="lb">
             <tr>
