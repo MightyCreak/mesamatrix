@@ -32,7 +32,7 @@ class Mesamatrix
         self::$serverRoot = implode('/', array_slice(explode('/', $dir), 0, -1));
 
         set_include_path(
-          self::$serverRoot.'/lib' . PATH_SEPARATOR .
+          self::$serverRoot . PATH_SEPARATOR .
           get_include_path()
         );
 
@@ -57,3 +57,5 @@ class Mesamatrix
 }
 
 \Mesamatrix::init();
+
+require_once('3rdparty/register.php');

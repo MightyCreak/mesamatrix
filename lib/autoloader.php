@@ -26,7 +26,7 @@ class Autoloader
     private $prefixPaths = array();
 
     public function __construct() {
-        $this->registerPrefix('Mesamatrix', '');
+        $this->registerPrefix('Mesamatrix', 'lib');
     }
 
     public function registerClass($class, $path) {
@@ -38,19 +38,21 @@ class Autoloader
         if (substr($path, -1) !== '/' && $path !== "") {
             $path .= '/';
         }
-        $components = explode('\\', $prefix);
-
         $prefixPaths = &$this->prefixPaths;
-        foreach ($components as $component) {
-            if (!array_key_exists($component, $prefixPaths)) {
-                $prefixPaths[$component] = array();
+
+        if ($prefix !== '') {
+            $components = explode('\\', $prefix);
+            foreach ($components as $component) {
+                if (!array_key_exists($component, $prefixPaths)) {
+                    $prefixPaths[$component] = array();
+                }
+                $prefixPaths = &$prefixPaths[$component];
             }
-            $prefixPaths = &$prefixPaths[$component];
         }
         $prefixPaths['\\'] = $path;
     }
 
-    public function findClass($class) {
+    public function findClass($class, $lowercase = false) {
         $class = trim($class, '\\');
 
         if (array_key_exists($class, $this->classPaths)) {
@@ -58,28 +60,34 @@ class Autoloader
         }
 
         $components = explode('\\', $class);
-        return $this->findPrefix($components, $this->prefixPaths);
+        return $this->findPrefix($components, $this->prefixPaths, $lowercase);
     }
 
-    private function findPrefix($components, $prefix) {
+    private function findPrefix($components, $prefix, $lowercase) {
+        $result = false;
         if (!empty($components) && array_key_exists($components[0], $prefix)) {
-            $prefixComponent = $prefix[$components[0]];
             // Try to get more specific prefix
-            $result = $this->findPrefix(array_shift($components), $prefixComponent);
-            if ($result !== false) {
-                return $result;
-            }
-            elseif (array_key_exists('\\', $prefixComponent)) {
-                $suffix = implode('/', $components);
-                $suffix = str_replace('_', '/', $suffix);
-                return $prefixComponent['\\'] . strtolower($suffix) . '.php';
-            }
+            $prefixComponent = $prefix[$components[0]];
+            array_shift($components);
+            $result = $this->findPrefix($components, $prefixComponent, $lowercase);
         }
-        return false;
+        if ($result === false && array_key_exists('\\', $prefix)) {
+            $suffix = implode('/', $components);
+            $suffix = str_replace('_', '/', $suffix);
+            if ($lowercase) {
+                $suffix = strtolower($suffix);
+            }
+            $result = $prefix['\\'] . $suffix . '.php';
+        }
+        return $result;
     }
 
     public function load($class) {
-        $path = stream_resolve_include_path($this->findClass($class));
+        $path = stream_resolve_include_path($this->findClass($class, false));
+        if (!$path) {
+            // try lowercase version (goes against PSR-0!)
+            $path = stream_resolve_include_path($this->findClass($class, true));
+        }
         if ($path) {
             require_once $path;
         }
