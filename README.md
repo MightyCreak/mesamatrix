@@ -69,7 +69,7 @@ And add this line at the end (it will sync the repository every 30 minutes):
 
 Once again, don't forget to change `/var/www/mesamatrix` to your own base directory.
 
-## License
+# License
 
 Mesamatrix is available under the GPLv3, a copy of which is available in
 LICENSE.
