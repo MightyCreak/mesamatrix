@@ -6,7 +6,7 @@ Here is the official website: http://mesamatrix.net/
 
 # Installation
 
-Three steps are required to install mesamatrix on your server.
+Three steps are required to install Mesamatrix on your server.
 
 ## Prerequisites
 
@@ -16,33 +16,64 @@ In order to install this project, you'll also need these:
 * apache or nginx
 * php 5
 
-## Setup mesa repository
+## Copy you config file
 
-Because the scripts just need to get the content of the repository and they don't need to have a branch of their own, the `setup.sh` script will create a *bare* clone (which is basically only the content of the `.git` directory).
+There is a default config file in `config/config.default.php`. If you want to have your own configuration, simply copy the file, and then you can edit it:
 
-If you don't want the repository directory to be in `/http/src/mesa.git`, edit the `outputdir` and `gitdir` variables in both `setup.sh` and `update.sh`.
+    $ cp config/config.default.php config/config.php
+    
+**Protips:** During the set up, you should enable debugging by changing `debug` variable value to `TRUE`, in the `info` section.
 
-And to set up mesamatrix, simply run from the project base directory:
+## Set up `mesa.git` repository
 
-    $ ./scripts/setup.sh
+Because the PHP scripts of Mesamatrix just need to get the content of the repository and they don't need to have a branch of their own, the `tools/setup.php` script will create a *bare* clone (which is basically only the content of the `.git` directory).
 
-## Setup the web interface
+To set up Mesamatrix, simply run from the project base directory:
 
-The default configuration is stored in `config/config.default.php`. To apply your own settings, create `config/config.php` or any file of the format `config/*.config.php`. These settings will override those in `config/config.default.php`.
+    $ php tools/setup.php
 
-## Setup cron
+**Protips:** If you don't like the default settings, you can edit your configuration file (`config/config.php`). Everything is in the `git` section. For instance, to change the `mesa.git` directory name, change the `dir` variable value.
 
-Last step, edit your crontab. Type this command:
+## Set up the web interface
+
+Configure your web server to point to the `http` directory (and enable PHP).
+
+Before the final phase, let's test if everything works fine. From the project base directory, run these lines:
+
+    $ php tools/fetch.php       # Fetch the latest commits from mesa.
+    $ php tools/parser.php      # Parse GL3.txt, it generates the file `http/gl3.xml`.
+                                # It might take some time since it's testing all the URLs.
+
+Now open up Mesamatrix in your browser (something like `http://localhost/mesamatrix/`); it should show the status of the 3D graphics drivers in a nicely formed web page.
+
+## Set up cron
+
+In order to fetch and parser `mesa`'s `GL3.txt` file automatically, you'll need to edit your crontab.
+
+But first, you'll need a script that will do the fetch and parse. Create a new file in here: `tools/update.sh`, and then edit it and copy these lines:
+
+```sh
+#!/bin/sh
+
+php -f /var/www/mesamatrix/tools/fetch.php
+php -f /var/www/mesamatrix/tools/parse.php
+```
+
+Don't forget to change `/var/www/mesamatrix` to your own base directory.
+
+To edit your crontab, type this command:
 
     $ crontab -e
 
 And add this line at the end (it will sync the repository every 30 minutes):
 
-    */30 * * * *         /path/to/scripts/update.sh
+    */30 * * * *         /var/www/mesamatrix/tools/update.sh
+
+Once again, don't forget to change `/var/www/mesamatrix` to your own base directory.
 
 ## License
 
-MesaMatrix is available under the GPLv3, a copy of which is available in
+Mesamatrix is available under the GPLv3, a copy of which is available in
 LICENSE.
 
 jQuery is available under the MIT License.
