@@ -48,9 +48,7 @@ Now open up Mesamatrix in your browser (something like `http://localhost/mesamat
 
 ## Set up cron
 
-In order to fetch and parser `mesa`'s `GL3.txt` file automatically, you'll need to edit your crontab.
-
-But first, you'll need a script that will do the fetch and parse. Create a new file in here: `tools/update.sh`, and then edit it and copy these lines:
+In order to fetch and parse `GL3.txt` file automatically, you'll need to edit your crontab. And for that, you'll need a script that will do both commands sequentially. Create a new file here: `tools/update.sh`, edit it and copy these lines in it:
 
 ```sh
 #!/bin/sh
