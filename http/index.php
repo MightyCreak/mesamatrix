@@ -168,7 +168,7 @@ $rank = 1;
 foreach($driversExtsDone as $drivername => $numExtsDone) {
 ?>
                 <tr>
-                    <th class="lbCol-rank"><?= $rank ?></td>
+                    <th class="lbCol-rank"><?= $rank ?></th>
                     <td class="lbCol-driver"><?= $drivername ?></td>
                     <td class="lbCol-score"><?= $numExtsDone." / ".$numTotalExts ?></td>
                     <td class="lbCol-score"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
