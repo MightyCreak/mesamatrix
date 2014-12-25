@@ -25,16 +25,16 @@ p { max-width: 800px; }
 .commits .commitsAge                { padding-right: 2em; }
 .commits .commitsAge::first-letter  { text-transform: uppercase; }
 
-.lb             { border-collapse: collapse; border-spacing: 0; }
-.lb th, .lb td  { padding: 0.1em 0.5em; }
-.lb th          { background-color: #d3d7cf; }
-.lb td          { border: 1px solid #d3d7cf; }
-.lbCol-rank     { text-align: center; }
-.lbCol-driver   { min-width: 10em; }
-.lbCol-score    { text-align: right; }
-.lbRow-1st      { background-color: rgba(195, 255, 155, 1.00); }
-.lbRow-2nd      { background-color: rgba(195, 255, 155, 0.67); }
-.lbRow-3rd      { background-color: rgba(195, 255, 155, 0.33); }
+.lb                             { border-collapse: collapse; border-spacing: 0; }
+.lb th, .lb td                  { padding: 0.1em 0.5em; }
+.lb th                          { background-color: #d3d7cf; }
+.lb td                          { border: 1px solid #d3d7cf; }
+.lbCol-rank                     { text-align: center; }
+.lbCol-driver                   { min-width: 10em; }
+.lbCol-score                    { text-align: right; }
+.lb tbody tr:nth-child(1) td    { background-color: rgba(195, 255, 155, 1.00); }
+.lb tbody tr:nth-child(2) td    { background-color: rgba(195, 255, 155, 0.67); }
+.lb tbody tr:nth-child(3) td    { background-color: rgba(195, 255, 155, 0.33); }
 
 .tableNoSpace    { border-spacing: 1px; border-collapse: separate; }
 

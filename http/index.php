@@ -154,33 +154,30 @@ foreach ($xml->commits->commit as $commit) {
         </table>
         <h1>Leaderboard</h1>
         <table class="lb">
-            <tr>
-                <th>#</th>
-                <th>Driver</th>
-                <th>Score</th>
-                <th>Completion</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Driver</th>
+                    <th>Score</th>
+                    <th>Completion</th>
+                </tr>
+            </thead>
+            <tbody>
 <?php
 $rank = 1;
-foreach($driversExtsDone as $drivername => $numExtsDone)
-{
-    $extraClass = "";
-    switch($rank) {
-    case 1: $extraClass = "lbRow-1st"; break;
-    case 2: $extraClass = "lbRow-2nd"; break;
-    case 3: $extraClass = "lbRow-3rd"; break;
-    }
+foreach($driversExtsDone as $drivername => $numExtsDone) {
 ?>
-            <tr>
-                <th class="lbCol-rank"><?= $rank ?></td>
-                <td class="lbCol-driver <?= $extraClass ?>"><?= $drivername ?></td>
-                <td class="lbCol-score <?= $extraClass ?>"><?= $numExtsDone." / ".$numTotalExts ?></td>
-                <td class="lbCol-score <?= $extraClass ?>"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
-            </tr>
+                <tr>
+                    <th class="lbCol-rank"><?= $rank ?></td>
+                    <td class="lbCol-driver"><?= $drivername ?></td>
+                    <td class="lbCol-score"><?= $numExtsDone." / ".$numTotalExts ?></td>
+                    <td class="lbCol-score"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
+                </tr>
 <?php
     $rank++;
 }
 ?>
+            </tbody>
         </table>
 <?php
 
