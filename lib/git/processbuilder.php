@@ -21,33 +21,16 @@
 
 namespace Mesamatrix\Git;
 
-class Util
+class ProcessBuilder extends \Symfony\Component\Process\ProcessBuilder
 {
-    public static function exec($cmd, &$pipe = false) {
+    public function __construct(array $arguments = array())
+    {
+        array_unshift($arguments, 'git');
         $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue("git", "dir"));
-        $cmd = str_replace('@gitDir@', escapeshellarg($gitDir), $cmd);
-
-        $pipeArray = array(
-          1 => STDOUT,
-          2 => STDERR
-        );
-        if ($pipe !== false) {
-            $pipeArray[1] = array("pipe", "w");
+        foreach ($arguments as &$arg) {
+            $arg = str_replace('@gitDir@', $gitDir, $arg);
         }
-
-        \Mesamatrix::debug_print("git ".$cmd);
-        $process = proc_open(
-            "git ".$cmd,
-            $pipeArray,
-            $pipes,
-            $gitDir
-        );
-        if (!is_resource($process)) {
-            die("Unable to execute git");
-        }
-        if ($pipe !== false) {
-            $pipe = $pipes[1];
-        }
-        return $process;
+        parent::__construct($arguments);
+        $this->setWorkingDirectory($gitDir);
     }
 }

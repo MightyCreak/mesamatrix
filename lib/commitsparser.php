@@ -34,6 +34,15 @@ class CommitsParser
         return $ret;
     }
 
+    public function parse_content($content) {
+        $handle = fopen("php://memory", "r+");
+        fwrite($handle, $content);
+        rewind($handle);
+        $ret = $this->parse_stream($handle);
+        fclose($handle);
+        return $ret;
+    }
+
     public function parse_stream($handle) {
         $commits = array();
 
