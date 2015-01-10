@@ -26,7 +26,8 @@ class ProcessBuilder extends \Symfony\Component\Process\ProcessBuilder
     public function __construct(array $arguments = array())
     {
         array_unshift($arguments, 'git');
-        $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue("git", "dir"));
+        $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "private_dir"))."/";
+        $gitDir .= \Mesamatrix::$config->getValue("git", "dir");
         foreach ($arguments as &$arg) {
             $arg = str_replace('@gitDir@', $gitDir, $arg);
         }
