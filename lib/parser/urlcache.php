@@ -22,7 +22,7 @@ namespace Mesamatrix\Parser;
 
 class UrlCache
 {
-    const EXPIRATIONDELAY = 90 * 24 * 60 * 60;  // 90 days.
+    const EXPIRATIONDELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
 
     /**
      * Default constructor.
