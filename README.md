@@ -63,7 +63,7 @@ Run `./mesamatrixctl list` to see the available commands, or
 To update the information available to Mesamatrix, the following commands need
 to be run to fetch new commits and regenerate the XML file:
 
-    $ ./mesamatrixctl mesa:fetch
+    $ ./mesamatrixctl fetch
     $ ./mesamatrixctl parse
 
 These commands can be put into a crontab or similar scheduling facility, for
