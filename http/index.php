@@ -1,21 +1,21 @@
 <?php
 /*
- * Copyright (C) 2014 Romain "Creak" Failliot.
- *
  * This file is part of mesamatrix.
  *
- * mesamatrix is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * any later version.
+ * Copyright (C) 2014 Romain "Creak" Failliot.
  *
- * mesamatrix is distributed in the hope that it will be useful,
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with mesamatrix. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 require_once "../lib/base.php";
@@ -343,7 +343,7 @@ if (Mesamatrix::$config->getValue("flattr", "enabled")) {
         <p><b>This page is generated from:</b> <a href="<?= Mesamatrix::$config->getValue("git", "web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a></p>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources:
         <a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><?= Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
-        <p><a href="http://www.gnu.org/licenses/"><img src="https://www.gnu.org/graphics/gplv3-127x51.png" alt="Logo GPLv3" /></a></p>
+        <p><a href="https://www.gnu.org/licenses/agpl.html"><img src="https://www.gnu.org/graphics/agplv3-155x51.png" alt="Logo AGPLv3" /></a></p>
         <h1>Authors</h1>
         <ul>
 <?php

@@ -71,7 +71,7 @@ automated operation of your Mesamatrix installation.
 
 # License
 
-Mesamatrix is available under the GPLv3, a copy of which is available in
+Mesamatrix is available under the AGPLv3, a copy of which is available in
 LICENSE.
 
 ### 3rd Party code libraries
