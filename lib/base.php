@@ -18,26 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once 'autoloader.php';
-
 class Mesamatrix
 {
     public static $serverRoot; // Path to root of installation
     public static $configDir; // Path to configuration directory
     public static $config; // Config object
-    public static $autoloader; // Autoloader object
+    public static $autoloader; // Autoloader
 
     public static function init() {
         $dir = str_replace("\\", '/', __DIR__);
         self::$serverRoot = implode('/', array_slice(explode('/', $dir), 0, -1));
 
-        set_include_path(
-          self::$serverRoot . PATH_SEPARATOR .
-          get_include_path()
-        );
-
-        self::$autoloader = new \Mesamatrix\Autoloader();
-        spl_autoload_register(array(self::$autoloader, 'load'));
+        self::$autoloader = (require self::$serverRoot.'/vendor/autoload.php');
 
         self::$configDir = self::$serverRoot.'/config';
         self::$config = new \Mesamatrix\Config(self::$configDir);
@@ -58,4 +50,3 @@ class Mesamatrix
 
 \Mesamatrix::init();
 
-require_once('3rdparty/register.php');

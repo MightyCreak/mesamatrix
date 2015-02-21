@@ -1,9 +1,0 @@
-[submodule "3rdparty/Symfony/Component/Console"]
-	path = 3rdparty/Symfony/Component/Console
-	url = https://github.com/symfony/Console
-[submodule "3rdparty/Symfony/Component/Process"]
-	path = 3rdparty/Symfony/Component/Process
-	url = https://github.com/symfony/Process.git
-[submodule "3rdparty/psr/log"]
-	path = 3rdparty/psr/log
-	url = https://github.com/php-fig/log.git

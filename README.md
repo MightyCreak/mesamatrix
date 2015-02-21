@@ -15,10 +15,9 @@ Mesamatrix requires the following software:
  * PHP 5.3.0 or higher
 
 If you are installing from Git, you need to initialise 3rd party code
-libraries:
+libraries with Composer:
 
-    $ git submodule init
-    $ git submodule update
+    $ php composer.phar install
 
 ## Configuration (optional)
 

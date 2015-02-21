@@ -1,4 +1,5 @@
 /private/
+/vendor/
 /http/gl3.xml
 /config/config.php
 *.swp
