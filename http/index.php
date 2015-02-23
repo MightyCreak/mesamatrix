@@ -28,7 +28,8 @@ $gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
 // Read "xml_file".
 $xml = simplexml_load_file($gl3Path);
 if (!$xml) {
-    exit("Can't read '".$gl3Path."'");
+    \Mesamatrix::$logger->critical("Can't read ".$gl3Path);
+    exit();
 }
 
 // Set all the versions in an array so that it can be sorted out.

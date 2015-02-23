@@ -35,8 +35,6 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $logger = new \Symfony\Component\Console\Logger\ConsoleLogger($output);
-
         //$gitLog = exec_git("log --pretty=format:%H --reverse " .
         //    Mesamatrix::$config->getValue("git", "oldest_commit").".. -- ".Mesamatrix::$config->getValue("git", "gl3"), $log);
         //$initialCommit = rtrim(fgets($log));
@@ -68,8 +66,9 @@ class Parse extends \Symfony\Component\Console\Command\Command
         // commits log
         $gitLogFormat = "%H%n  timestamp: %ct%n  author: %an%n  subject: %s%n";
         $gitCommits = new \Mesamatrix\Git\ProcessBuilder(array(
-          'log', '-n', \Mesamatrix::$config->getValue('git', 'commitparser_depth'),
-          '--pretty=format:'.$gitLogFormat, '--', \Mesamatrix::$config->getValue('git', 'gl3')
+          'log', '-n', \Mesamatrix::$config->getValue('git', 'commitparser_depth', 10),
+          '--pretty=format:'.$gitLogFormat, '--',
+          \Mesamatrix::$config->getValue('git', 'gl3', 'docs/GL3.txt')
         ));
         $proc = $gitCommits->getProcess();
         $this->getHelper('process')->mustRun($output, $proc);
@@ -79,6 +78,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         $xmlCommits = $xml->addChild("commits");
         foreach ($commits as $gitCommit) {
+            \Mesamatrix::$logger->debug('Processing commit '.$gitCommit["hash"]);
             $commit = $xmlCommits->addChild("commit");
             $commit->addAttribute("hash", $gitCommit["hash"]);
             $commit->addAttribute("timestamp", $gitCommit["timestamp"]);
@@ -115,6 +115,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
             $glsl->addAttribute("version", $glVersion->getGlslVersion());
 
             foreach ($glVersion->getExtensions() as $glExt) {
+                \Mesamatrix::$logger->debug('Processing extension '.$glExt->getName());
                 $ext = $gl->addChild("extension");
                 $ext->addAttribute("name", $glExt->getName());
 
@@ -162,7 +163,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
                 }
             }
         }
-        
+
         if ($urlCache) {
             $urlCache->save();
         }
@@ -174,5 +175,6 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         file_put_contents($xmlPath, $dom->saveXML());
         //$xml->asXML($xmlPath);
+        \Mesamatrix::$logger->notice('XML saved to '.$xmlPath);
     }
 }

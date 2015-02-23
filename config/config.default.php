@@ -3,9 +3,21 @@
 // Default configuration for MesaMatrix
 // Copy to config/config.php for use
 
+use \Monolog\Logger as Log;
+/* available log levels:
+ * Log::EMERGENCY
+ * Log::ALERT
+ * Log::CRITICAL
+ * Log::ERROR
+ * Log::WARNING (default)
+ * Log::NOTICE
+ * Log::INFO
+ * Log::DEBUG
+ */
+
 $CONFIG = array(
     "info" => array(
-        "debug" => FALSE,
+        "log_level" => Log::WARNING,
         "version" => "1.0",
         "title" => "The OpenGL vs Mesa matrix",
         "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",

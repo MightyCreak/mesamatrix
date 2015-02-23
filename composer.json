@@ -6,7 +6,10 @@
     "require": {
         "symfony/console": "^2.6",
         "symfony/process": "^2.6",
-        "psr/log": "1.0.0"
+        "psr/log": "1.0.0",
+        "monolog/monolog": "~1.12",
+        "symfony/monolog-bridge": "~2.6",
+        "symfony/event-dispatcher": "~2.6"
     },
 
     "autoload": {

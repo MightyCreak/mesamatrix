@@ -34,6 +34,10 @@ class Application extends \Symfony\Component\Console\Application
     {
         // Set default output verbosity
         $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
+        \Mesamatrix::$logger = new \Monolog\Logger('cli-logger');
+        \Mesamatrix::$logger->pushHandler(
+            new \Symfony\Bridge\Monolog\Handler\ConsoleHandler($output)
+        );
         return parent::configureIO($input, $output);
     }
 
