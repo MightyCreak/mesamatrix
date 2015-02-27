@@ -51,11 +51,15 @@ class Mesamatrix
 
         // register the log file
         $logLevel = self::$config->getValue('info', 'log_level', Logger::WARNING);
-        self::$logger->popHandler();
-        self::$logger->pushHandler(new StreamHandler(
-            self::path(self::$config->getValue('info', 'private_dir').'/mesamatrix.log'),
-            $logLevel
-        ));
+        $logPath = self::path(self::$config->getValue('info', 'private_dir').'/mesamatrix.log');
+        if (is_writable($logPath)) {
+            self::$logger->popHandler();
+            self::$logger->pushHandler(new StreamHandler($logPath, $logLevel));
+        }
+        else {
+            self::$logger->error('Error log '.$logPath.' is not writable!');
+        }
+
         if ($logLevel < Logger::INFO) {
             ini_set('error_reporting', E_ALL);
             ini_set('display_errors', 1);

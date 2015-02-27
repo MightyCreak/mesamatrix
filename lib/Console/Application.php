@@ -22,22 +22,41 @@ namespace Mesamatrix\Console;
 
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Output\OutputInterface;
+use \Symfony\Component\Console\ConsoleEvents;
+use \Symfony\Component\EventDispatcher\EventDispatcher;
+use \Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 class Application extends \Symfony\Component\Console\Application
 {
     public function __construct()
     {
         parent::__construct('Mesamatrix CLI', \Mesamatrix::$config->getValue('info', 'version'));
+
+        $dispatcher = new EventDispatcher();
+
+        // Install CLI logger
+        $dispatcher->addListener(ConsoleEvents::COMMAND,
+            function (ConsoleCommandEvent $e)
+            {
+                $logger = new \Monolog\Logger(
+                    'cli.'.$e->getCommand()->getName(),
+                    \Mesamatrix::$logger->getHandlers()
+                );
+                $logger->pushHandler(
+                    new \Symfony\Bridge\Monolog\Handler\ConsoleHandler($e->getOutput())
+                );
+                \Mesamatrix::$logger = $logger;
+            }
+        );
+
+        $this->setDispatcher($dispatcher);
     }
 
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
         // Set default output verbosity
         $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-        \Mesamatrix::$logger = new \Monolog\Logger('cli-logger');
-        \Mesamatrix::$logger->pushHandler(
-            new \Symfony\Bridge\Monolog\Handler\ConsoleHandler($output)
-        );
+
         return parent::configureIO($input, $output);
     }
 
