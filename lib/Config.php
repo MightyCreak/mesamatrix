@@ -22,7 +22,6 @@ namespace Mesamatrix;
 
 class Config
 {
-    protected $debugMode;
     protected $cache = array();
 
     public function __construct($configDir) {
@@ -35,25 +34,6 @@ class Config
             foreach ($extraConfigs as $config) {
                 $this->readData($config);
             }
-        }
-
-        $this->debug($this->getValue('info', 'debug', false));
-    }
-
-    public function debug($set = null) {
-        if (is_null($set)) {
-            return $this->debugMode;
-        }
-        elseif ($set) {
-            ini_set('display_errors', 1);
-            ini_set('error_reporting', E_ALL);
-            $this->debugMode = true;
-        }
-        else
-        {
-            ini_set('display_errors', 0);
-            ini_set('error_reporting', E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
-            $this->debugMode = false;
         }
     }
 
@@ -68,6 +48,7 @@ class Config
 
     public function readData($configFile) {
         if (file_exists($configFile)) {
+            \Mesamatrix::$logger->info('Loading configuration file '.$configFile);
             @include $configFile;
             if (isset($CONFIG) && is_array($CONFIG)) {
                 foreach ($CONFIG as $section => $sectionConfig) {

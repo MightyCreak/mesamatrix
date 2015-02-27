@@ -69,6 +69,7 @@ class CommitsParser
                     $line = fgets($handle);
                 }
 
+                \Mesamatrix::$logger->debug('Added commit '.$hash);
                 $commits[] = array(
                     "hash" => $hash,
                     "timestamp" => $timestamp,

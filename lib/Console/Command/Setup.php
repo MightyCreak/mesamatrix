@@ -36,7 +36,7 @@ class Setup extends \Symfony\Component\Console\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $git = new \Mesamatrix\Git\ProcessBuilder(array(
-          'clone', '--bare', '--depth', \Mesamatrix::$config->getValue('git', 'depth'),
+          'clone', '--bare', '--depth', \Mesamatrix::$config->getValue('git', 'depth', 6000),
           \Mesamatrix::$config->getValue('git', 'url'), '@gitDir@'
         ));
         $this->getHelper('process')->mustRun($output, $git->getProcess());
