@@ -130,7 +130,7 @@ foreach ($xml->drivers->vendor as $vendor) {
     </head>
     <body>
         <h1>Last commits</h1>
-        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= Mesamatrix::$config->getValue("git", "web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
+        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
         <table class="commits">
             <thead>
                 <tr>
@@ -142,7 +142,7 @@ foreach ($xml->drivers->vendor as $vendor) {
 <?php
 foreach ($xml->commits->commit as $commit) {
     $commitDate = date(DATE_RFC2822, (int) $commit["timestamp"]);
-    $commitUrl = Mesamatrix::$config->getValue("git", "web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
+    $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
                 <tr>
                     <td class="commitsAge"><script>document.write(getRelativeDate('<?= $commitDate ?>'));</script><noscript><?= $commitDate ?></noscript></td>
@@ -341,7 +341,7 @@ if (Mesamatrix::$config->getValue("flattr", "enabled")) {
             <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
         </ul>
         <h1>Sources</h1>
-        <p><b>This page is generated from:</b> <a href="<?= Mesamatrix::$config->getValue("git", "web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a></p>
+        <p><b>This page is generated from:</b> <a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a></p>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources:
         <a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><?= Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
         <p><a href="https://www.gnu.org/licenses/agpl.html"><img src="https://www.gnu.org/graphics/agplv3-155x51.png" alt="Logo AGPLv3" /></a></p>

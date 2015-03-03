@@ -43,6 +43,13 @@ class Config
                 return $this->cache[$section][$key];
             }
         }
+        $logMsg = 'Unable to find config value for '.$section.'.'.$key;
+        if (is_null($default)) {
+            \Mesamatrix::$logger->error($logMsg);
+        }
+        else {
+            \Mesamatrix::$logger->info($logMsg.', using default '.$default);
+        }
         return $default;
     }
 
