@@ -91,11 +91,7 @@ $numTotalExts = $leaderboard->getNumTotalExts();
 /////////////////////////////////////////////////
 // Update times.
 //
-$updateTime = filemtime($gl3Path);
-$lastGitUpdate = "No commit found";
-if (count($xml->commits->commit) > 0) {
-    $lastGitUpdate = date(DATE_RFC2822, (int) $xml->commits->commit[0]["timestamp"]);
-}
+$lastGitUpdate = date(DATE_RFC2822, (int) $xml['updated']);
 
 /////////////////////////////////////////////////
 // Drivers CSS classes.
