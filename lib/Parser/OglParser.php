@@ -23,9 +23,13 @@ namespace Mesamatrix\Parser;
 class OglParser
 {
     private $hints;
+    private $matrix;
+    private $time;
 
-    public function __construct($hints) {
+    public function __construct($hints, $matrix, $time = null) {
         $this->hints = $hints;
+        $this->matrix = $matrix;
+        $this->time = $time;
     }
 
     public function parse($filename) {
@@ -57,7 +61,6 @@ class OglParser
         $reNote = "/^(\(.+\)) (.*)$/";
 
         $ignoreHints = array("all drivers");
-        $oglMatrix = new OglMatrix();
 
         $line = fgets($handle);
         while ($line !== FALSE) {
@@ -70,7 +73,11 @@ class OglParser
             }
 
             if (preg_match($reVersion, $line, $matches) === 1) {
-                $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6], $this->hints);
+                $glVersion = $this->matrix->getGlVersionByName($matches[1], $matches[3]);
+                if (!$glVersion) {
+                    $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6], $this->hints);
+                    $this->matrix->addGlVersion($glVersion);
+                }
 
                 $allSupportedDrivers = array();
                 if (preg_match($reAllDone, $line, $matches) === 1) {
@@ -117,13 +124,11 @@ class OglParser
                             $parentDrivers = $supportedDrivers;
                         }
 
-                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers);
+                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $this->time);
                     }
 
                     $line = fgets($handle);
                 }
-
-                $oglMatrix->addGlVersion($glVersion);
 
                 $line = $this->skipEmptyLines($line, $handle);
 
@@ -141,7 +146,7 @@ class OglParser
             }
         }
 
-        return $oglMatrix;
+        return $this->matrix;
     }
 
     private function skipEmptyLines($curLine, $handle) {

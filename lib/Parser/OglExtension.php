@@ -24,8 +24,27 @@ class OglExtension
 {
     public function __construct($name, $status, $hints, $supportedDrivers = array()) {
         $this->name = $name;
-        $this->status = $status;
         $this->hints = $hints;
+        $this->supportedDrivers = array();
+        $this->lastModified = null;
+
+        $this->setStatus($status);
+        foreach ($supportedDrivers as $driverName) {
+            $this->addSupportedDriver($driverName);
+        }
+    }
+
+    // name
+    public function setName($name) {
+        $this->name = $name;
+    }
+    public function getName() {
+        return $this->name;
+    }
+
+    // status
+    public function setStatus($status) {
+        $this->status = $status;
 
         // Set the hint.
         $hint = "";
@@ -40,29 +59,71 @@ class OglExtension
         }
 
         $this->setHint($hint);
+    }
+    public function getStatus() {
+        return $this->status;
+    }
 
-        // Set the supported drivers list.
-        $this->supportedDrivers = array();
-        foreach ($supportedDrivers as &$driverName) {
-            $this->supportedDrivers[] = new OglSupportedDriver($driverName, $this->hints);
+    // hint
+    public function setHint($hint) {
+        $this->hintIdx = $this->hints->addToHints($hint);
+    }
+    public function getHintIdx() {
+        return $this->hintIdx;
+    }
+
+    // supported drivers
+    public function addSupportedDriver($driverName, $time = null) {
+        $this->supportedDrivers[] = new OglSupportedDriver($driverName, $this->hints, $time);
+    }
+    public function getSupportedDrivers() {
+        return $this->supportedDrivers;
+    }
+    public function getSupportedDriverByName($driverName) {
+        foreach ($this->supportedDrivers as $supportedDriver) {
+            $matchName = $supportedDriver->getName();
+            if (strncmp($driverName, $matchName, strlen($matchName)) === 0) {
+                return $supportedDriver;
+            }
         }
     }
 
-    public function setName($name) { $this->name = $name; }
-    public function getName()      { return $this->name; }
+    // last modified
+    public function setLastModified($time) {
+        $this->lastModified = $time;
+    }
+    public function getLastModified() {
+        return $this->lastModified;
+    }
 
-    public function setStatus($status) { $this->status = $status; }
-    public function getStatus()        { return $this->status; }
-
-    public function setHint($hint) { $this->hintIdx = $this->hints->addToHints($hint); }
-    public function getHintIdx()   { return $this->hintIdx; }
-
-    public function addSupportedDriver($supportedDriver) { $this->supportedDrivers[] = $supportedDriver; }
-    public function getSupportedDrivers()                { return $this->supportedDrivers; }
+    // merge
+    public function incorporate($other, $time) {
+        if ($this->name !== $other->name) {
+            \Mesamatrix::$logger->error('Merging extensions with different names');
+        }
+        if ($this->status !== $other->status) {
+            $this->status = $other->status;
+            $this->setLastModified($time);
+        }
+        if ($this->hintIdx !== $other->hintIdx) {
+            $this->hintIdx = $other->hintIdx;
+            $this->setLastModified($time);
+        }
+        foreach ($other->supportedDrivers as $supportedDriver) {
+            if ($driver = $this->getSupportedDriverByName($supportedDriver->getName())) {
+                $driver->incorporate($supportedDriver, $time);
+            }
+            else {
+                $supportedDriver->setLastModified($time);
+                $this->supportedDrivers[] = $supportedDriver;
+            }
+        }
+    }
 
     private $name;
     private $status;
     private $hints;
     private $hintIdx;
     private $supportedDrivers;
+    private $lastModified;
 };
