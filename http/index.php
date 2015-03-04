@@ -235,7 +235,7 @@ foreach ($glVersions as $glVersion) {
 
         $cellText = '';
         if (isset($ext->mesa['modified'])) {
-            $cellText = '<span>'.date('Y-m-d', (int) $ext->mesa['modified']).'</span>';
+            $cellText = '<span data-timestamp="' . $ext->mesa['modified'] . '">'.date('Y-m-d', (int) $ext->mesa['modified']).'</span>';
         }
 
         $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext["name"]));
@@ -274,7 +274,7 @@ foreach ($glVersions as $glVersion) {
                         $taskClasses .= " footnote";
                     }
                     if (isset($driverNode['modified'])) {
-                        $cellText = '<span>'.date('Y-m-d', (int) $driverNode['modified']).'</span>';
+                        $cellText = '<span data-timestamp="' . $driverNode['modified'] . '">'.date('Y-m-d', (int) $driverNode['modified']).'</span>';
                     }
                 }
                 else {

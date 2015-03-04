@@ -63,7 +63,7 @@ p { max-width: 800px; }
     position: absolute;
     bottom: 0;
     right: 0;
-    font: 9px sans-serif;
+    font: 0.7em sans-serif;
     text-decoration: none;
     color: black;
 }
