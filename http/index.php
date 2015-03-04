@@ -89,11 +89,6 @@ $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
 $numTotalExts = $leaderboard->getNumTotalExts();
 
 /////////////////////////////////////////////////
-// Update times.
-//
-$lastGitUpdate = date(DATE_RFC2822, (int) $xml['updated']);
-
-/////////////////////////////////////////////////
 // Drivers CSS classes.
 //
 foreach ($xml->drivers->vendor as $vendor) {
@@ -108,6 +103,15 @@ foreach ($xml->drivers->vendor as $vendor) {
 
 /////////////////////////////////////////////////
 // Write the HTML code.
+function writeLocalDate($timestamp) {
+    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
+    return '<script>document.write(getLocalDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
+}
+function writeRelativeDate($timestamp) {
+    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
+    return '<script>document.write(getRelativeDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -126,7 +130,7 @@ foreach ($xml->drivers->vendor as $vendor) {
     </head>
     <body>
         <h1>Last commits</h1>
-        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
+        <p><b>Last git update:</b> <?= writeLocalDate($xml['updated']) ?> (<a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
         <table class="commits">
             <thead>
                 <tr>
@@ -137,11 +141,10 @@ foreach ($xml->drivers->vendor as $vendor) {
            <tbody>
 <?php
 foreach ($xml->commits->commit as $commit) {
-    $commitDate = date(DATE_RFC2822, (int) $commit["timestamp"]);
     $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
                 <tr>
-                    <td class="commitsAge"><script>document.write(getRelativeDate('<?= $commitDate ?>'));</script><noscript><?= $commitDate ?></noscript></td>
+                    <td class="commitsAge"><?= writeRelativeDate($commit['timestamp']) ?></td>
                     <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
                 </tr>
 <?php
@@ -230,6 +233,11 @@ foreach ($glVersions as $glVersion) {
             $taskClasses .= " isInProgress";
         }
 
+        $cellText = '';
+        if (isset($ext->mesa['modified'])) {
+            $cellText = '<span>'.date('Y-m-d', (int) $ext->mesa['modified']).'</span>';
+        }
+
         $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext["name"]));
         $extHintIdx = $hints->findHint($ext->mesa["hint"]);
         if ($extHintIdx !== -1) {
@@ -245,7 +253,7 @@ foreach ($glVersions as $glVersion) {
                     <td id="<?= $extUrlId ?>"<?php if (strncmp($ext["name"], "-", 1) === 0) { ?> class="extension-child"<?php } ?>>
                         <?= $extNameText ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>">&nbsp;</a><?php } ?></td>
+                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
 <?php
 
         foreach ($xml->drivers->vendor as $vendor) {
@@ -256,6 +264,7 @@ foreach ($glVersions as $glVersion) {
                 $driverNode = $ext->supported->{$driver["name"]};
                 $extHintIdx = -1;
                 $taskClasses = "task";
+                $cellText = '';
                 if ($driverNode) {
                     // Driver found.
                     $taskClasses .= " isDone";
@@ -264,12 +273,15 @@ foreach ($glVersions as $glVersion) {
                     if ($extHintIdx !== -1) {
                         $taskClasses .= " footnote";
                     }
+                    if (isset($driverNode['modified'])) {
+                        $cellText = '<span>'.date('Y-m-d', (int) $driverNode['modified']).'</span>';
+                    }
                 }
                 else {
                     $taskClasses .= " isNotStarted";
                 }
 ?>
-                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>">&nbsp;</a><?php } ?></td>
+                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
 <?php
             }
         }
