@@ -41,7 +41,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output) {
         $gl3Path = \Mesamatrix::$config->getValue('git', 'gl3', 'docs/GL3.txt');
         $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
-            'log', '--pretty=format:%H:%at', '--reverse',
+            'log', '--pretty=format:%H|%at|%aN|%cN', '--reverse',
             \Mesamatrix::$config->getValue('git', 'oldest_commit').'..', '--',
             $gl3Path
         ));
@@ -52,15 +52,16 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $hints = new Hints();
         $matrix = new \Mesamatrix\Parser\OglMatrix();
         foreach ($commitLines as $commitLine) {
-            list($commit, $time) = explode(':', $commitLine);
-            \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$commit);
+            list($commitHash, $time, $author, $committer) = explode('|', $commitLine);
+            $commit = new \Mesamatrix\Git\Commit($commitHash, $time, $author, $committer);
+            \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$commit->getHash());
             $cat = new \Mesamatrix\Git\ProcessBuilder(array(
-              'show', $commit.':'.$gl3Path
+              'show', $commit->getHash().':'.$gl3Path
             ));
             $proc = $cat->getProcess();
             $this->getHelper('process')->mustRun($output, $proc);
 
-            $parser = new \Mesamatrix\Parser\OglParser($hints, $matrix, $time);
+            $parser = new \Mesamatrix\Parser\OglParser($hints, $matrix, $commit);
             $parser->parse_content($proc->getOutput());
         }
 
@@ -197,8 +198,11 @@ class Parse extends \Symfony\Component\Console\Command\Command
             if ($mesaHintId !== -1) {
                 $mesaStatus->addAttribute("hint", $hints->allHints[$mesaHintId]);
             }
-            if ($time = $glExt->getLastModified()) {
-                $mesaStatus->addAttribute("modified", $time);
+            if ($commit = $glExt->getModifiedAt()) {
+                $modified = $mesaStatus->addChild("modified");
+                $modified->addChild("commit", $commit->getHash());
+                $modified->addChild("date", $commit->getDate()->getTimestamp());
+                $modified->addChild("author", $commit->getAuthor());
             }
 
             $supported = $ext->addChild("supported");
@@ -208,8 +212,11 @@ class Parse extends \Symfony\Component\Console\Command\Command
                 if ($hintId !== -1) {
                     $driver->addAttribute("hint", $hints->allHints[$hintId]);
                 }
-                if ($time = $glDriver->getLastModified()) {
-                    $driver->addAttribute("modified", $time);
+                if ($commit = $glDriver->getModifiedAt()) {
+                    $modified = $driver->addChild("modified");
+                    $modified->addChild("commit", $commit->getHash());
+                    $modified->addChild("date", $commit->getDate()->getTimestamp());
+                    $modified->addChild("author", $commit->getAuthor());
                 }
             }
         }

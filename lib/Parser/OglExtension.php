@@ -26,7 +26,7 @@ class OglExtension
         $this->name = $name;
         $this->hints = $hints;
         $this->supportedDrivers = array();
-        $this->lastModified = null;
+        $this->modifiedAt = null;
 
         $this->setStatus($status);
         foreach ($supportedDrivers as $driverName) {
@@ -73,8 +73,8 @@ class OglExtension
     }
 
     // supported drivers
-    public function addSupportedDriver($driverName, $time = null) {
-        $this->supportedDrivers[] = new OglSupportedDriver($driverName, $this->hints, $time);
+    public function addSupportedDriver($driverName, $commit = null) {
+        $this->supportedDrivers[] = new OglSupportedDriver($driverName, $this->hints, $commit);
     }
     public function getSupportedDrivers() {
         return $this->supportedDrivers;
@@ -88,33 +88,33 @@ class OglExtension
         }
     }
 
-    // last modified
-    public function setLastModified($time) {
-        $this->lastModified = $time;
+    // modified at
+    public function setModifiedAt($commit) {
+        $this->modifiedAt = $commit;
     }
-    public function getLastModified() {
-        return $this->lastModified;
+    public function getModifiedAt() {
+        return $this->modifiedAt;
     }
 
     // merge
-    public function incorporate($other, $time) {
+    public function incorporate($other, $commit) {
         if ($this->name !== $other->name) {
             \Mesamatrix::$logger->error('Merging extensions with different names');
         }
         if ($this->status !== $other->status) {
             $this->status = $other->status;
-            $this->setLastModified($time);
+            $this->setModifiedAt($commit);
         }
         if ($this->hintIdx !== $other->hintIdx) {
             $this->hintIdx = $other->hintIdx;
-            $this->setLastModified($time);
+            $this->setModifiedAt($commit);
         }
         foreach ($other->supportedDrivers as $supportedDriver) {
             if ($driver = $this->getSupportedDriverByName($supportedDriver->getName())) {
-                $driver->incorporate($supportedDriver, $time);
+                $driver->incorporate($supportedDriver, $commit);
             }
             else {
-                $supportedDriver->setLastModified($time);
+                $supportedDriver->setModifiedAt($commit);
                 $this->supportedDrivers[] = $supportedDriver;
             }
         }
@@ -125,5 +125,5 @@ class OglExtension
     private $hints;
     private $hintIdx;
     private $supportedDrivers;
-    private $lastModified;
+    private $modifiedAt;
 };

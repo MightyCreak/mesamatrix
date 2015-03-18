@@ -64,10 +64,10 @@ class OglVersion
     }
 
     // GL/GLSL extensions.
-    public function addExtension($name, $status, $supportedDrivers = array(), $time = null) {
+    public function addExtension($name, $status, $supportedDrivers = array(), $commit = null) {
         $newExtension = new OglExtension($name, $status, $this->hints, $supportedDrivers);
         if ($extension = $this->getExtensionByName($name)) {
-            $extension->incorporate($newExtension, $time);
+            $extension->incorporate($newExtension, $commit);
         }
         else {
             $this->extensions[] = $newExtension;

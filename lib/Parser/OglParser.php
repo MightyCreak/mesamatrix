@@ -24,12 +24,12 @@ class OglParser
 {
     private $hints;
     private $matrix;
-    private $time;
+    private $commit;
 
-    public function __construct($hints, $matrix, $time = null) {
+    public function __construct($hints, $matrix, $commit = null) {
         $this->hints = $hints;
         $this->matrix = $matrix;
-        $this->time = $time;
+        $this->commit = $commit;
     }
 
     public function parse($filename) {
@@ -124,7 +124,7 @@ class OglParser
                             $parentDrivers = $supportedDrivers;
                         }
 
-                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $this->time);
+                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $this->commit);
                     }
 
                     $line = fgets($handle);

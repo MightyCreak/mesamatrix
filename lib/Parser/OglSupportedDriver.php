@@ -26,7 +26,7 @@ class OglSupportedDriver
         $this->setName("<undefined>");
         $this->hints = $hints;
         $this->hintIdx = -1;
-        $this->lastModified = null;
+        $this->modifiedAt = null;
 
         foreach (Constants::$allDrivers as $driver) {
             $driverLen = strlen($driver);
@@ -53,27 +53,27 @@ class OglSupportedDriver
         return $this->hintIdx;
     }
 
-    // last modified
-    public function setLastModified($time) {
-        $this->lastModified = $time;
+    // modified at
+    public function setModifiedAt($commit) {
+        $this->modifiedAt = $commit;
     }
-    public function getLastModified() {
-        return $this->lastModified;
+    public function getModifiedAt() {
+        return $this->modifiedAt;
     }
 
     // merge
-    public function incorporate($other, $time) {
+    public function incorporate($other, $commit) {
         if ($this->name !== $other->name) {
             \Mesamatrix::$logger->error('Merging supported drivers with different names');
         }
         if ($this->hintIdx !== $other->hintIdx) {
             $this->hintIdx = $other->hintIdx;
-            $this->setLastModified($time);
+            $this->setModifiedAt($commit);
         }
     }
 
     private $name;
     private $hints;
     private $hintIdx;
-    private $lastModified;
+    private $modifiedAt;
 };

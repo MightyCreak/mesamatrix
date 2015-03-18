@@ -234,8 +234,8 @@ foreach ($glVersions as $glVersion) {
         }
 
         $cellText = '';
-        if (isset($ext->mesa['modified'])) {
-            $cellText = '<span data-timestamp="' . $ext->mesa['modified'] . '">'.date('Y-m-d', (int) $ext->mesa['modified']).'</span>';
+        if (!empty($ext->mesa->modified)) {
+            $cellText = '<span data-timestamp="' . $ext->mesa->modified->date . '">'.date('Y-m-d', (int) $ext->mesa->modified->date).'</span>';
         }
 
         $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext["name"]));
@@ -273,8 +273,8 @@ foreach ($glVersions as $glVersion) {
                     if ($extHintIdx !== -1) {
                         $taskClasses .= " footnote";
                     }
-                    if (isset($driverNode['modified'])) {
-                        $cellText = '<span data-timestamp="' . $driverNode['modified'] . '">'.date('Y-m-d', (int) $driverNode['modified']).'</span>';
+                    if (!empty($driverNode->modified)) {
+                        $cellText = '<span data-timestamp="' . $driverNode->modified->date . '">'.date('Y-m-d', (int) $driverNode->modified->date).'</span>';
                     }
                 }
                 else {
