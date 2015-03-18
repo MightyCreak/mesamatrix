@@ -24,21 +24,19 @@ class Constants
 {
     // List of all the drivers.
     public static $allDrivers = array(
-        "swrast",
         "softpipe",
         "llvmpipe",
         "i965",
         "nv50",
         "nvc0",
-        "r300",
         "r600",
         "radeonsi"
     );
 
     public static $allDriversVendors = array(
-        "Software"  => array("swrast", "softpipe", "llvmpipe"),
+        "Software"  => array("softpipe", "llvmpipe"),
         "Intel"     => array("i965"),
         "nVidia"    => array("nv50", "nvc0"),
-        "AMD"       => array("r300", "r600", "radeonsi"),
+        "AMD"       => array("r600", "radeonsi"),
     );
 }
