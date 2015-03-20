@@ -51,6 +51,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $commitLines = explode(PHP_EOL, $gitLogProc->getOutput());
         $hints = new Hints();
         $matrix = new \Mesamatrix\Parser\OglMatrix();
+        $parser = new \Mesamatrix\Parser\OglParser($hints, $matrix);
         foreach ($commitLines as $commitLine) {
             list($commitHash, $time, $author, $committer) = explode('|', $commitLine);
             $commit = new \Mesamatrix\Git\Commit($commitHash, $time, $author, $committer);
@@ -61,8 +62,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
             $proc = $cat->getProcess();
             $this->getHelper('process')->mustRun($output, $proc);
 
-            $parser = new \Mesamatrix\Parser\OglParser($hints, $matrix, $commit);
-            $parser->parse_content($proc->getOutput());
+            $parser->parse_content($proc->getOutput(), $commit);
         }
 
         $xml = new \SimpleXMLElement("<mesa></mesa>");

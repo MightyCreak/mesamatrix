@@ -24,35 +24,31 @@ class OglParser
 {
     private $hints;
     private $matrix;
-    private $commit;
 
-    public function __construct($hints, $matrix, $commit = null) {
+    public function __construct($hints, $matrix) {
         $this->hints = $hints;
         $this->matrix = $matrix;
-        $this->commit = $commit;
     }
 
-    public function parse($filename) {
+    public function parse($filename, $commit = null) {
         $handle = fopen($filename, "r");
         if ($handle === FALSE) {
             return NULL;
         }
 
-        $ret = $this->parse_stream($handle);
+        $this->parse_stream($handle, $commit);
         fclose($handle);
-        return $ret;
     }
 
-    public function parse_content($content) {
+    public function parse_content($content, $commit = null) {
         $handle = fopen("php://memory", "r+");
         fwrite($handle, $content);
         rewind($handle);
-        $ret = $this->parse_stream($handle);
+        $this->parse_stream($handle, $commit);
         fclose($handle);
-        return $ret;
     }
 
-    public function parse_stream($handle) {
+    public function parse_stream($handle, $commit = null) {
         // Regexp patterns.
         $reTableHeader = "/^Feature([ ]+)Status/";
         $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
@@ -124,7 +120,7 @@ class OglParser
                             $parentDrivers = $supportedDrivers;
                         }
 
-                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $this->commit);
+                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $commit);
                     }
 
                     $line = fgets($handle);
@@ -145,8 +141,6 @@ class OglParser
                 $line = fgets($handle);
             }
         }
-
-        return $this->matrix;
     }
 
     private function skipEmptyLines($curLine, $handle) {
