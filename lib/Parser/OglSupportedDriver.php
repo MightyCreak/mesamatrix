@@ -26,7 +26,7 @@ class OglSupportedDriver
         $this->setName("<undefined>");
         $this->hints = $hints;
         $this->hintIdx = -1;
-        $this->modifiedAt = null;
+        $this->setModifiedAt(null);
 
         foreach (Constants::$allDrivers as $driver) {
             $driverLen = strlen($driver);

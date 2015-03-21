@@ -23,12 +23,12 @@ namespace Mesamatrix\Parser;
 class OglExtension
 {
     public function __construct($name, $status, $hints, $supportedDrivers = array()) {
-        $this->name = $name;
-        $this->hints = $hints;
-        $this->supportedDrivers = array();
-        $this->modifiedAt = null;
-
+        $this->setName($name);
         $this->setStatus($status);
+        $this->hints = $hints;
+        $this->setModifiedAt(null);
+
+        $this->supportedDrivers = array();
         foreach ($supportedDrivers as $driverName) {
             $this->addSupportedDriver($driverName);
         }
