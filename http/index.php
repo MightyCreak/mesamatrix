@@ -21,8 +21,214 @@
 require_once "../lib/base.php";
 
 /////////////////////////////////////////////////
-// Load XML.
+// Hints functions.
+//
+function registerExtensionHints(SimpleXMLElement $glExt, SimpleXMLElement $xml, Mesamatrix\Hints $hints) {
+    if ($glExt->mesa["hint"]) {
+        $hints->addHint((string) $glExt->mesa["hint"]);
+    }
 
+    foreach ($xml->drivers->vendor as $vendor) {
+        foreach ($vendor->driver as $driver) {
+            $driverNode = $glExt->supported->{$driver["name"]};
+            if ($driverNode) {
+                // Driver found.
+                if ($driverNode["hint"]) {
+                    $hints->addHint((string) $driverNode["hint"]);
+                }
+            }
+        }
+    }
+}
+
+function registerHints(array $glVersions, SimpleXMLElement $xml) {
+    $hints = new Mesamatrix\Hints();
+    foreach ($glVersions as $glVersion) {
+        foreach ($glVersion->extension as $glExt) {
+            registerExtensionHints($glExt, $xml, $hints);
+
+            foreach ($glExt->subextension as $glSubExt) {
+                registerExtensionHints($glSubExt, $xml, $hints);
+            }
+        }
+    }
+
+    return $hints;
+}
+
+/////////////////////////////////////////////////
+// Write HTML functions.
+//
+function writeLocalDate($timestamp) {
+    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
+    return '<script>document.write(getLocalDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
+}
+
+function writeRelativeDate($timestamp) {
+    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
+    return '<script>document.write(getRelativeDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
+}
+
+function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml, Mesamatrix\Hints $hints) {
+    $taskClasses = "task";
+    if ($glExt->mesa["status"] == "complete") {
+        $taskClasses .= " isDone";
+    }
+    elseif ($glExt->mesa["status"] == "incomplete") {
+        $taskClasses .= " isNotStarted";
+    }
+    else {
+        $taskClasses .= " isInProgress";
+    }
+
+    $cellText = '';
+    if (!empty($glExt->mesa->modified)) {
+        $cellText = '<span data-timestamp="' . $glExt->mesa->modified->date . '">'.date('Y-m-d', (int) $glExt->mesa->modified->date).'</span>';
+    }
+
+    $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $glExt["name"]));
+    $extHintIdx = $hints->findHint($glExt->mesa["hint"]);
+    if ($extHintIdx !== -1) {
+        $taskClasses .= " footnote";
+    }
+
+    $extNameText = $glExt["name"];
+    if (isset($glExt->link)) {
+        $extNameText = str_replace($glExt->link, "<a href=\"".$glExt->link["href"]."\">".$glExt->link."</a>", $extNameText);
+    }
+
+    $isSubExt = strncmp($glExt["name"], "-", 1) === 0;
+?>
+                <tr class="extension">
+                    <td id="<?= $extUrlId ?>"<?php if ($isSubExt) { ?> class="extension-child"<?php } ?>>
+                        <?= $extNameText ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
+                    </td>
+                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$glExt->mesa["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
+<?php
+
+    foreach ($xml->drivers->vendor as $vendor) {
+?>
+                    <td></td>
+<?php
+        foreach ($vendor->driver as $driver) {
+            $driverNode = $glExt->supported->{$driver["name"]};
+            $extHintIdx = -1;
+            $taskClasses = "task";
+            $cellText = '';
+            if ($driverNode) {
+                // Driver found.
+                $taskClasses .= " isDone";
+                $driver["done"] += 1;
+                $extHintIdx = $hints->findHint($driverNode["hint"]);
+                if ($extHintIdx !== -1) {
+                    $taskClasses .= " footnote";
+                }
+                if (!empty($driverNode->modified)) {
+                    $cellText = '<span data-timestamp="' . $driverNode->modified->date . '">'.date('Y-m-d', (int) $driverNode->modified->date).'</span>';
+                }
+            }
+            else {
+                $taskClasses .= " isNotStarted";
+            }
+?>
+                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
+<?php
+        }
+    }
+?>
+                </tr>
+<?php
+}
+
+function writeExtensionList(SimpleXMLElement $glVersion, $glUrlId, SimpleXMLElement $xml, Mesamatrix\Hints $hints) {
+    foreach ($glVersion->extension as $glExt) {
+        writeExtension($glExt, $glUrlId, $xml, $hints);
+
+        foreach ($glExt->subextension as $glSubExt) {
+            writeExtension($glSubExt, $glUrlId, $xml, $hints);
+        }
+    }
+}
+
+function writeMatrix(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints $hints, Mesamatrix\Leaderboard $leaderboard) {
+    foreach ($glVersions as $glVersion) {
+        $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
+        $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
+
+        // Write OpenGL version header.
+?>
+        <h1 id="<?= $glUrlId ?>">
+            <?= $text ?> <a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
+        </h1>
+        <table class="tableNoSpace">
+            <thead class="tableHeaderLine">
+                <tr>
+                    <th colspan="2"></th>
+<?php
+        foreach ($xml->drivers->vendor as $vendor) {
+?>
+                    <th></th>
+                    <th class="<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></th>
+<?php
+        }
+?>
+                </tr>
+                <tr>
+                    <th class="hCellVendor-default hCell-ext">Extension</th>
+                    <th class="hCellVendor-default hCell-driver">mesa</th>
+<?php
+        foreach ($xml->drivers->vendor as $vendor) {
+?>
+                    <th class="hCell-sep"></th>
+<?php
+            foreach ($vendor->driver as $driver) {
+?>
+                    <th class="<?= $vendor["class"] ?> hCell-driver"><?= $driver["name"] ?></th>
+<?php
+            }
+        }
+?>
+                </tr>
+            </thead>
+            <tbody>
+<?php
+        // Write OpenGL version extensions.
+        writeExtensionList($glVersion, $glUrlId, $xml, $hints);
+
+        // Write OpenGL version footer.
+        $lbGlVersion = $leaderboard->findGlVersion($glVersion["name"].$glVersion["version"]);
+        if ($lbGlVersion !== NULL) {
+            $numGlVersionExts = $lbGlVersion->getNumExts();
+?>
+            </tbody>
+            <tfoot>
+                <tr class="extension">
+                    <td><b>Total:</b></td>
+                    <td class="hCellVendor-default task"><?= $lbGlVersion->getNumDriverExtsDone("mesa")."/".$numGlVersionExts ?></td>
+<?php
+            foreach ($xml->drivers->vendor as $vendor) {
+?>
+                    <td></td>
+<?php
+                foreach ($vendor->driver as $driver) {
+                    $driverName = (string) $driver["name"];
+?>
+                    <td class="<?= $vendor["class"] ?> task"><?= $lbGlVersion->getNumDriverExtsDone($driverName)."/".$numGlVersionExts ?></td>
+<?php
+                }
+            }
+?>
+                </tr>
+            </tfoot>
+        </table>
+<?php
+        }
+    }
+}
+
+/////////////////////////////////////////////////
+// Load XML.
+//
 $gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
 
 // Read "xml_file".
@@ -56,29 +262,8 @@ usort($glVersions, function($a, $b) {
         }
     });
 
-/////////////////////////////////////////////////
-// Hints.
-//
-$hints = new Mesamatrix\Hints();
-foreach ($glVersions as $glVersion) {
-    foreach ($glVersion->extension as $ext) {
-        if ($ext->mesa["hint"]) {
-            $hints->addHint((string) $ext->mesa["hint"]);
-        }
-
-        foreach ($xml->drivers->vendor as $vendor) {
-            foreach ($vendor->driver as $driver) {
-                $driverNode = $ext->supported->{$driver["name"]};
-                if ($driverNode) {
-                    // Driver found.
-                    if ($driverNode["hint"]) {
-                        $hints->addHint((string) $driverNode["hint"]);
-                    }
-                }
-            }
-        }
-    }
-}
+// Register hints.
+$hints = registerHints($glVersions, $xml);
 
 /////////////////////////////////////////////////
 // Leaderboard.
@@ -102,16 +287,8 @@ foreach ($xml->drivers->vendor as $vendor) {
 }
 
 /////////////////////////////////////////////////
-// Write the HTML code.
-function writeLocalDate($timestamp) {
-    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
-    return '<script>document.write(getLocalDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
-}
-function writeRelativeDate($timestamp) {
-    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
-    return '<script>document.write(getRelativeDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
-}
-
+// HTML code.
+//
 ?>
 <!DOCTYPE html>
 <html>
@@ -138,7 +315,7 @@ function writeRelativeDate($timestamp) {
                     <th>Commit message</th>
                 </tr>
             </thead>
-           <tbody>
+            <tbody>
 <?php
 foreach ($xml->commits->commit as $commit) {
     $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
@@ -180,144 +357,8 @@ foreach($driversExtsDone as $drivername => $numExtsDone) {
             </tbody>
         </table>
 <?php
-
-foreach ($glVersions as $glVersion) {
-    $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
-    $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
-
-?>
-        <h1 id="<?= $glUrlId ?>">
-            <?= $text ?> <a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
-        </h1>
-        <table class="tableNoSpace">
-            <thead class="tableHeaderLine">
-                <tr>
-                    <th colspan="2"></th>
-<?php
-    foreach ($xml->drivers->vendor as $vendor) {
-?>
-                    <th></th>
-                    <th class="<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></th>
-<?php
-    }
-?>
-                </tr>
-                <tr>
-                    <th class="hCellVendor-default hCell-ext">Extension</th>
-                    <th class="hCellVendor-default hCell-driver">mesa</th>
-<?php
-    foreach ($xml->drivers->vendor as $vendor) {
-?>
-                    <th class="hCell-sep"></th>
-<?php
-        foreach ($vendor->driver as $driver) {
-?>
-                    <th class="<?= $vendor["class"] ?> hCell-driver"><?= $driver["name"] ?></th>
-<?php
-        }
-    }
-?>
-                </tr>
-            </thead>
-            <tbody>
-<?php
-    foreach ($glVersion->extension as $ext) {
-        $taskClasses = "task";
-        if ($ext->mesa["status"] == "complete") {
-            $taskClasses .= " isDone";
-        }
-        elseif ($ext->mesa["status"] == "incomplete") {
-            $taskClasses .= " isNotStarted";
-        }
-        else {
-            $taskClasses .= " isInProgress";
-        }
-
-        $cellText = '';
-        if (!empty($ext->mesa->modified)) {
-            $cellText = '<span data-timestamp="' . $ext->mesa->modified->date . '">'.date('Y-m-d', (int) $ext->mesa->modified->date).'</span>';
-        }
-
-        $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext["name"]));
-        $extHintIdx = $hints->findHint($ext->mesa["hint"]);
-        if ($extHintIdx !== -1) {
-            $taskClasses .= " footnote";
-        }
-
-        $extNameText = $ext["name"];
-        if (isset($ext->link)) {
-            $extNameText = str_replace($ext->link, "<a href=\"".$ext->link["href"]."\">".$ext->link."</a>", $extNameText);
-        }
-?>
-                <tr class="extension">
-                    <td id="<?= $extUrlId ?>"<?php if (strncmp($ext["name"], "-", 1) === 0) { ?> class="extension-child"<?php } ?>>
-                        <?= $extNameText ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
-                    </td>
-                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
-<?php
-
-        foreach ($xml->drivers->vendor as $vendor) {
-?>
-                    <td></td>
-<?php
-            foreach ($vendor->driver as $driver) {
-                $driverNode = $ext->supported->{$driver["name"]};
-                $extHintIdx = -1;
-                $taskClasses = "task";
-                $cellText = '';
-                if ($driverNode) {
-                    // Driver found.
-                    $taskClasses .= " isDone";
-                    $driver["done"] += 1;
-                    $extHintIdx = $hints->findHint($driverNode["hint"]);
-                    if ($extHintIdx !== -1) {
-                        $taskClasses .= " footnote";
-                    }
-                    if (!empty($driverNode->modified)) {
-                        $cellText = '<span data-timestamp="' . $driverNode->modified->date . '">'.date('Y-m-d', (int) $driverNode->modified->date).'</span>';
-                    }
-                }
-                else {
-                    $taskClasses .= " isNotStarted";
-                }
-?>
-                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
-<?php
-            }
-        }
-?>
-                </tr>
-<?php
-    }
-
-    $lbGlVersion = $leaderboard->findGlVersion($glVersion["name"].$glVersion["version"]);
-    if ($lbGlVersion !== NULL) {
-        $numGlVersionExts = $lbGlVersion->getNumExts();
-?>
-            </tbody>
-            <tfoot>
-                <tr class="extension">
-                    <td><b>Total:</b></td>
-                    <td class="hCellVendor-default task"><?= $lbGlVersion->getNumDriverExtsDone("mesa")."/".$numGlVersionExts ?></td>
-<?php
-        foreach ($xml->drivers->vendor as $vendor) {
-?>
-                    <td></td>
-<?php
-            foreach ($vendor->driver as $driver) {
-	        $driverName = (string) $driver["name"];
-?>
-                    <td class="<?= $vendor["class"] ?> task"><?= $lbGlVersion->getNumDriverExtsDone($driverName)."/".$numGlVersionExts ?></td>
-<?php
-            }
-        }
-?>
-                </tr>
-            </tfoot>
-        </table>
-<?php
-    }
-}
+// Write the OpenGL matrix.
+writeMatrix($glVersions, $xml, $hints, $leaderboard);
 ?>
         <h1>Footnotes</h1>
         <ol>

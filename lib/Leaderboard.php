@@ -33,28 +33,54 @@ class Leaderboard {
      *
      * @param SimpleXMLElement $xml Root of the XML data.
      */
-    public function load($xml) {
+    public function load(\SimpleXMLElement $xml) {
         foreach($xml->gl as $glVersion) {
             $lbGlVersion = $this->createGlVersion($glVersion["name"].$glVersion["version"]);
-            $lbGlVersion->setNumExts(count($glVersion->extension));
 
+            // Count total extensions and sub-extensions.
+            $numTotalExts = count($glVersion->extension);
+            foreach ($glVersion->extension as $glExt) {
+                $numTotalExts += count($glExt->subextension);
+            }
+
+            $lbGlVersion->setNumExts($numTotalExts);
+
+            // Count done mesa extensions and sub-extensions.
             $numDoneExts = 0;
-            foreach ($glVersion->extension as $ext) {
-                if ($ext->mesa["status"] == "complete")
-                {
+            foreach ($glVersion->extension as $glExt) {
+                // Extension.
+                if ($glExt->mesa["status"] == "complete") {
                     $numDoneExts += 1;
+                }
+
+                // Sub-extensions.
+                foreach ($glExt->subextension as $glSubExt) {
+                    if ($glSubExt->mesa["status"] == "complete") {
+                        $numDoneExts += 1;
+                    }
                 }
             }
 
             $lbGlVersion->addDriver("mesa", $numDoneExts);
 
+            // Count done extensions and sub-extensions for each drivers.
             foreach ($xml->drivers->vendor as $vendor) {
                 foreach ($vendor->driver as $driver) {
                     $driverName = (string) $driver["name"];
+
+                    // Count done extensions and sub-extensions for $driverName.
                     $numDoneExts = 0;
-                    foreach ($glVersion->extension as $ext) {
-                        if ($ext->supported->{$driverName}) {
+                    foreach ($glVersion->extension as $glExt) {
+                        // Extension.
+                        if ($glExt->supported->{$driverName}) {
                             $numDoneExts += 1;
+                        }
+
+                        // Sub-extensions.
+                        foreach ($glExt->subextension as $glSubExt) {
+                            if ($glSubExt->supported->{$driverName}) {
+                                $numDoneExts += 1;
+                            }
                         }
                     }
 

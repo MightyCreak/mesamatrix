@@ -82,12 +82,14 @@ class OglParser
 
                 $line = $this->skipEmptyLines(fgets($handle), $handle);
 
+                $lastExt = null;
                 $parentDrivers = NULL;
                 while ($line !== FALSE && $line !== "\n") {
                     if (preg_match($reExtension, $line, $matches) === 1) {
                         $supportedDrivers = $allSupportedDrivers;
                         $matches[1] = trim($matches[1]);
-                        if ($matches[1][0] === "-") {
+                        $isSubExt = $matches[1][0] === "-" && $lastExt !== null;
+                        if ($isSubExt) {
                             $this->mergeDrivers($supportedDrivers, $parentDrivers);
                         }
 
@@ -116,11 +118,16 @@ class OglParser
                             $matches[2] = $matches[2]." (".$matches[4].")";
                         }
 
-                        if ($matches[1][0] !== "-") {
+                        if (!$isSubExt) {
                             $parentDrivers = $supportedDrivers;
                         }
 
-                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $commit);
+                        if ($isSubExt) {
+                            $lastExt->addSubExtension($matches[1], $matches[2], $supportedDrivers, $commit);
+                        }
+                        else {
+                            $lastExt = $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $commit);
+                        }
                     }
 
                     $line = fgets($handle);

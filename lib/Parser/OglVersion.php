@@ -63,21 +63,44 @@ class OglVersion
         return $this->glslVersion;
     }
 
-    // GL/GLSL extensions.
+    /**
+     * Add an extension, or merge it if it already exists.
+     *
+     * @param string $name Name of the extension.
+     * @param string $status Status of the extension.
+     * @param array $supportedDrivers List of drivers supported for this extension.
+     * @param \Mesamatrix\Git\Commit $commit The commit used by the parser.
+     *
+     * @return OglExtension The new or existing extension.
+     */
     public function addExtension($name, $status, $supportedDrivers = array(), $commit = null) {
         $newExtension = new OglExtension($name, $status, $this->hints, $supportedDrivers);
         if ($extension = $this->getExtensionByName($name)) {
             $extension->incorporate($newExtension, $commit);
+            return $extension;
         }
         else {
             $this->extensions[] = $newExtension;
+            return $newExtension;
         }
     }
 
+    /**
+     * Get the list of all extensions.
+     *
+     * @return OglExtension[] All the extensions.
+     */
     public function getExtensions() {
         return $this->extensions;
     }
 
+    /**
+     * Find the extensions with the given name.
+     *
+     * @param string $name The name of the extension to find.
+     *
+     * @return OglExtension The extension or null if not found.
+     */
     public function getExtensionByName($name) {
         foreach ($this->extensions as $extension) {
             if ($extension->getName() === $name) {
