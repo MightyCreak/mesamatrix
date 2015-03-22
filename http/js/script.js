@@ -75,6 +75,10 @@ function getRelativeDate(text) {
     return year + "-" + month + "-" + day;
 }
 
+function gaussian(x, a, b, c) {
+    return a * Math.exp(- Math.pow(x - b, 2) / (2 * Math.pow(c, 2)));
+}
+
 $(document).ready(function() {
     $(".footnote a").tipsy({gravity: "w"});
 //    $(".footnote a").on("click", function(e) {
@@ -85,4 +89,11 @@ $(document).ready(function() {
 //            $(this).tipsy("hide");
 //        }
 //    });
+
+    // adjust the opacity of the 'modified' text based on age
+    var timeConst = 1.2e7;
+    $('.task span').each(function() {
+        var timeDiff = (Date.now()/1000) - $(this).data('timestamp');
+        $(this).css('opacity', gaussian(timeDiff, 1, 0, timeConst));
+    });
 });

@@ -23,32 +23,32 @@ namespace Mesamatrix\Parser;
 class OglParser
 {
     private $hints;
+    private $matrix;
 
-    public function __construct($hints) {
+    public function __construct($hints, $matrix) {
         $this->hints = $hints;
+        $this->matrix = $matrix;
     }
 
-    public function parse($filename) {
+    public function parse($filename, $commit = null) {
         $handle = fopen($filename, "r");
         if ($handle === FALSE) {
             return NULL;
         }
 
-        $ret = $this->parse_stream($handle);
+        $this->parse_stream($handle, $commit);
         fclose($handle);
-        return $ret;
     }
 
-    public function parse_content($content) {
+    public function parse_content($content, $commit = null) {
         $handle = fopen("php://memory", "r+");
         fwrite($handle, $content);
         rewind($handle);
-        $ret = $this->parse_stream($handle);
+        $this->parse_stream($handle, $commit);
         fclose($handle);
-        return $ret;
     }
 
-    public function parse_stream($handle) {
+    public function parse_stream($handle, $commit = null) {
         // Regexp patterns.
         $reTableHeader = "/^Feature([ ]+)Status/";
         $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
@@ -57,7 +57,6 @@ class OglParser
         $reNote = "/^(\(.+\)) (.*)$/";
 
         $ignoreHints = array("all drivers");
-        $oglMatrix = new OglMatrix();
 
         $line = fgets($handle);
         while ($line !== FALSE) {
@@ -70,7 +69,11 @@ class OglParser
             }
 
             if (preg_match($reVersion, $line, $matches) === 1) {
-                $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6], $this->hints);
+                $glVersion = $this->matrix->getGlVersionByName($matches[1], $matches[3]);
+                if (!$glVersion) {
+                    $glVersion = new OglVersion($matches[1], $matches[3], $matches[4], $matches[6], $this->hints);
+                    $this->matrix->addGlVersion($glVersion);
+                }
 
                 $allSupportedDrivers = array();
                 if (preg_match($reAllDone, $line, $matches) === 1) {
@@ -117,13 +120,11 @@ class OglParser
                             $parentDrivers = $supportedDrivers;
                         }
 
-                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers);
+                        $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $commit);
                     }
 
                     $line = fgets($handle);
                 }
-
-                $oglMatrix->addGlVersion($glVersion);
 
                 $line = $this->skipEmptyLines($line, $handle);
 
@@ -140,8 +141,6 @@ class OglParser
                 $line = fgets($handle);
             }
         }
-
-        return $oglMatrix;
     }
 
     private function skipEmptyLines($curLine, $handle) {

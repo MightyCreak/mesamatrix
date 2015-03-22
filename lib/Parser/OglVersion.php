@@ -24,31 +24,68 @@ class OglVersion
 {
     public function __construct($glName, $glVersion, $glslName, $glslVersion, $hints) {
         $this->setGlName($glName);
-        $this->glVersion = $glVersion;
-        $this->glslName = $glslName;
-        $this->glslVersion = $glslVersion;
+        $this->setGlVersion($glVersion);
+        $this->setGlslName($glslName);
+        $this->setGlslVersion($glslVersion);
         $this->hints = $hints;
         $this->extensions = array();
     }
 
-    /// GL name and version.
-    public function setGlName($name)       { $this->glName = "Open".$name; }
-    public function getGlName()            { return $this->glName; }
-    public function setGlVersion($version) { $this->glVersion = $version; }
-    public function getGlVersion()         { return $this->glVersion; }
-
-    /// GLSL name and version.
-    public function setGlslName($name)       { $this->glslName = $name; }
-    public function getGlslName()            { return $this->glslName; }
-    public function setGlslVersion($version) { $this->glslVersion = $version; }
-    public function getGlslVersion()         { return $this->glslVersion; }
-
-    /// GL/GLSL extensions.
-    public function addExtension($name, $status, $supportedDrivers = array()) {
-        $this->extensions[] = new OglExtension($name, $status, $this->hints, $supportedDrivers);
+    // GL name
+    public function setGlName($name) {
+        $this->glName = "Open".$name;
+    }
+    public function getGlName() {
+        return $this->glName;
     }
 
-    public function getExtensions() { return $this->extensions; }
+    // GL version
+    public function setGlVersion($version) {
+        $this->glVersion = $version;
+    }
+    public function getGlVersion() {
+        return $this->glVersion;
+    }
+
+    // GLSL name
+    public function setGlslName($name) {
+        $this->glslName = $name;
+    }
+    public function getGlslName() {
+        return $this->glslName;
+    }
+
+    // GLSL version
+    public function setGlslVersion($version) {
+        $this->glslVersion = $version;
+    }
+    public function getGlslVersion() {
+        return $this->glslVersion;
+    }
+
+    // GL/GLSL extensions.
+    public function addExtension($name, $status, $supportedDrivers = array(), $commit = null) {
+        $newExtension = new OglExtension($name, $status, $this->hints, $supportedDrivers);
+        if ($extension = $this->getExtensionByName($name)) {
+            $extension->incorporate($newExtension, $commit);
+        }
+        else {
+            $this->extensions[] = $newExtension;
+        }
+    }
+
+    public function getExtensions() {
+        return $this->extensions;
+    }
+
+    public function getExtensionByName($name) {
+        foreach ($this->extensions as $extension) {
+            if ($extension->getName() === $name) {
+                return $extension;
+            }
+        }
+        return null;
+    }
 
     private $glName;
     private $glVersion;

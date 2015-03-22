@@ -23,9 +23,28 @@ namespace Mesamatrix\Parser;
 class OglExtension
 {
     public function __construct($name, $status, $hints, $supportedDrivers = array()) {
-        $this->name = $name;
-        $this->status = $status;
+        $this->setName($name);
+        $this->setStatus($status);
         $this->hints = $hints;
+        $this->setModifiedAt(null);
+
+        $this->supportedDrivers = array();
+        foreach ($supportedDrivers as $driverName) {
+            $this->addSupportedDriver($driverName);
+        }
+    }
+
+    // name
+    public function setName($name) {
+        $this->name = $name;
+    }
+    public function getName() {
+        return $this->name;
+    }
+
+    // status
+    public function setStatus($status) {
+        $this->status = $status;
 
         // Set the hint.
         $hint = "";
@@ -40,29 +59,71 @@ class OglExtension
         }
 
         $this->setHint($hint);
+    }
+    public function getStatus() {
+        return $this->status;
+    }
 
-        // Set the supported drivers list.
-        $this->supportedDrivers = array();
-        foreach ($supportedDrivers as &$driverName) {
-            $this->supportedDrivers[] = new OglSupportedDriver($driverName, $this->hints);
+    // hint
+    public function setHint($hint) {
+        $this->hintIdx = $this->hints->addToHints($hint);
+    }
+    public function getHintIdx() {
+        return $this->hintIdx;
+    }
+
+    // supported drivers
+    public function addSupportedDriver($driverName, $commit = null) {
+        $this->supportedDrivers[] = new OglSupportedDriver($driverName, $this->hints, $commit);
+    }
+    public function getSupportedDrivers() {
+        return $this->supportedDrivers;
+    }
+    public function getSupportedDriverByName($driverName) {
+        foreach ($this->supportedDrivers as $supportedDriver) {
+            $matchName = $supportedDriver->getName();
+            if (strncmp($driverName, $matchName, strlen($matchName)) === 0) {
+                return $supportedDriver;
+            }
         }
     }
 
-    public function setName($name) { $this->name = $name; }
-    public function getName()      { return $this->name; }
+    // modified at
+    public function setModifiedAt($commit) {
+        $this->modifiedAt = $commit;
+    }
+    public function getModifiedAt() {
+        return $this->modifiedAt;
+    }
 
-    public function setStatus($status) { $this->status = $status; }
-    public function getStatus()        { return $this->status; }
-
-    public function setHint($hint) { $this->hintIdx = $this->hints->addToHints($hint); }
-    public function getHintIdx()   { return $this->hintIdx; }
-
-    public function addSupportedDriver($supportedDriver) { $this->supportedDrivers[] = $supportedDriver; }
-    public function getSupportedDrivers()                { return $this->supportedDrivers; }
+    // merge
+    public function incorporate($other, $commit) {
+        if ($this->name !== $other->name) {
+            \Mesamatrix::$logger->error('Merging extensions with different names');
+        }
+        if ($this->status !== $other->status) {
+            $this->status = $other->status;
+            $this->setModifiedAt($commit);
+        }
+        if ($this->hintIdx !== $other->hintIdx) {
+            $this->hintIdx = $other->hintIdx;
+            $this->setModifiedAt($commit);
+        }
+        foreach ($other->supportedDrivers as $supportedDriver) {
+            if ($driver = $this->getSupportedDriverByName($supportedDriver->getName())) {
+                $driver->incorporate($supportedDriver, $commit);
+            }
+            else {
+                $supportedDriver->setModifiedAt($commit);
+                $this->supportedDrivers[] = $supportedDriver;
+            }
+        }
+    }
 
     private $name;
     private $status;
     private $hints;
     private $hintIdx;
     private $supportedDrivers;
+    private $modifiedAt;
 };

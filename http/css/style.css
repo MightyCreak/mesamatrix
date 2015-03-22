@@ -50,7 +50,23 @@ p { max-width: 800px; }
 
 .extension-child { padding-left: 1em; }
 .extension:hover { background-color: #babdb6; }
-.task { border-radius: 4px; padding-right: 4px; text-align: right; }
+.task {
+    position: relative;
+    border-radius: 4px;
+    padding-right: 4px;
+    height: 19px;
+    width: 72px;
+    padding: 0;
+}
+
+.task span {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font: 0.7em sans-serif;
+    text-decoration: none;
+    color: black;
+}
 
 .isDone { background-color: #8ae234; }
 .isInProgress { background-color: #f1922b; }
@@ -60,7 +76,8 @@ p { max-width: 800px; }
 
 .footnote a {
     display: block;
-    text-decoration: none;
+    height: 100%;
+    width: 100%;
 }
 .footnote.task {
     padding:0;

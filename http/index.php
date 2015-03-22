@@ -89,15 +89,6 @@ $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
 $numTotalExts = $leaderboard->getNumTotalExts();
 
 /////////////////////////////////////////////////
-// Update times.
-//
-$updateTime = filemtime($gl3Path);
-$lastGitUpdate = "No commit found";
-if (count($xml->commits->commit) > 0) {
-    $lastGitUpdate = date(DATE_RFC2822, (int) $xml->commits->commit[0]["timestamp"]);
-}
-
-/////////////////////////////////////////////////
 // Drivers CSS classes.
 //
 foreach ($xml->drivers->vendor as $vendor) {
@@ -112,6 +103,15 @@ foreach ($xml->drivers->vendor as $vendor) {
 
 /////////////////////////////////////////////////
 // Write the HTML code.
+function writeLocalDate($timestamp) {
+    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
+    return '<script>document.write(getLocalDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
+}
+function writeRelativeDate($timestamp) {
+    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
+    return '<script>document.write(getRelativeDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -130,7 +130,7 @@ foreach ($xml->drivers->vendor as $vendor) {
     </head>
     <body>
         <h1>Last commits</h1>
-        <p><b>Last git update:</b> <script>document.write(getLocalDate("<?= $lastGitUpdate ?>"));</script><noscript><?= $lastGitUpdate ?></noscript> (<a href="<?= Mesamatrix::$config->getValue("git", "web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
+        <p><b>Last git update:</b> <?= writeLocalDate($xml['updated']) ?> (<a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
         <table class="commits">
             <thead>
                 <tr>
@@ -141,11 +141,10 @@ foreach ($xml->drivers->vendor as $vendor) {
            <tbody>
 <?php
 foreach ($xml->commits->commit as $commit) {
-    $commitDate = date(DATE_RFC2822, (int) $commit["timestamp"]);
-    $commitUrl = Mesamatrix::$config->getValue("git", "web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
+    $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
                 <tr>
-                    <td class="commitsAge"><script>document.write(getRelativeDate('<?= $commitDate ?>'));</script><noscript><?= $commitDate ?></noscript></td>
+                    <td class="commitsAge"><?= writeRelativeDate($commit['timestamp']) ?></td>
                     <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
                 </tr>
 <?php
@@ -234,6 +233,11 @@ foreach ($glVersions as $glVersion) {
             $taskClasses .= " isInProgress";
         }
 
+        $cellText = '';
+        if (!empty($ext->mesa->modified)) {
+            $cellText = '<span data-timestamp="' . $ext->mesa->modified->date . '">'.date('Y-m-d', (int) $ext->mesa->modified->date).'</span>';
+        }
+
         $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $ext["name"]));
         $extHintIdx = $hints->findHint($ext->mesa["hint"]);
         if ($extHintIdx !== -1) {
@@ -249,7 +253,7 @@ foreach ($glVersions as $glVersion) {
                     <td id="<?= $extUrlId ?>"<?php if (strncmp($ext["name"], "-", 1) === 0) { ?> class="extension-child"<?php } ?>>
                         <?= $extNameText ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>">&nbsp;</a><?php } ?></td>
+                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$ext->mesa["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
 <?php
 
         foreach ($xml->drivers->vendor as $vendor) {
@@ -260,6 +264,7 @@ foreach ($glVersions as $glVersion) {
                 $driverNode = $ext->supported->{$driver["name"]};
                 $extHintIdx = -1;
                 $taskClasses = "task";
+                $cellText = '';
                 if ($driverNode) {
                     // Driver found.
                     $taskClasses .= " isDone";
@@ -268,12 +273,15 @@ foreach ($glVersions as $glVersion) {
                     if ($extHintIdx !== -1) {
                         $taskClasses .= " footnote";
                     }
+                    if (!empty($driverNode->modified)) {
+                        $cellText = '<span data-timestamp="' . $driverNode->modified->date . '">'.date('Y-m-d', (int) $driverNode->modified->date).'</span>';
+                    }
                 }
                 else {
                     $taskClasses .= " isNotStarted";
                 }
 ?>
-                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>">&nbsp;</a><?php } ?></td>
+                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
 <?php
             }
         }
@@ -341,7 +349,7 @@ if (Mesamatrix::$config->getValue("flattr", "enabled")) {
             <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
         </ul>
         <h1>Sources</h1>
-        <p><b>This page is generated from:</b> <a href="<?= Mesamatrix::$config->getValue("git", "web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a></p>
+        <p><b>This page is generated from:</b> <a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a></p>
         <p>If you want to report a bug or simply to participate in the project, feel free to get the sources:
         <a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><?= Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
         <p><a href="https://www.gnu.org/licenses/agpl.html"><img src="https://www.gnu.org/graphics/agplv3-155x51.png" alt="Logo AGPLv3" /></a></p>

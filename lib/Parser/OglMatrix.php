@@ -34,5 +34,15 @@ class OglMatrix
         return $this->glVersions;
     }
 
+    public function getGlVersionByName($name, $version) {
+        foreach ($this->glVersions as $glVersion) {
+            if ($glVersion->getGlName() === 'Open'.$name
+             && $glVersion->getGlVersion() === $version) {
+                return $glVersion;
+            }
+        }
+        return null;
+    }
+
     private $glVersions;
 };
