@@ -42,7 +42,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output) {
         $gl3Path = \Mesamatrix::$config->getValue('git', 'gl3', 'docs/GL3.txt');
         $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
-            'log', '--pretty=format:%H|%at|%aN|%cN', '--reverse',
+            'log', '--pretty=format:%H|%at|%aN|%cN|%ct', '--reverse',
             \Mesamatrix::$config->getValue('git', 'oldest_commit').'..', '--',
             $gl3Path
         ));
@@ -54,8 +54,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $matrix = new \Mesamatrix\Parser\OglMatrix();
         $parser = new \Mesamatrix\Parser\OglParser($hints, $matrix);
         foreach ($commitLines as $commitLine) {
-            list($commitHash, $time, $author, $committer) = explode('|', $commitLine);
-            $commit = new \Mesamatrix\Git\Commit($commitHash, $time, $author, $committer);
+            list($commitHash, $time, $author, $committer, $committerTime) = explode('|', $commitLine);
+            $commit = new \Mesamatrix\Git\Commit($commitHash, $time, $author, $committer, $committerTime);
             \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$commit->getHash());
             $cat = new \Mesamatrix\Git\ProcessBuilder(array(
               'show', $commit->getHash().':'.$gl3Path
@@ -207,7 +207,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         if ($commit = $glExt->getModifiedAt()) {
             $modified = $mesaStatus->addChild("modified");
             $modified->addChild("commit", $commit->getHash());
-            $modified->addChild("date", $commit->getDate()->getTimestamp());
+            $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
             $modified->addChild("author", $commit->getAuthor());
         }
 
@@ -221,7 +221,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
             if ($commit = $glDriver->getModifiedAt()) {
                 $modified = $driver->addChild("modified");
                 $modified->addChild("commit", $commit->getHash());
-                $modified->addChild("date", $commit->getDate()->getTimestamp());
+                $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
                 $modified->addChild("author", $commit->getAuthor());
             }
         }
