@@ -24,6 +24,7 @@ class OglExtension
 {
     public function __construct($name, $status, $hints, $supportedDrivers = array()) {
         $this->hints = $hints;
+        $this->subextensions = array();
         $this->setName($name);
         $this->setStatus($status);
         $this->setModifiedAt(null);
@@ -120,10 +121,56 @@ class OglExtension
         }
     }
 
+    /**
+     * Add a sub-extension, or merge it if it already exists.
+     *
+     * @param string $name Name of the extension.
+     * @param string $status Status of the extension.
+     * @param array $supportedDrivers List of drivers supported for this extension.
+     * @param \Mesamatrix\Git\Commit $commit The commit used by the parser.
+     */
+    public function addSubExtension($name, $status, $supportedDrivers = array(), $commit = null) {
+        $newExtension = new OglExtension($name, $status, $this->hints, $supportedDrivers);
+        $subext = $this->findSubExtensionByName($name);
+        if($subext !== null) {
+            $subext->incorporate($newExtension, $commit);
+        }
+        else {
+            $this->subextensions[] = $newExtension;
+        }
+    }
+
+    /**
+     * Get the list of all sub-extensions.
+     *
+     * @return OglExtension[] All the sub-extensions.
+     */
+    public function getSubExtensions() {
+        return $this->subextensions;
+    }
+
+    /**
+     * Find the extensions with the given name.
+     *
+     * @param string $name The name of the extension to find.
+     *
+     * @return OglExtension The extension or null if not found.
+     */
+    private function findSubExtensionByName($name) {
+        foreach ($this->subextensions as $subext) {
+            if($subext->getName() === $name) {
+                return $subext;
+            }
+        }
+
+        return null;
+    }
+
     private $name;
     private $status;
     private $hints;
     private $hintIdx;
     private $supportedDrivers;
     private $modifiedAt;
+    private $subextensions;
 };

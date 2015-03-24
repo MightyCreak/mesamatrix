@@ -24,6 +24,7 @@ namespace Mesamatrix\Console\Command;
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \Mesamatrix\Parser\OglVersion;
+use \Mesamatrix\Parser\OglExtension;
 use \Mesamatrix\Parser\UrlCache;
 use \Mesamatrix\Parser\Hints;
 
@@ -163,62 +164,71 @@ class Parse extends \Symfony\Component\Console\Command\Command
         foreach ($glVersion->getExtensions() as $glExt) {
             \Mesamatrix::$logger->debug('Processing extension '.$glExt->getName());
             $ext = $gl->addChild("extension");
-            $ext->addAttribute("name", $glExt->getName());
+            $this->generateExtension($ext, $glExt, $hints);
+        }
+    }
 
-            if ($this->urlCache) {
-                if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
-                    $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url").urlencode($matches[2])."/";
-                    if ($matches[1] === "GL") {
-                        // Found a GL_TYPE_extension.
-                        $openglUrl .= urlencode($matches[3]).".txt";
-                    }
-                    else {
-                        // Found a GLX_TYPE_Extension.
-                        $openglUrl .= "glx_".urlencode($matches[3]).".txt";
-                    }
+    protected function generateExtension(\SimpleXMLElement $xmlExt, OglExtension $glExt, Hints $hints) {
+        $xmlExt->addAttribute("name", $glExt->getName());
 
-                    if ($this->urlCache->isValid($openglUrl)) {
-                        $linkNode = $ext->addChild("link", $matches[0]);
-                        $linkNode->addAttribute("href", $openglUrl);
-                    }
+        if ($this->urlCache) {
+            if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
+                $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url").urlencode($matches[2])."/";
+                if ($matches[1] === "GL") {
+                    // Found a GL_TYPE_extension.
+                    $openglUrl .= urlencode($matches[3]).".txt";
+                }
+                else {
+                    // Found a GLX_TYPE_Extension.
+                    $openglUrl .= "glx_".urlencode($matches[3]).".txt";
+                }
+
+                if ($this->urlCache->isValid($openglUrl)) {
+                    $linkNode = $xmlExt->addChild("link", $matches[0]);
+                    $linkNode->addAttribute("href", $openglUrl);
                 }
             }
+        }
 
-            $mesaStatus = $ext->addChild("mesa");
-            $statusLength = 0;
-            foreach ($this->statuses as $matchStatus) {
-                foreach ($matchStatus as $match) {
-                    if (fnmatch($match, $glExt->getStatus()) && strlen($match) >= $statusLength) {
-                        $mesaStatus->addAttribute("status", $matchStatus->getName());
-                        $statusLength = strlen($match);
-                    }
+        $mesaStatus = $xmlExt->addChild("mesa");
+        $statusLength = 0;
+        foreach ($this->statuses as $matchStatus) {
+            foreach ($matchStatus as $match) {
+                if (fnmatch($match, $glExt->getStatus()) && strlen($match) >= $statusLength) {
+                    $mesaStatus->addAttribute("status", $matchStatus->getName());
+                    $statusLength = strlen($match);
                 }
             }
-            $mesaHintId = $glExt->getHintIdx();
-            if ($mesaHintId !== -1) {
-                $mesaStatus->addAttribute("hint", $hints->allHints[$mesaHintId]);
+        }
+        $mesaHintId = $glExt->getHintIdx();
+        if ($mesaHintId !== -1) {
+            $mesaStatus->addAttribute("hint", $hints->allHints[$mesaHintId]);
+        }
+        if ($commit = $glExt->getModifiedAt()) {
+            $modified = $mesaStatus->addChild("modified");
+            $modified->addChild("commit", $commit->getHash());
+            $modified->addChild("date", $commit->getDate()->getTimestamp());
+            $modified->addChild("author", $commit->getAuthor());
+        }
+
+        $supported = $xmlExt->addChild("supported");
+        foreach ($glExt->getSupportedDrivers() as $glDriver) {
+            $driver = $supported->addChild($glDriver->getName());
+            $hintId = $glDriver->getHintIdx();
+            if ($hintId !== -1) {
+                $driver->addAttribute("hint", $hints->allHints[$hintId]);
             }
-            if ($commit = $glExt->getModifiedAt()) {
-                $modified = $mesaStatus->addChild("modified");
+            if ($commit = $glDriver->getModifiedAt()) {
+                $modified = $driver->addChild("modified");
                 $modified->addChild("commit", $commit->getHash());
                 $modified->addChild("date", $commit->getDate()->getTimestamp());
                 $modified->addChild("author", $commit->getAuthor());
             }
+        }
 
-            $supported = $ext->addChild("supported");
-            foreach ($glExt->getSupportedDrivers() as $glDriver) {
-                $driver = $supported->addChild($glDriver->getName());
-                $hintId = $glDriver->getHintIdx();
-                if ($hintId !== -1) {
-                    $driver->addAttribute("hint", $hints->allHints[$hintId]);
-                }
-                if ($commit = $glDriver->getModifiedAt()) {
-                    $modified = $driver->addChild("modified");
-                    $modified->addChild("commit", $commit->getHash());
-                    $modified->addChild("date", $commit->getDate()->getTimestamp());
-                    $modified->addChild("author", $commit->getAuthor());
-                }
-            }
+        foreach ($glExt->getSubExtensions() as $glSubExt) {
+            $xmlSubExt = $xmlExt->addChild("subextension");
+            $this->generateExtension($xmlSubExt, $glSubExt, $hints);
         }
     }
 }
