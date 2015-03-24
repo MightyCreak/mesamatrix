@@ -26,13 +26,15 @@ class Commit
     private $date;
     private $author;
     private $committer;
+    private $committerDate;
 
-    public function __construct($hash, $date, $author, $committer = null)
+    public function __construct($hash, $date, $author, $committer = null, $committerDate = null)
     {
         $this->setHash($hash);
         $this->setDate($date);
         $this->setAuthor($author);
         $this->setCommitter(isset($committer) ? $committer : $author);
+        $this->setCommitterDate(isset($committerDate) ? $committerDate : $date);
     }
 
     public function getHash()
@@ -84,5 +86,26 @@ class Commit
     public function setCommitter($committer)
     {
         $this->committer = $committer;
+    }
+
+    public function getCommitterDate()
+    {
+        return $this->committerDate;
+    }
+
+    public function setCommitterDate($date)
+    {
+        if (is_numeric($date)) {
+            $this->setCommitterDateString('@'.$date);
+        } elseif (is_string($date)) {
+            $this->setCommitterDateString($date);
+        } else {
+            $this->committerDate = $date;
+        }
+    }
+
+    public function setCommitterDateString($date, $timezone = null)
+    {
+        $this->setCommitterDate(new \DateTime($date, $timezone));
     }
 }
