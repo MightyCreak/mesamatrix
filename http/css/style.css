@@ -70,7 +70,7 @@ p { max-width: 800px; }
 
 .isDone { background-color: #8ae234; }
 .isInProgress { background-color: #f1922b; }
-.isNotStarted { background-color: #ef2929; }
+.isNotStarted { background-color: #bababa; }
 
 .permalink:link { text-decoration: none; color: #DDDDDD; }
 
@@ -89,6 +89,6 @@ p { max-width: 800px; }
     background: repeating-linear-gradient(45deg, #f1922b, #f1922b 10px, #d1720b 10px, #d1720b 20px);
 }
 .footnote.isNotStarted {
-    background: repeating-linear-gradient(45deg, #ef2929, #ef2929 10px, #cf0909 10px, #cf0909 20px);
+    background: repeating-linear-gradient(45deg, #bababa, #bababa 10px, #909090 10px, #909089 20px);
 }
 
