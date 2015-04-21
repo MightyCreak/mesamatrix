@@ -306,56 +306,62 @@ foreach ($xml->drivers->vendor as $vendor) {
         <script src="js/script.js"></script>
     </head>
     <body>
-        <h1>Last commits</h1>
-        <p><b>Last git update:</b> <?= writeLocalDate($xml['updated']) ?> (<a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
-        <table class="commits">
-            <thead>
-                <tr>
-                    <th>Age</th>
-                    <th>Commit message</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="stats">
+            <div class="stats-commits">
+                <h1>Last commits</h1>
+                <p><b>Last git update:</b> <?= writeLocalDate($xml['updated']) ?> (<a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
+                <table class="commits">
+                    <thead>
+                        <tr>
+                            <th>Age</th>
+                            <th>Commit message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 <?php
 foreach ($xml->commits->commit as $commit) {
     $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
-                <tr>
-                    <td class="commitsAge"><?= writeRelativeDate($commit['timestamp']) ?></td>
-                    <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
-                </tr>
+                        <tr>
+                            <td class="commitsAge"><?= writeRelativeDate($commit['timestamp']) ?></td>
+                            <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
+                        </tr>
 <?php
 }
 ?>
-            </tbody>
-        </table>
-        <h1>Leaderboard</h1>
-        <table class="lb">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Driver</th>
-                    <th>Score</th>
-                    <th>Completion</th>
-                </tr>
-            </thead>
-            <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="stats-lb">
+                <h1>Leaderboard</h1>
+                <table class="lb">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Driver</th>
+                            <th>Score</th>
+                            <th>Completion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 <?php
 $rank = 1;
 foreach($driversExtsDone as $drivername => $numExtsDone) {
 ?>
-                <tr>
-                    <th class="lbCol-rank"><?= $rank ?></th>
-                    <td class="lbCol-driver"><?= $drivername ?></td>
-                    <td class="lbCol-score"><?= $numExtsDone." / ".$numTotalExts ?></td>
-                    <td class="lbCol-score"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
-                </tr>
+                        <tr>
+                            <th class="lbCol-rank"><?= $rank ?></th>
+                            <td class="lbCol-driver"><?= $drivername ?></td>
+                            <td class="lbCol-score"><?= $numExtsDone." / ".$numTotalExts ?></td>
+                            <td class="lbCol-score"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
+                        </tr>
 <?php
     $rank++;
 }
 ?>
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 <?php
 // Write the OpenGL matrix.
 writeMatrix($glVersions, $xml, $hints, $leaderboard);
