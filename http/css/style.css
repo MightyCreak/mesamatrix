@@ -21,12 +21,20 @@ body { font-size: 85%; font-family: sans-serif; }
 
 p { max-width: 800px; }
 
+.stats {
+    display: flex;
+}
+
+.stats-lb {
+    margin-left: 40px;
+}
+
 .commits th                         { text-align: left; }
 .commits .commitsAge                { padding-right: 2em; }
 .commits .commitsAge::first-letter  { text-transform: uppercase; }
 
 .lb                             { border-collapse: collapse; border-spacing: 0; }
-.lb th, .lb td                  { padding: 0.1em 0.5em; }
+.lb th, .lb td                  { padding: 0.25em 0.5em; }
 .lb th                          { background-color: #d3d7cf; }
 .lb td                          { border: 1px solid #d3d7cf; }
 .lbCol-rank                     { text-align: center; }
