@@ -50,12 +50,49 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $this->getHelper('process')->mustRun($output, $gitLogProc);
 
         $commitLines = explode(PHP_EOL, $gitLogProc->getOutput());
-        $hints = new Hints();
-        $matrix = new \Mesamatrix\Parser\OglMatrix();
-        $parser = new \Mesamatrix\Parser\OglParser($hints, $matrix);
+        if (empty($commitLines)) {
+            // No commit? There must be a problem.
+            \Mesamatrix::$logger->error("No commit found.");
+            return 1;
+        }
+
+        // Create commit list.
+        $commits = array();
         foreach ($commitLines as $commitLine) {
             list($commitHash, $time, $author, $committer, $committerTime) = explode('|', $commitLine);
             $commit = new \Mesamatrix\Git\Commit($commitHash, $time, $author, $committer, $committerTime);
+            $commits[] = $commit;
+        }
+
+        $lastCommitFilename = \Mesamatrix::$config->getValue('info', 'private_dir', 'private').'/last_commit_parsed';
+
+        // Get last commit parsed.
+        $lastCommitParsed = "";
+        if (file_exists($lastCommitFilename)) {
+            $h = fopen($lastCommitFilename, "r");
+            if ($h !== false) {
+                $lastCommitParsed = fgets($h);
+                fclose($h);
+            }
+        }
+
+        // Get last commit fetched.
+        $lastCommitFetched = $commits[0]->getHash();
+
+        // Compare last parsed and fetched commits.
+        \Mesamatrix::$logger->debug("Last commit fetched: ${lastCommitFetched}");
+        \Mesamatrix::$logger->debug("Last commit parsed:  ${lastCommitParsed}");
+        if ($lastCommitFetched === $lastCommitParsed) {
+            \Mesamatrix::$logger->info("No new commit, no need to parse.");
+            return 0;
+        }
+
+        \Mesamatrix::$logger->info("New commit found, let's parse!");
+
+        $hints = new Hints();
+        $matrix = new \Mesamatrix\Parser\OglMatrix();
+        $parser = new \Mesamatrix\Parser\OglParser($hints, $matrix);
+        foreach ($commits as $commit) {
             \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$commit->getHash());
             $cat = new \Mesamatrix\Git\ProcessBuilder(array(
               'show', $commit->getHash().':'.$gl3Path
@@ -106,8 +143,14 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $dom->formatOutput = true;
 
         file_put_contents($xmlPath, $dom->saveXML());
-        //$xml->asXML($xmlPath);
         \Mesamatrix::$logger->notice('XML saved to '.$xmlPath);
+
+        // Save last commit parsed.
+        $h = fopen($lastCommitFilename, "w");
+        if ($h !== false) {
+            fwrite($h, $lastCommitFetched);
+            fclose($h);
+        }
     }
 
     protected function populateDrivers(\SimpleXMLElement $drivers) {
