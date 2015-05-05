@@ -309,7 +309,6 @@ foreach ($xml->drivers->vendor as $vendor) {
         <div class="stats">
             <div class="stats-commits">
                 <h1>Last commits</h1>
-                <p><b>Last git update:</b> <?= writeLocalDate($xml['updated']) ?> (<a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">see the log</a>)</p>
                 <table class="commits">
                     <thead>
                         <tr>
@@ -329,6 +328,10 @@ foreach ($xml->commits->commit as $commit) {
 <?php
 }
 ?>
+                        <tr>
+                            <td><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a></td>
+                            <td></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -377,7 +380,17 @@ for($i = 0; $i < $numHints; $i++) {
 }
 ?>
         </ol>
-        <h1>How to help</h1>
+        <h1>About Mesamatrix</h1>
+        <h2>How it works</h2>
+        <p>It is merely a representation of a text file from the Mesa git repository. You can see the raw file here:</p>
+        <p><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a>.</p>
+        <p>Frequently, the Mesa git is fetched and, if there is a new commit for the text file, a PHP script will parse it and format it into XML. Then another PHP script displays the data into the HTML you can see here.</p>
+        <p><b>Last time the text file was parsed:</b> <?= writeLocalDate($xml['updated']) ?>.</p>
+        <h2>Source code</h2>
+        <p>The code is free and licenced under AGPLv3. If you want to report a bug, participate to the project or simply browse the code:</p>
+        <p><a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><?= Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
+        <p><a href="https://www.gnu.org/licenses/agpl.html"><img src="https://www.gnu.org/graphics/agplv3-155x51.png" alt="Logo AGPLv3" /></a></p>
+        <h2>How to help</h2>
         <p>If you find this page useful and want to help, you can report issues, or <a href="https://github.com/MightyCreak/mesamatrix">grab the code</a> and add whatever feature you want.</p>
 <?php
 if (Mesamatrix::$config->getValue("flattr", "enabled")) {
@@ -387,7 +400,7 @@ if (Mesamatrix::$config->getValue("flattr", "enabled")) {
 <?php
 }
 ?>
-        <h1>Learn more</h1>
+        <h2>See also</h2>
         <p>Here are few links to learn more about the Linux graphics drivers:</p>
         <ul>
             <li>Freedesktop.org: <a href="http://xorg.freedesktop.org/wiki/RadeonFeature/#index5h2">Radeon GPUs</a></li>
@@ -395,12 +408,7 @@ if (Mesamatrix::$config->getValue("flattr", "enabled")) {
             <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Radeon" title="Radeon">Radeon</a></li>
             <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
         </ul>
-        <h1>Sources</h1>
-        <p><b>This page is generated from:</b> <a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a></p>
-        <p>If you want to report a bug or simply to participate in the project, feel free to get the sources:
-        <a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><?= Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
-        <p><a href="https://www.gnu.org/licenses/agpl.html"><img src="https://www.gnu.org/graphics/agplv3-155x51.png" alt="Logo AGPLv3" /></a></p>
-        <h1>Authors</h1>
+        <h2>Authors</h2>
         <ul>
 <?php
 foreach (Mesamatrix::$config->getValue("info", "authors") as $k => $v) {
