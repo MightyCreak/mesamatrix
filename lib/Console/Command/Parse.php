@@ -77,7 +77,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
 
         // Get last commit fetched.
-        $lastCommitFetched = $commits[0]->getHash();
+        $lastCommitFetched = $commits[count($commits) - 1]->getHash();
 
         // Compare last parsed and fetched commits.
         \Mesamatrix::$logger->debug("Last commit fetched: ${lastCommitFetched}");
