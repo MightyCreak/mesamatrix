@@ -306,126 +306,128 @@ foreach ($xml->drivers->vendor as $vendor) {
         <script src="js/script.js"></script>
     </head>
     <body>
-        <div class="stats">
-            <div class="stats-commits">
-                <h1>Last commits</h1>
-                <table class="commits">
-                    <thead>
-                        <tr>
-                            <th>Age</th>
-                            <th>Commit message</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <div id="main">
+            <div class="stats">
+                <div class="stats-commits">
+                    <h1>Last commits</h1>
+                    <table class="commits">
+                        <thead>
+                            <tr>
+                                <th>Age</th>
+                                <th>Commit message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 <?php
 foreach ($xml->commits->commit as $commit) {
     $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
-                        <tr>
-                            <td class="commitsAge"><?= writeRelativeDate($commit['timestamp']) ?></td>
-                            <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
-                        </tr>
+                            <tr>
+                                <td class="commitsAge"><?= writeRelativeDate($commit['timestamp']) ?></td>
+                                <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
+                            </tr>
 <?php
 }
 ?>
-                        <tr>
-                            <td><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="stats-lb">
-                <h1>Leaderboard</h1>
-                <table class="lb">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Driver</th>
-                            <th>Score</th>
-                            <th>Completion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                            <tr>
+                                <td><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="stats-lb">
+                    <h1>Leaderboard</h1>
+                    <table class="lb">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Driver</th>
+                                <th>Score</th>
+                                <th>Completion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 <?php
 $rank = 1;
 foreach($driversExtsDone as $drivername => $numExtsDone) {
 ?>
-                        <tr>
-                            <th class="lbCol-rank"><?= $rank ?></th>
-                            <td class="lbCol-driver"><?= $drivername ?></td>
-                            <td class="lbCol-score"><?= $numExtsDone." / ".$numTotalExts ?></td>
-                            <td class="lbCol-score"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
-                        </tr>
+                            <tr>
+                                <th class="lbCol-rank"><?= $rank ?></th>
+                                <td class="lbCol-driver"><?= $drivername ?></td>
+                                <td class="lbCol-score"><?= $numExtsDone." / ".$numTotalExts ?></td>
+                                <td class="lbCol-score"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
+                            </tr>
 <?php
     $rank++;
 }
 ?>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 <?php
 // Write the OpenGL matrix.
 writeMatrix($glVersions, $xml, $hints, $leaderboard);
 ?>
-        <h1>Footnotes</h1>
-        <ol>
+            <h1>Footnotes</h1>
+            <ol>
 <?php
 $numHints = $hints->getNumHints();
 for($i = 0; $i < $numHints; $i++) {
 ?>
-            <li id="Footnotes_<?= $i + 1 ?>"><?= $hints->getHint($i) ?></li>
+                <li id="Footnotes_<?= $i + 1 ?>"><?= $hints->getHint($i) ?></li>
 <?php
 }
 ?>
-        </ol>
-        <h1>About Mesamatrix</h1>
-        <h2>How it works</h2>
-        <p>It is merely a representation of a text file from the Mesa git repository. You can see the raw file here:</p>
-        <p><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a>.</p>
-        <p>Frequently, the Mesa git is fetched and, if there is a new commit for the text file, a PHP script will parse it and format it into XML. Then another PHP script displays the data into the HTML you can see here.</p>
-        <p><b>Last time the text file was parsed:</b> <?= writeLocalDate($xml['updated']) ?>.</p>
-        <h2>Source code</h2>
-        <a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
-        <p>The code is free and licenced under AGPLv3. If you want to report a bug, participate to the project or simply browse the code:</p>
-        <p><a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><?= Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
-        <p><a href="https://www.gnu.org/licenses/agpl.html"><img src="https://www.gnu.org/graphics/agplv3-155x51.png" alt="Logo AGPLv3" /></a></p>
-        <h2>How to help</h2>
-        <p>If you find this page useful and want to help, you can report issues, or <a href="https://github.com/MightyCreak/mesamatrix">grab the code</a> and add whatever feature you want.</p>
+            </ol>
+            <h1>About Mesamatrix</h1>
+            <h2>How it works</h2>
+            <p>It is merely a representation of a text file from the Mesa git repository. You can see the raw file here:</p>
+            <p><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a>.</p>
+            <p>Frequently, the Mesa git is fetched and, if there is a new commit for the text file, a PHP script will parse it and format it into XML. Then another PHP script displays the data into the HTML you can see here.</p>
+            <p><b>Last time the text file was parsed:</b> <?= writeLocalDate($xml['updated']) ?>.</p>
+            <h2>Source code</h2>
+            <a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
+            <p>The code is free and licenced under AGPLv3. If you want to report a bug, participate to the project or simply browse the code:</p>
+            <p><a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><?= Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
+            <p><a href="https://www.gnu.org/licenses/agpl.html"><img src="https://www.gnu.org/graphics/agplv3-155x51.png" alt="Logo AGPLv3" /></a></p>
+            <h2>How to help</h2>
+            <p>If you find this page useful and want to help, you can report issues, or <a href="https://github.com/MightyCreak/mesamatrix">grab the code</a> and add whatever feature you want.</p>
 <?php
 if (Mesamatrix::$config->getValue("flattr", "enabled")) {
 ?>
-        <p>You can click here too, if you want to Flattr me:</p>
-        <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= Mesamatrix::$config->getValue("flattr", "id") ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= Mesamatrix::$config->getValue("info", "title") ?>')+'&description='+encodeURIComponent('<?= Mesamatrix::$config->getValue("info", "description") ?>')+'&language='+encodeURIComponent('<?= Mesamatrix::$config->getValue("flattr", "language") ?>')+'&tags=<?= Mesamatrix::$config->getValue("flattr", "tags") ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
+            <p>You can click here too, if you want to Flattr me:</p>
+            <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= Mesamatrix::$config->getValue("flattr", "id") ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= Mesamatrix::$config->getValue("info", "title") ?>')+'&description='+encodeURIComponent('<?= Mesamatrix::$config->getValue("info", "description") ?>')+'&language='+encodeURIComponent('<?= Mesamatrix::$config->getValue("flattr", "language") ?>')+'&tags=<?= Mesamatrix::$config->getValue("flattr", "tags") ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
 <?php
 }
 ?>
-        <h2>See also</h2>
-        <p>Here are few links to learn more about the Linux graphics drivers:</p>
-        <ul>
-            <li>Freedesktop.org: <a href="http://xorg.freedesktop.org/wiki/RadeonFeature/#index5h2">Radeon GPUs</a></li>
-            <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Mesa_%28computer_graphics%29" title="Mesa (computer graphics)">Mesa (computer graphics)</a></li>
-            <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Radeon" title="Radeon">Radeon</a></li>
-            <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
-        </ul>
-        <h2>Authors</h2>
-        <ul>
+            <h2>See also</h2>
+            <p>Here are few links to learn more about the Linux graphics drivers:</p>
+            <ul>
+                <li>Freedesktop.org: <a href="http://xorg.freedesktop.org/wiki/RadeonFeature/#index5h2">Radeon GPUs</a></li>
+                <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Mesa_%28computer_graphics%29" title="Mesa (computer graphics)">Mesa (computer graphics)</a></li>
+                <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Radeon" title="Radeon">Radeon</a></li>
+                <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
+            </ul>
+            <h2>Authors</h2>
+            <ul>
 <?php
 foreach (Mesamatrix::$config->getValue("info", "authors") as $k => $v) {
     if (is_string($k)) {
 ?>
-            <li><a href="<?= $v ?>"><?= $k ?></a></li>
+                <li><a href="<?= $v ?>"><?= $k ?></a></li>
 <?php
     }
     else {
 ?>
-            <li><?= $v ?></li>
+                <li><?= $v ?></li>
 <?php
     }
 }
 ?>
-        </ul>
+            </ul>
+        </div>
     </body>
 </html>
 
