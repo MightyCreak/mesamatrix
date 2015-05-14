@@ -30,8 +30,8 @@ p { max-width: 800px; }
     display: flex;
 }
 
-.stats-lb {
-    margin-left: 40px;
+.stats-commits {
+    flex: 1;
 }
 
 .commits th                         { text-align: left; }
