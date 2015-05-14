@@ -90,10 +90,29 @@ $(document).ready(function() {
 //        }
 //    });
 
+    $(".mesaScore").tipsy({
+        fallback: "It represents the completion status of `mesa` only",
+        gravity: "n",
+        fade: true
+    });
+
     // adjust the opacity of the 'modified' text based on age
     var timeConst = 1.2e7;
     $('.task span').each(function() {
         var timeDiff = (Date.now()/1000) - $(this).data('timestamp');
         $(this).css('opacity', gaussian(timeDiff, 1, 0, timeConst));
+    });
+
+    $('.mesaScore').each(function() {
+        var blend = Math.round($(this).data('score'));
+        if (blend == 100) {
+            $(this).addClass('mesaScore-done');
+        }
+        else if (blend < 90) {
+            $(this).addClass('mesaScore-notyet');
+        }
+        else {
+            $(this).addClass('mesaScore-almost');
+        }
     });
 });

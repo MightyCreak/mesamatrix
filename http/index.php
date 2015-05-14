@@ -154,11 +154,33 @@ function writeMatrix(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints 
     foreach ($glVersions as $glVersion) {
         $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
         $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
+        $lbGlVersion = $leaderboard->findGlVersion($glVersion["name"].$glVersion["version"]);
+
+        $numGlVersionExts = 0;
+        $numGlVersionExtsDone = 0;
+        $driverExtsDone = array();
+        $mesaScore = 0.0;
+        if ($lbGlVersion !== NULL) {
+            $numGlVersionExts = $lbGlVersion->getNumExts();
+
+            $numGlVersionExtsDone = $lbGlVersion->getNumDriverExtsDone("mesa");
+            $driverExtsDone["mesa"] = $numGlVersionExtsDone;
+            foreach ($xml->drivers->vendor as $vendor) {
+                foreach ($vendor->driver as $driver) {
+                    $driverName = (string) $driver["name"];
+                    $extsDone = $lbGlVersion->getNumDriverExtsDone($driverName);
+                    $numGlVersionExtsDone += $extsDone;
+                    $driverExtsDone[$driverName] = $extsDone;
+                }
+            }
+
+            $mesaScore = sprintf("%.1f", $driverExtsDone["mesa"] / $numGlVersionExts * 100.0);
+        }
 
         // Write OpenGL version header.
 ?>
         <h1 id="<?= $glUrlId ?>">
-            <?= $text ?> <a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
+            <?= $text ?> <span class="mesaScore" data-score="<?= $mesaScore ?>"><?= $mesaScore ?>%</span> <a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
         </h1>
         <table class="tableNoSpace">
             <thead class="tableHeaderLine">
@@ -194,17 +216,17 @@ function writeMatrix(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints 
 <?php
         // Write OpenGL version extensions.
         writeExtensionList($glVersion, $glUrlId, $xml, $hints);
-
-        // Write OpenGL version footer.
-        $lbGlVersion = $leaderboard->findGlVersion($glVersion["name"].$glVersion["version"]);
-        if ($lbGlVersion !== NULL) {
-            $numGlVersionExts = $lbGlVersion->getNumExts();
 ?>
             </tbody>
+<?php
+
+        // Write OpenGL version footer.
+        if ($lbGlVersion !== NULL) {
+?>
             <tfoot>
                 <tr class="extension">
                     <td><b>Total:</b></td>
-                    <td class="hCellVendor-default task"><?= $lbGlVersion->getNumDriverExtsDone("mesa")."/".$numGlVersionExts ?></td>
+                    <td class="hCellVendor-default task"><?= $driverExtsDone["mesa"]."/".$numGlVersionExts ?></td>
 <?php
             foreach ($xml->drivers->vendor as $vendor) {
 ?>
@@ -213,7 +235,7 @@ function writeMatrix(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints 
                 foreach ($vendor->driver as $driver) {
                     $driverName = (string) $driver["name"];
 ?>
-                    <td class="<?= $vendor["class"] ?> task"><?= $lbGlVersion->getNumDriverExtsDone($driverName)."/".$numGlVersionExts ?></td>
+                    <td class="<?= $vendor["class"] ?> task"><?= $driverExtsDone[$driverName]."/".$numGlVersionExts ?></td>
 <?php
                 }
             }

@@ -55,6 +55,15 @@ p { max-width: 800px; }
     width: 100%;
 }
 
+.mesaScore {
+    font-size: 0.7em;
+    color: #DDDDDD;
+    cursor: help;
+}
+.mesaScore-done { color: #99D75F; }
+.mesaScore-almost { color: #E1A25E; }
+.mesaScore-notyet { color: #B94B3D; }
+
 .hCellVendor-default { background-color: #d3d7cf; }
 .hCellVendor-soft    { background-color: #d1b4ce; }
 .hCellVendor-intel   { background-color: #b9cee4; }
