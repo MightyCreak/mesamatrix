@@ -17,21 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-body { font-size: 85%; font-family: sans-serif; }
+body {
+    font-size: 85%;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+}
 
 p { max-width: 800px; }
-
-#main {
-    max-width: 85em;
-    margin: 0px auto;
-}
 
 .stats {
     display: flex;
 }
 
-.stats-lb {
-    margin-left: 40px;
+.stats-commits {
+    flex: 1;
 }
 
 .commits th                         { text-align: left; }
