@@ -21,12 +21,17 @@ body { font-size: 85%; font-family: sans-serif; }
 
 p { max-width: 800px; }
 
+#main {
+    max-width: 85em;
+    margin: 0px auto;
+}
+
 .stats {
     display: flex;
 }
 
-.stats-lb {
-    margin-left: 40px;
+.stats-commits {
+    flex: 1;
 }
 
 .commits th                         { text-align: left; }
@@ -44,7 +49,11 @@ p { max-width: 800px; }
 .lb tbody tr:nth-child(2) td    { background-color: rgba(195, 255, 155, 0.67); }
 .lb tbody tr:nth-child(3) td    { background-color: rgba(195, 255, 155, 0.33); }
 
-.tableNoSpace    { border-spacing: 1px; border-collapse: separate; }
+.tableNoSpace {
+    border-spacing: 1px;
+    border-collapse: separate;
+    width: 100%;
+}
 
 .hCellVendor-default { background-color: #d3d7cf; }
 .hCellVendor-soft    { background-color: #d1b4ce; }
