@@ -50,14 +50,14 @@ class Mesamatrix
         self::$config = new \Mesamatrix\Config(self::$configDir);
 
         // attempt to create the private dir
-        $privateDir = self::$config->getValue('info', 'private_dir');
+        $privateDir = self::path(self::$config->getValue('info', 'private_dir'));
         if (!is_dir($privateDir)) {
             mkdir($privateDir);
         }
 
         // register the log file
         $logLevel = self::$config->getValue('info', 'log_level', Logger::WARNING);
-        $logPath = self::path($privateDir.'/mesamatrix.log');
+        $logPath = $privateDir.'/mesamatrix.log';
         if (!file_exists($logPath) && is_dir($privateDir)) {
             touch($logPath);
         }
