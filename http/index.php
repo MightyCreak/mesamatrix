@@ -86,7 +86,9 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
         $cellText = '<span data-timestamp="' . $glExt->mesa->modified->date . '">'.date('Y-m-d', (int) $glExt->mesa->modified->date).'</span>';
     }
 
-    $extUrlId = $glUrlId."_Extension_".urlencode(str_replace(" ", "", $glExt["name"]));
+    $extUrlId = str_replace(" ", "_", $glExt["name"]);
+    $extUrlId = preg_replace('/[^A-Za-z_]/', '', $extUrlId);
+    $extUrlId = $glUrlId."_Extension_".$extUrlId;
     $extHintIdx = $hints->findHint($glExt->mesa["hint"]);
     if ($extHintIdx !== -1) {
         $taskClasses .= " footnote";
