@@ -323,7 +323,7 @@ foreach ($xml->drivers->vendor as $vendor) {
         <link rel="shortcut icon" href="images/gears.png" />
         <link href="css/style.css?v=<?= Mesamatrix::$config->getValue("info", "version") ?>" rel="stylesheet" type="text/css" media="all"/>
         <link href="css/tipsy.css" rel="stylesheet" type="text/css" media="all" />
-        <script src="js/jquery-1.11.1.min.js"></script>
+        <script src="js/jquery-1.11.3.min.js"></script>
         <script src="js/jquery.tipsy.js"></script>
         <script src="js/script.js"></script>
     </head>
