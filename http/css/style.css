@@ -74,6 +74,11 @@ p { max-width: 800px; }
 .hCell-sep       { width: 0.3em; }
 .hCell-driver    { min-width: 5.1em; }
 
+.permalink { margin-left: 0.3em; display: none; }
+.permalink:link { text-decoration: none; color: #DDDDDD; }
+.permalink:visited { text-decoration: none; color: #DDDDDD; }
+:hover > .permalink { display: inline; }
+
 .extension-child { padding-left: 1em; }
 .extension:hover { background-color: #babdb6; }
 .task {
@@ -98,8 +103,6 @@ p { max-width: 800px; }
 .isDone { background-color: #A7E969; }
 .isInProgress { background-color: #E99D4A; }
 .isNotStarted { background-color: #D55E4F; }
-
-.permalink:link { text-decoration: none; color: #DDDDDD; }
 
 .footnote.task {
     padding: 0;

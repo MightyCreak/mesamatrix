@@ -101,7 +101,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
 ?>
                 <tr class="extension">
                     <td id="<?= $extUrlId ?>"<?php if ($isSubExt) { ?> class="extension-child"<?php } ?>>
-                        <?= $extNameText ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
+                        <?= $extNameText ?><a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
                     <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).". ".$glExt->mesa["hint"]; } ?>"><?= $cellText ?></td>
 <?php
@@ -180,7 +180,7 @@ function writeMatrix(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints 
         // Write OpenGL version header.
 ?>
         <h1 id="<?= $glUrlId ?>">
-            <?= $text ?> <span class="mesaScore" data-score="<?= $mesaScore ?>"><?= $mesaScore ?>%</span> <a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
+            <?= $text ?> <span class="mesaScore" data-score="<?= $mesaScore ?>"><?= $mesaScore ?>%</span><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
         </h1>
         <table class="tableNoSpace">
             <thead class="tableHeaderLine">
