@@ -80,19 +80,12 @@ function gaussian(x, a, b, c) {
 }
 
 $(document).ready(function() {
-    $(".footnote a").tipsy({gravity: "w"});
-//    $(".footnote a").on("click", function(e) {
-//        if ($(".tipsy").length === 0) {
-//            $(this).tipsy("show");
-//        }
-//        else {
-//            $(this).tipsy("hide");
-//        }
-//    });
+    // Add tipsy for the footnote.
+    $('.footnote').tipsy({gravity: 'w', fade: true});
 
-    $(".mesaScore").tipsy({
-        fallback: "It represents the completion status of `mesa` only",
-        gravity: "n",
+    $('.mesaScore').tipsy({
+        fallback: 'It represents the completion status of `mesa` only',
+        gravity: 'n',
         fade: true
     });
 

@@ -103,7 +103,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
                     <td id="<?= $extUrlId ?>"<?php if ($isSubExt) { ?> class="extension-child"<?php } ?>>
                         <?= $extNameText ?> <a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$glExt->mesa["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
+                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).". ".$glExt->mesa["hint"]; } ?>"><?= $cellText ?></td>
 <?php
 
     foreach ($xml->drivers->vendor as $vendor) {
@@ -131,7 +131,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
                 $taskClasses .= " isNotStarted";
             }
 ?>
-                    <td class="<?= $taskClasses ?>"><?php if ($extHintIdx !== -1) { ?><a href="#Footnotes_<?= $extHintIdx + 1 ?>" title="<?= ($extHintIdx + 1).". ".$driverNode["hint"] ?>"><?= $cellText ?></a><?php } else { echo $cellText; } ?></td>
+                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).". ".$driverNode["hint"]; } ?>"><?= $cellText ?></td>
 <?php
         }
     }
@@ -392,17 +392,6 @@ foreach($driversExtsDone as $drivername => $numExtsDone) {
 // Write the OpenGL matrix.
 writeMatrix($glVersions, $xml, $hints, $leaderboard);
 ?>
-            <h1>Footnotes</h1>
-            <ol>
-<?php
-$numHints = $hints->getNumHints();
-for($i = 0; $i < $numHints; $i++) {
-?>
-                <li id="Footnotes_<?= $i + 1 ?>"><?= $hints->getHint($i) ?></li>
-<?php
-}
-?>
-            </ol>
             <h1>About Mesamatrix</h1>
             <h2>How it works</h2>
             <p>It is merely a representation of a text file from the Mesa git repository. You can see the raw file here:</p>

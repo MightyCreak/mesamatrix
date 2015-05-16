@@ -83,6 +83,7 @@ p { max-width: 800px; }
     height: 19px;
     width: 72px;
     padding: 0;
+    cursor: default;
 }
 
 .task span {
@@ -100,13 +101,9 @@ p { max-width: 800px; }
 
 .permalink:link { text-decoration: none; color: #DDDDDD; }
 
-.footnote a {
-    display: block;
-    height: 100%;
-    width: 100%;
-}
 .footnote.task {
-    padding:0;
+    padding: 0;
+    cursor: help;
 }
 .footnote.isDone {
     background: repeating-linear-gradient(45deg, #A7E969, #A7E969 10px, #97C86A 10px, #97C86A 20px);
