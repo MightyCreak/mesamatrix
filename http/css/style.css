@@ -25,6 +25,8 @@ body {
     justify-content: center;
 }
 
+#main { min-width: 0; }
+
 p { max-width: 800px; }
 
 .stats {
