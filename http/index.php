@@ -323,6 +323,7 @@ foreach ($xml->drivers->vendor as $vendor) {
         <title><?= Mesamatrix::$config->getValue("info", "title") ?></title>
 
         <link rel="shortcut icon" href="images/gears.png" />
+        <link rel="alternate" type="application/rss+xml" title="rss feed" href="rss.php" />
         <link href="css/style.css?v=<?= Mesamatrix::$config->getValue("info", "version") ?>" rel="stylesheet" type="text/css" media="all"/>
         <link href="css/tipsy.css" rel="stylesheet" type="text/css" media="all" />
         <script src="js/jquery-1.11.3.min.js"></script>
@@ -331,6 +332,12 @@ foreach ($xml->drivers->vendor as $vendor) {
     </head>
     <body>
         <div id="main">
+            <header>
+                <img src="images/banner.svg" class="banner" />
+                <div class="header-icons">
+                    <a href="rss.php"><img src="images/feed.svg" alt="RSS feed" /></a>
+                </div>
+            </header>
             <div class="stats">
                 <div class="stats-commits">
                     <h1>Last commits</h1>
