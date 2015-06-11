@@ -9,7 +9,9 @@
         "psr/log": "1.0.0",
         "monolog/monolog": "~1.12",
         "symfony/monolog-bridge": "~2.6",
-        "symfony/event-dispatcher": "~2.6"
+        "symfony/event-dispatcher": "~2.6",
+        "suin/php-rss-writer": "~1.0",
+        "symfony/http-foundation": "~2.6"
     },
 
     "autoload": {
