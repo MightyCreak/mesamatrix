@@ -22,6 +22,7 @@ use Monolog\Logger;
 use Monolog\ErrorHandler;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\StreamHandler;
+use Symfony\Component\HttpFoundation\Request as HTTPRequest;
 
 class Mesamatrix
 {
@@ -30,6 +31,7 @@ class Mesamatrix
     public static $config; // Config object
     public static $autoloader; // Autoloader
     public static $logger; // Logger
+    public static $request; // HTTP request object
 
     public static function init() {
         date_default_timezone_set('UTC');
@@ -73,6 +75,9 @@ class Mesamatrix
             ini_set('error_reporting', E_ALL);
             ini_set('display_errors', 1);
         }
+
+        // initialise request
+        self::$request = HTTPRequest::createFromGlobals();
 
         self::$logger->debug('Base initialisation complete');
     }
