@@ -53,7 +53,7 @@ foreach ($xml->commits->commit as $commit) {
     $item
         ->title((string)$commit["subject"])
         //->url($commitWeb . $commit["hash"])
-        ->url($baseUrl . '?commit=' . $commit["hash"])
+        ->url($baseUrl . '#commit-' . $commit["hash"])
         ->pubDate((int)$commit["timestamp"])
         ->appendTo($channel);
 }

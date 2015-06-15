@@ -353,18 +353,20 @@ foreach ($xml->drivers->vendor as $vendor) {
 foreach ($xml->commits->commit as $commit) {
     $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
-                            <tr>
+                            <tr id="<?= $commit['hash'] ?>">
                                 <td class="commitsAge"><?= writeRelativeDate($commit['timestamp']) ?></td>
                                 <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
                             </tr>
 <?php
 }
 ?>
+                        </tbody>
+                        <tfoot>
                             <tr>
                                 <td><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a></td>
                                 <td></td>
                             </tr>
-                        </tbody>
+                        </tfoot>
                     </table>
                 </div>
                 <div class="stats-lb">

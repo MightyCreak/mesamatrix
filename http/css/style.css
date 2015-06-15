@@ -57,6 +57,17 @@ p { max-width: 800px; }
 .commits .commitsAge                { padding-right: 2em; }
 .commits .commitsAge::first-letter  { text-transform: uppercase; }
 
+.commits tbody tr {
+    cursor: cell;
+    transition: background-color .1s ease-in;
+}
+.commits tbody tr:hover {
+    background-color: #babdb6;
+}
+.commits tbody tr.selected {
+    background-color: #a7e969;
+}
+
 .lb                             { border-collapse: collapse; border-spacing: 0; }
 .lb th, .lb td                  { padding: 0.25em 0.5em; }
 .lb th                          { background-color: #d3d7cf; }
