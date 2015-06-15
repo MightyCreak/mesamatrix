@@ -84,15 +84,30 @@ function gaussian(x, a, b, c) {
  */
 function Commit($tr) {
     this.$tr = $tr;
+    this.selected = $tr.hasClass('selected');
 }
 Commit.prototype = {
     $tr: null,
+    selected: false,
 
     select: function() {
-        this.$tr.addClass('selected');
+        if (!this.selected) {
+            this.$tr.addClass('selected');
+            this.selected = true;
+        }
     },
     deselect: function() {
-        this.$tr.removeClass('selected');
+        if (this.selected) {
+            this.$tr.removeClass('selected');
+            this.selected = false;
+        }
+    },
+    toggleSelect: function() {
+        if (this.selected) {
+            this.deselect();
+        } else {
+            this.select();
+        }
     }
 };
 
@@ -106,7 +121,7 @@ function CommitsManager(commitsTable) {
     var hash = window.location.hash.substr(1);
     if (hash.substr(0, 7) === 'commit-') {
         var commit = this.find(hash.substr(7));
-        this.select(commit);
+        commit.select();
     }
 
     this.initEvents();
@@ -114,7 +129,6 @@ function CommitsManager(commitsTable) {
 CommitsManager.prototype = {
     commitsTable: null,
     commits: [],
-    selectedCommit: null,
 
     find: function(commitHash) {
         if (!this.commits[commitHash]) {
@@ -126,19 +140,20 @@ CommitsManager.prototype = {
         }
         return this.commits[commitHash];
     },
-    select: function(commit) {
-        if (this.selectedCommit) {
-            this.selectedCommit.deselect();
+    deselectAll: function() {
+        for (var commitHash in this.commits) {
+            this.commits[commitHash].deselect();
         }
-        this.selectedCommit = commit;
-        commit.select();
     },
 
     initEvents: function() {
         var self = this;
-        this.commitsTable.on('click', 'tr', function() {
+        this.commitsTable.on('click', 'tr', function(e) {
+            if (!e.ctrlKey && !e.shiftKey) {
+                self.deselectAll();
+            }
             var commit = self.find($(this).attr('id'));
-            self.select(commit);
+            commit.toggleSelect();
         });
     }
 };
