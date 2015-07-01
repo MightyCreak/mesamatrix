@@ -23,11 +23,19 @@ namespace Mesamatrix\Console\Command;
 
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Output\OutputInterface;
+use \Mesamatrix\Parser\OglParser;
+use \Mesamatrix\Parser\OglMatrix;
 use \Mesamatrix\Parser\OglVersion;
 use \Mesamatrix\Parser\OglExtension;
 use \Mesamatrix\Parser\UrlCache;
 use \Mesamatrix\Parser\Hints;
 
+/**
+ * Class that handles the 'parse' command.
+ *
+ * It reads all the commits of the file GL3.txt and transform it to an XML
+ * file. The entry point for this class is the `execute()` method.
+ */
 class Parse extends \Symfony\Component\Console\Command\Command
 {
     protected $urlCache;
@@ -35,36 +43,19 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
     protected function configure() {
         $this->setName('parse')
-             ->setDescription('Parse data and generate XML')
-        ;
+             ->setDescription('Parse data and generate XML');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $gl3Path = \Mesamatrix::$config->getValue('git', 'gl3', 'docs/GL3.txt');
-        $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
-            'log', '--pretty=format:%H|%at|%aN|%cN|%ct', '--reverse',
-            \Mesamatrix::$config->getValue('git', 'oldest_commit').'..', '--',
-            $gl3Path
-        ));
-        $gitLogProc = $gitLog->getProcess();
-        $this->getHelper('process')->mustRun($output, $gitLogProc);
 
-        $commitLines = explode(PHP_EOL, $gitLogProc->getOutput());
-        if (empty($commitLines)) {
-            // No commit? There must be a problem.
-            \Mesamatrix::$logger->error("No commit found.");
+        $commits = $this->fetchCommits($gl3Path, $output);
+        if ($commits === NULL) {
             return 1;
         }
 
-        // Create commit list.
-        $commits = array();
-        foreach ($commitLines as $commitLine) {
-            list($commitHash, $time, $author, $committer, $committerTime) = explode('|', $commitLine);
-            $commit = new \Mesamatrix\Git\Commit($commitHash, $time, $author, $committer, $committerTime);
-            $commits[] = $commit;
-        }
-
-        $lastCommitFilename = \Mesamatrix::$config->getValue('info', 'private_dir', 'private').'/last_commit_parsed';
+        $lastCommitFilename = \Mesamatrix::$config->getValue('info', 'private_dir', 'private')
+                            . '/last_commit_parsed';
 
         // Get last commit parsed.
         $lastCommitParsed = "";
@@ -90,8 +81,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
         \Mesamatrix::$logger->info("New commit found, let's parse!");
 
         $hints = new Hints();
-        $matrix = new \Mesamatrix\Parser\OglMatrix();
-        $parser = new \Mesamatrix\Parser\OglParser($hints, $matrix);
+        $matrix = new OglMatrix();
+        $parser = new OglParser($hints, $matrix);
         foreach ($commits as $commit) {
             \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$commit->getHash());
             $cat = new \Mesamatrix\Git\ProcessBuilder(array(
@@ -113,29 +104,13 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $drivers = $xml->addChild("drivers");
         $this->populateDrivers($drivers);
 
-        $xmlCommits = $xml->addChild('commits');
-        $this->generateCommitsLog($xmlCommits, $gl3Path, $output);
-
         $this->statuses = $xml->addChild("statuses");
         $this->populateStatuses($this->statuses);
 
-        // Need URL cache?
-        $this->urlCache = NULL;
-        if(\Mesamatrix::$config->getValue("opengl_links", "enabled", false)) {
-            // Load URL cache.
-            $this->urlCache = new UrlCache();
-            $this->urlCache->load();
-        }
+        $xmlCommits = $xml->addChild('commits');
+        $this->generateCommitsLog($xmlCommits, $commits);
 
-        // extensions
-        foreach ($matrix->getGlVersions() as $glVersion) {
-            $gl = $xml->addChild('gl');
-            $this->generateGlSection($gl, $glVersion, $hints);
-        }
-
-        if ($this->urlCache) {
-            $this->urlCache->save();
-        }
+        $this->generateGlSections($xml, $matrix, $hints);
 
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
 
@@ -151,6 +126,48 @@ class Parse extends \Symfony\Component\Console\Command\Command
             fwrite($h, $lastCommitFetched);
             fclose($h);
         }
+    }
+
+    /**
+     * Fetch commits from mesa's git.
+     *
+     * @param string $gl3Path The path of the GL3.txt file.
+     * @param OutputInterface $output The output to write to.
+     * @return array|null.
+     */
+    protected function fetchCommits($gl3Path, OutputInterface $output) {
+        $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
+            'log', '--pretty=format:%H|%at|%aN|%cN|%ct|%s', '--reverse',
+            \Mesamatrix::$config->getValue('git', 'oldest_commit').'..', '--',
+            $gl3Path
+        ));
+        $proc = $gitLog->getProcess();
+        $this->getHelper('process')->mustRun($output, $proc);
+
+        $commitLines = explode(PHP_EOL, $proc->getOutput());
+        if (empty($commitLines)) {
+            // No commit? There must be a problem.
+            \Mesamatrix::$logger->error("No commit found.");
+            return NULL;
+        }
+
+        // Create commit list.
+        $commits = array();
+        foreach ($commitLines as $commitLine) {
+            $commitData = explode('|', $commitLine, 6);
+            if ($commitData !== FALSE) {
+                $commit = new \Mesamatrix\Git\Commit();
+                $commit->setHash($commitData[0])
+                       ->setDate($commitData[1])
+                       ->setAuthor($commitData[2])
+                       ->setCommitter($commitData[3])
+                       ->setCommitterDate($commitData[4])
+                       ->setSubject($commitData[5]);
+                $commits[] = $commit;
+            }
+        }
+
+        return $commits;
     }
 
     protected function populateDrivers(\SimpleXMLElement $drivers) {
@@ -175,26 +192,25 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $inProgressStatus->addChild("match", "*");
     }
 
-    protected function generateCommitsLog(\SimpleXMLElement $xml, $gl3Path, OutputInterface $output) {
-        $gitLogFormat = "%H%n  timestamp: %ct%n  author: %an%n  subject: %s%n";
-        $gitCommits = new \Mesamatrix\Git\ProcessBuilder(array(
-          'log', '-n', \Mesamatrix::$config->getValue('git', 'commitparser_depth', 10),
-          '--pretty=format:'.$gitLogFormat, '--',
-          $gl3Path
-        ));
-        $proc = $gitCommits->getProcess();
-        $this->getHelper('process')->mustRun($output, $proc);
-
-        $commitsParser = new \Mesamatrix\CommitsParser();
-        $commits = $commitsParser->parse_content($proc->getOutput());
-
-        foreach ($commits as $gitCommit) {
-            \Mesamatrix::$logger->debug('Processing commit '.$gitCommit["hash"]);
-            $commit = $xml->addChild("commit");
-            $commit->addAttribute("hash", $gitCommit["hash"]);
-            $commit->addAttribute("timestamp", $gitCommit["timestamp"]);
-            $commit->addAttribute("subject", $gitCommit["subject"]);
+    protected function generateCommitsLog(\SimpleXMLElement $xml, array $commits) {
+        foreach (array_reverse($commits) as $commit) {
+            \Mesamatrix::$logger->debug('Processing commit '.$commit->getHash());
+            $commitNode = $xml->addChild("commit");
+            $commitNode->addAttribute("hash", $commit->getHash());
+            $commitNode->addAttribute("timestamp", $commit->getCommitterDate()->getTimestamp());
+            $commitNode->addAttribute("subject", $commit->getSubject());
         }
+    }
+
+    protected function generateGlSections(\SimpleXMLElement $xml, OglMatrix $matrix, Hints $hints) {
+        $this->loadUrlCache();
+
+        foreach ($matrix->getGlVersions() as $glVersion) {
+            $gl = $xml->addChild('gl');
+            $this->generateGlSection($gl, $glVersion, $hints);
+        }
+
+        $this->saveUrlCache();
     }
 
     protected function generateGlSection(\SimpleXMLElement $gl, OglVersion $glVersion, Hints $hints) {
@@ -272,6 +288,21 @@ class Parse extends \Symfony\Component\Console\Command\Command
         foreach ($glExt->getSubExtensions() as $glSubExt) {
             $xmlSubExt = $xmlExt->addChild("subextension");
             $this->generateExtension($xmlSubExt, $glSubExt, $hints);
+        }
+    }
+
+    protected function loadUrlCache() {
+        $this->urlCache = NULL;
+        if(\Mesamatrix::$config->getValue("opengl_links", "enabled", false)) {
+            // Load URL cache.
+            $this->urlCache = new UrlCache();
+            $this->urlCache->load();
+        }
+    }
+
+    protected function saveUrlCache() {
+        if ($this->urlCache) {
+            $this->urlCache->save();
         }
     }
 }

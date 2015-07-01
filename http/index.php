@@ -87,7 +87,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
     }
 
     $extUrlId = str_replace(" ", "_", $glExt["name"]);
-    $extUrlId = preg_replace('/[^A-Za-z_]/', '', $extUrlId);
+    $extUrlId = preg_replace('/[^A-Za-z0-9_]/', '', $extUrlId);
     $extUrlId = $glUrlId."_Extension_".$extUrlId;
     $extHintIdx = $hints->findHint($glExt->mesa["hint"]);
     if ($extHintIdx !== -1) {
@@ -96,7 +96,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
 
     $extNameText = $glExt["name"];
     if (isset($glExt->link)) {
-        $extNameText = str_replace($glExt->link, "<a href=\"".$glExt->link["href"]."\">".$glExt->link."</a>", $extNameText);
+        $extNameText = str_replace($glExt->link, '<a href="'.$glExt->link['href'].'">'.$glExt->link.'</a>', $extNameText);
     }
 
     $isSubExt = strncmp($glExt["name"], "-", 1) === 0;
@@ -105,7 +105,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
                     <td id="<?= $extUrlId ?>"<?php if ($isSubExt) { ?> class="extension-child"<?php } ?>>
                         <?= $extNameText ?><a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).". ".$glExt->mesa["hint"]; } ?>"><?= $cellText ?></td>
+                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).'. '.$glExt->mesa['hint']; ?>"<?php } ?>><?= $cellText ?></td>
 <?php
 
     foreach ($xml->drivers->vendor as $vendor) {
@@ -133,7 +133,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
                 $taskClasses .= " isNotStarted";
             }
 ?>
-                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).". ".$driverNode["hint"]; } ?>"><?= $cellText ?></td>
+                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).'. '.$driverNode['hint']; ?>"<?php } ?>><?= $cellText ?></td>
 <?php
         }
     }
@@ -333,7 +333,7 @@ foreach ($xml->drivers->vendor as $vendor) {
     <body>
         <div id="main">
             <header>
-                <img src="images/banner.svg" class="banner" />
+                <img src="images/banner.svg" class="banner" alt="Mesamatrix banner" />
                 <div class="header-icons">
                     <a href="rss.php"><img src="images/feed.svg" alt="RSS feed" /></a>
                 </div>
@@ -350,7 +350,10 @@ foreach ($xml->drivers->vendor as $vendor) {
                         </thead>
                         <tbody>
 <?php
-foreach ($xml->commits->commit as $commit) {
+$numCommits = \Mesamatrix::$config->getValue('info', 'commitlog_length', 10);
+$numCommits = min($numCommits, $xml->commits->commit->count());
+for ($i = 0; $i < $numCommits; ++$i) {
+    $commit = $xml->commits->commit[$i];
     $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
                             <tr>
@@ -361,8 +364,7 @@ foreach ($xml->commits->commit as $commit) {
 }
 ?>
                             <tr>
-                                <td><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a></td>
-                                <td></td>
+                                <td colspan="2"><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a></td>
                             </tr>
                         </tbody>
                     </table>

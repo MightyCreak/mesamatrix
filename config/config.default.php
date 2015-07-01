@@ -23,8 +23,9 @@ $CONFIG = array(
         "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",
         "xml_file" => "http/gl3.xml",
         "project_url" => "https://github.com/MightyCreak/mesamatrix",
-        // Either '$author' or '$author => $website'
+        "commitlog_length" => 10,
         "authors" => array(
+            // Either '$author' or '$author => $website'
             "Romain 'Creak' Failliot",
             "Tobias Droste",
             "Robin McCorkell" => "mailto:rmccorkell@karoshi.org.uk",
@@ -53,7 +54,6 @@ $CONFIG = array(
         "depth" => 6000,
         // oldest_commit is based on parser compatibility
         "oldest_commit" => "b6ab52b7f941b689753d4b9af7d58083e6917fd6",
-        "commitparser_depth" => 10,
 
         "gl3" => "docs/GL3.txt",
     ),
