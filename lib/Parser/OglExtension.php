@@ -26,12 +26,13 @@ class OglExtension
         $this->hints = $hints;
         $this->subextensions = array();
         $this->setName($name);
-        $this->setStatus($status);
+        $this->parseStatus($status);
         $this->setModifiedAt(null);
 
         $this->supportedDrivers = array();
         foreach ($supportedDrivers as $driverName) {
-            $this->addSupportedDriver($driverName);
+            $driver = new OglSupportedDriver($driverName, $this->hints);
+            $this->addSupportedDriver($driver);
         }
     }
 
@@ -46,23 +47,26 @@ class OglExtension
     // status
     public function setStatus($status) {
         $this->status = $status;
-
-        // Set the hint.
+    }
+    public function getStatus() {
+        return $this->status;
+    }
+    public function parseStatus($status) {
         $hint = "";
         if (strncmp($status, "DONE", strlen("DONE")) === 0) {
+            $this->status = 'complete';
             $hint = substr($status, strlen("DONE") + 1);
         }
         elseif (strncmp($status, "not started", strlen("not started")) === 0) {
+            $this->status = 'incomplete';
             $hint = substr($status, strlen("not started") + 1);
         }
         else {
+            $this->status = 'started';
             $hint = $status;
         }
 
         $this->setHint($hint);
-    }
-    public function getStatus() {
-        return $this->status;
     }
 
     // hint
@@ -74,8 +78,16 @@ class OglExtension
     }
 
     // supported drivers
-    public function addSupportedDriver($driverName, $commit = null) {
-        $this->supportedDrivers[] = new OglSupportedDriver($driverName, $this->hints, $commit);
+    public function addSupportedDriver(OglSupportedDriver $driver, \Mesamatrix\Git\Commit $commit = null) {
+        if ($existingDriver = $this->getSupportedDriverByName($driver->getName())) {
+            $existingDriver->incorporate($driver, $commit);
+            return $existingDriver;
+        }
+        else {
+            $driver->setModifiedAt($commit);
+            $this->supportedDrivers[] = $driver;
+            return $driver;
+        }
     }
     public function getSupportedDrivers() {
         return $this->supportedDrivers;
@@ -106,18 +118,13 @@ class OglExtension
             $this->status = $other->status;
             $this->setModifiedAt($commit);
         }
+
         if ($this->hintIdx !== $other->hintIdx) {
             $this->hintIdx = $other->hintIdx;
             $this->setModifiedAt($commit);
         }
         foreach ($other->supportedDrivers as $supportedDriver) {
-            if ($driver = $this->getSupportedDriverByName($supportedDriver->getName())) {
-                $driver->incorporate($supportedDriver, $commit);
-            }
-            else {
-                $supportedDriver->setModifiedAt($commit);
-                $this->supportedDrivers[] = $supportedDriver;
-            }
+            $this->addSupportedDriver($supportedDriver, $commit);
         }
     }
 
@@ -131,13 +138,21 @@ class OglExtension
      */
     public function addSubExtension($name, $status, $supportedDrivers = array(), $commit = null) {
         $newExtension = new OglExtension($name, $status, $this->hints, $supportedDrivers);
-        $subext = $this->findSubExtensionByName($name);
-        if($subext !== null) {
-            $subext->incorporate($newExtension, $commit);
+        return $this->addSubExtension2($newExtension, $commit);
+    }
+    public function addSubExtension2(OglExtension $extension, \Mesamatrix\Git\Commit $commit) {
+        $retSubExt = null;
+        $existingSubExt = $this->findSubExtensionByName($extension->getName());
+        if($existingSubExt !== null) {
+            $existingSubExt->incorporate($extension, $commit);
+            $retSubExt = $existingSubExt;
         }
         else {
-            $this->subextensions[] = $newExtension;
+            $this->subextensions[] = $extension;
+            $retSubExt = $extension;
         }
+
+        return $retSubExt;
     }
 
     /**

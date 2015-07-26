@@ -44,7 +44,7 @@ class UrlCache
             $urlCacheContents = file_get_contents($filepath);
             if ($urlCacheContents !== FALSE) {
                 $this->cachedUrls = json_decode($urlCacheContents, true);
-                \Mesamatrix::$logger->notice("URL cache file loaded.");
+                \Mesamatrix::$logger->info("URL cache file loaded.");
             }
         }
     }
@@ -61,7 +61,7 @@ class UrlCache
         $filepath = $privateDir.'/'.\Mesamatrix::$config->getValue("opengl_links", "cache_file", "urlcache.json");
         $res = file_put_contents($filepath, json_encode($this->cachedUrls));
         if ($res !== FALSE)
-            \Mesamatrix::$logger->notice("URL cache file saved: ".$filepath.".");
+            \Mesamatrix::$logger->info("URL cache file saved: ".$filepath.".");
         else
             \Mesamatrix::$logger->error("Can't save URL cache file in \"".$filepath."\".");
     }

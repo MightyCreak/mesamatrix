@@ -36,7 +36,7 @@ class OglMatrix
 
     public function getGlVersionByName($name, $version) {
         foreach ($this->glVersions as $glVersion) {
-            if ($glVersion->getGlName() === 'Open'.$name
+            if ($glVersion->getGlName() === $name
              && $glVersion->getGlVersion() === $version) {
                 return $glVersion;
             }

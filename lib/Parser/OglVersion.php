@@ -33,7 +33,7 @@ class OglVersion
 
     // GL name
     public function setGlName($name) {
-        $this->glName = "Open".$name;
+        $this->glName = $name;
     }
     public function getGlName() {
         return $this->glName;
@@ -75,14 +75,22 @@ class OglVersion
      */
     public function addExtension($name, $status, $supportedDrivers = array(), $commit = null) {
         $newExtension = new OglExtension($name, $status, $this->hints, $supportedDrivers);
-        if ($extension = $this->getExtensionByName($name)) {
-            $extension->incorporate($newExtension, $commit);
-            return $extension;
+        return $this->addExtension2($newExtension, $commit);
+    }
+
+    public function addExtension2(OglExtension $extension, \Mesamatrix\Git\Commit $commit) {
+        $retExt = null;
+        $existingExt = $this->getExtensionByName($extension->getName());
+        if ($existingExt !== null) {
+            $existingExt->incorporate($extension, $commit);
+            $retExt = $existingExt;
         }
         else {
-            $this->extensions[] = $newExtension;
-            return $newExtension;
+            $this->extensions[] = $extension;
+            $retExt = $extension;
         }
+
+        return $retExt;
     }
 
     /**

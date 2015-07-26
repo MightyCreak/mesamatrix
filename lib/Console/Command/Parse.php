@@ -38,8 +38,10 @@ use \Mesamatrix\Parser\Hints;
  */
 class Parse extends \Symfony\Component\Console\Command\Command
 {
-    protected $urlCache;
+    protected $output;
+    protected $gl3Path;
     protected $statuses;
+    protected $urlCache;
 
     protected function configure() {
         $this->setName('parse')
@@ -47,9 +49,14 @@ class Parse extends \Symfony\Component\Console\Command\Command
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $gl3Path = \Mesamatrix::$config->getValue('git', 'gl3', 'docs/GL3.txt');
+        $this->output = $output;
+        $this->gl3Path = \Mesamatrix::$config->getValue('git', 'gl3', 'docs/GL3.txt');
+        $this->statuses = array(
+            'complete' => 'DONE*',
+            'incomplete' => 'not started*',
+            'started' => '*');
 
-        $commits = $this->fetchCommits($gl3Path, $output);
+        $commits = $this->fetchCommits();
         if ($commits === NULL) {
             return 1;
         }
@@ -80,45 +87,27 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         \Mesamatrix::$logger->info("New commit found, let's parse!");
 
-        $hints = new Hints();
-        $matrix = new OglMatrix();
-        $parser = new OglParser($hints, $matrix);
-        foreach ($commits as $commit) {
-            \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$commit->getHash());
-            $cat = new \Mesamatrix\Git\ProcessBuilder(array(
-              'show', $commit->getHash().':'.$gl3Path
-            ));
-            $proc = $cat->getProcess();
-            $this->getHelper('process')->mustRun($output, $proc);
-
-            $parser->parse_content($proc->getOutput(), $commit);
+        // Ensure existence of the commits directory.
+        $commitsDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
+                   . '/commits';
+        if (!is_dir($commitsDir)) {
+            if (!mkdir($commitsDir)) {
+                \Mesamatrix::$logger->critical('Couldn\'t create directory `'.$commitsDir.'`.');
+                return 1;
+            }
         }
 
-        $xml = new \SimpleXMLElement("<mesa></mesa>");
+        $this->loadUrlCache();
 
-        $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir')).'/';
-        $gitDir .= \Mesamatrix::$config->getValue('git', 'mesa_dir', 'mesa.git');
-        $updated = filemtime($gitDir . '/FETCH_HEAD');
-        $xml->addAttribute('updated', $updated);
+        // Parse each commit.
+        foreach ($commits as $commit) {
+            $this->parseCommit($commit);
+        }
 
-        $drivers = $xml->addChild("drivers");
-        $this->populateDrivers($drivers);
+        $this->saveUrlCache();
 
-        $this->statuses = $xml->addChild("statuses");
-        $this->populateStatuses($this->statuses);
-
-        $xmlCommits = $xml->addChild('commits');
-        $this->generateCommitsLog($xmlCommits, $commits);
-
-        $this->generateGlSections($xml, $matrix, $hints);
-
-        $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
-
-        $dom = dom_import_simplexml($xml)->ownerDocument;
-        $dom->formatOutput = true;
-
-        file_put_contents($xmlPath, $dom->saveXML());
-        \Mesamatrix::$logger->notice('XML saved to '.$xmlPath);
+        // Merge all the commits.
+        $this->generateMergedXml($commits);
 
         // Save last commit parsed.
         $h = fopen($lastCommitFilename, "w");
@@ -131,18 +120,16 @@ class Parse extends \Symfony\Component\Console\Command\Command
     /**
      * Fetch commits from mesa's git.
      *
-     * @param string $gl3Path The path of the GL3.txt file.
-     * @param OutputInterface $output The output to write to.
      * @return array|null.
      */
-    protected function fetchCommits($gl3Path, OutputInterface $output) {
+    protected function fetchCommits() {
         $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
             'log', '--pretty=format:%H|%at|%aN|%cN|%ct|%s', '--reverse',
             \Mesamatrix::$config->getValue('git', 'oldest_commit').'..', '--',
-            $gl3Path
+            $this->gl3Path
         ));
         $proc = $gitLog->getProcess();
-        $this->getHelper('process')->mustRun($output, $proc);
+        $this->getHelper('process')->mustRun($this->output, $proc);
 
         $commitLines = explode(PHP_EOL, $proc->getOutput());
         if (empty($commitLines)) {
@@ -170,6 +157,97 @@ class Parse extends \Symfony\Component\Console\Command\Command
         return $commits;
     }
 
+    /**
+     * Parse a commit.
+     *
+     * @param \Commit $commit The commit to parse.
+     */
+    protected function parseCommit(\Mesamatrix\Git\Commit $commit) {
+        // Show content for this commit.
+        $hash = $commit->getHash();
+        $cat = new \Mesamatrix\Git\ProcessBuilder(array('show', $hash.':'.$this->gl3Path));
+        $proc = $cat->getProcess();
+        $this->getHelper('process')->mustRun($this->output, $proc);
+
+        // Parse the content.
+        \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$hash);
+        $hints = new Hints();
+        $matrix = new OglMatrix();
+        $parser = new OglParser($hints, $matrix);
+        $parser->parseContent($proc->getOutput(), $commit);
+
+        // Create the XML.
+        $xml = new \SimpleXMLElement("<mesa></mesa>");
+
+        // Write commit info.
+        $xmlCommit = $xml->addChild('commit');
+        $xmlCommit->addChild('hash', $hash);
+        //$xmlCommit->addChild('subject', $commit->getSubject());
+        $xmlCommit->addChild('author', $commit->getAuthor());
+        $xmlCommit->addChild('committer-date', $commit->getCommitterDate()->format(\DateTime::W3C));
+        $xmlCommit->addChild('committer-name', $commit->getCommitter());
+
+        // Write GL sections.
+        $this->generateGlSections($xml, $matrix, $hints);
+
+        // Write file.
+        $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
+                   . '/commits/commit_'.$hash.'.xml';
+        $dom = dom_import_simplexml($xml)->ownerDocument;
+        $dom->formatOutput = true;
+
+        file_put_contents($xmlPath, $dom->saveXML());
+        \Mesamatrix::$logger->info('XML saved to '.$xmlPath);
+    }
+
+    /**
+     * Take all the parsed commits and merged them to generate the final XML.
+     *
+     * @param array \Commit $commits The commits to merge.
+     */
+    protected function generateMergedXml(array $commits) {
+        \Mesamatrix::$logger->info('Merge all the commits.');
+
+        $hints = new Hints();
+        $matrix = new OglMatrix();
+        $parser = new OglParser($hints, $matrix);
+        foreach ($commits as $commit) {
+            $hash = $commit->getHash();
+            $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
+                     . '/commits/commit_'.$hash.'.xml';
+
+            $mesa = simplexml_load_file($xmlPath);
+            $parser->parseXmlCommit($mesa, $commit);
+            unset($mesa);
+        }
+
+        $xml = new \SimpleXMLElement("<mesa></mesa>");
+
+        $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir')).'/';
+        $gitDir .= \Mesamatrix::$config->getValue('git', 'mesa_dir', 'mesa.git');
+        $updated = filemtime($gitDir . '/FETCH_HEAD');
+        $xml->addAttribute('updated', $updated);
+
+        $drivers = $xml->addChild("drivers");
+        $this->populateDrivers($drivers);
+
+        $statuses = $xml->addChild("statuses");
+        $this->populateStatuses($statuses);
+
+        $xmlCommits = $xml->addChild('commits');
+        $this->generateCommitsLog($xmlCommits, $commits);
+
+        $this->generateGlSections($xml, $matrix, $hints);
+
+        $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
+
+        $dom = dom_import_simplexml($xml)->ownerDocument;
+        $dom->formatOutput = true;
+        file_put_contents($xmlPath, $dom->saveXML());
+
+        \Mesamatrix::$logger->info('XML saved to '.$xmlPath);
+    }
+
     protected function populateDrivers(\SimpleXMLElement $drivers) {
         foreach (\Mesamatrix\Parser\Constants::$allDriversVendors as $glVendor => $glDrivers) {
             $vendor = $drivers->addChild("vendor");
@@ -181,15 +259,11 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
     }
 
-    protected function populateStatuses(\SimpleXMLElement $statuses) {
-        $complete = $statuses->addChild("complete");
-        $complete->addChild("match", "DONE*");
-
-        $incomplete = $statuses->addChild("incomplete");
-        $incomplete->addChild("match", "not started*");
-
-        $inProgressStatus = $statuses->addChild("started");
-        $inProgressStatus->addChild("match", "*");
+    protected function populateStatuses(\SimpleXMLElement $xmlStatuses) {
+        foreach ($this->statuses as $status => $match) {
+            $xmlStatus = $xmlStatuses->addChild($status);
+            $xmlStatus->addChild('match', $match);
+        }
     }
 
     protected function generateCommitsLog(\SimpleXMLElement $xml, array $commits) {
@@ -203,14 +277,10 @@ class Parse extends \Symfony\Component\Console\Command\Command
     }
 
     protected function generateGlSections(\SimpleXMLElement $xml, OglMatrix $matrix, Hints $hints) {
-        $this->loadUrlCache();
-
         foreach ($matrix->getGlVersions() as $glVersion) {
             $gl = $xml->addChild('gl');
             $this->generateGlSection($gl, $glVersion, $hints);
         }
-
-        $this->saveUrlCache();
     }
 
     protected function generateGlSection(\SimpleXMLElement $gl, OglVersion $glVersion, Hints $hints) {
@@ -250,15 +320,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
 
         $mesaStatus = $xmlExt->addChild("mesa");
-        $statusLength = 0;
-        foreach ($this->statuses as $matchStatus) {
-            foreach ($matchStatus as $match) {
-                if (fnmatch($match, $glExt->getStatus()) && strlen($match) >= $statusLength) {
-                    $mesaStatus->addAttribute("status", $matchStatus->getName());
-                    $statusLength = strlen($match);
-                }
-            }
-        }
+        $mesaStatus->addAttribute("status", $glExt->getStatus());
         $mesaHintId = $glExt->getHintIdx();
         if ($mesaHintId !== -1) {
             $mesaStatus->addAttribute("hint", $hints->allHints[$mesaHintId]);
