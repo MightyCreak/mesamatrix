@@ -75,7 +75,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
 
         // Get last commit fetched.
-        $lastCommitFetched = $commits[count($commits) - 1]->getHash();
+        $numCommits = count($commits);
+        $lastCommitFetched = $commits[$numCommits - 1]->getHash();
 
         // Compare last parsed and fetched commits.
         \Mesamatrix::$logger->debug("Last commit fetched: ${lastCommitFetched}");
@@ -99,8 +100,27 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         $this->loadUrlCache();
 
+        // Get list of new commits to parse.
+        $firstNewCommitIdx = 0;
+        if (!empty($lastCommitParsed)) {
+            // Find index of the last parsed commit in the commit list.
+            // It can't be the last one since we verified they are different.
+            $i = 0;
+            while ($i < $numCommits - 1 && $commits[$i]->getHash() !== $lastCommitParsed) {
+                ++$i;
+            }
+
+            if ($i === $numCommits - 1) {
+                \Mesamatrix::$logger->error('The last parsed commit ('.$lastCommitParsed.') could not be found in the list of commits.');
+                return 1;
+            }
+
+            $firstNewCommitIdx = $i + 1;
+        }
+
         // Parse each commit.
-        foreach ($commits as $commit) {
+        $newCommits = array_slice($commits, $firstNewCommitIdx);
+        foreach ($newCommits as $commit) {
             $this->parseCommit($commit);
         }
 
