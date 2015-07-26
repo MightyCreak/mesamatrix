@@ -119,14 +119,17 @@ class OglParser
                         }
 
                         if (!$isSubExt) {
+                            // Set supported drivers for future sub-extensions.
                             $parentDrivers = $supportedDrivers;
-                        }
 
-                        if ($isSubExt) {
-                            $lastExt->addSubExtension($matches[1], $matches[2], $supportedDrivers, $commit);
+                            // Add the extension.
+                            $newExtension = new OglExtension($matches[1], $matches[2], $this->hints, $supportedDrivers);
+                            $lastExt = $glVersion->addExtension($newExtension, $commit);
                         }
                         else {
-                            $lastExt = $glVersion->addExtension($matches[1], $matches[2], $supportedDrivers, $commit);
+                            // Add the sub-extension.
+                            $newSubExtension = new OglExtension($matches[1], $matches[2], $this->hints, $supportedDrivers);
+                            $lastExt->addSubExtension($newSubExtension, $commit);
                         }
                     }
 
@@ -189,7 +192,7 @@ class OglParser
                 }
 
                 // Add the extension.
-                $glExt = $glSection->addExtension2($newExtension, $commit);
+                $glExt = $glSection->addExtension($newExtension, $commit);
                 unset($extName, $extStatus, $extHint, $extDrivers, $newExtension);
 
                 foreach ($extension->subextension as $subextension) {
@@ -210,7 +213,7 @@ class OglParser
                     }
 
                     // Add the sub-extension.
-                    $glSubExt = $glExt->addSubExtension2($newSubExtension, $commit);
+                    $glSubExt = $glExt->addSubExtension($newSubExtension, $commit);
                 }
             }
         }

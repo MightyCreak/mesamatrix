@@ -66,19 +66,12 @@ class OglVersion
     /**
      * Add an extension, or merge it if it already exists.
      *
-     * @param string $name Name of the extension.
-     * @param string $status Status of the extension.
-     * @param array $supportedDrivers List of drivers supported for this extension.
+     * @param OglExtension $extension The extension to add/merge.
      * @param \Mesamatrix\Git\Commit $commit The commit used by the parser.
      *
      * @return OglExtension The new or existing extension.
      */
-    public function addExtension($name, $status, $supportedDrivers = array(), $commit = null) {
-        $newExtension = new OglExtension($name, $status, $this->hints, $supportedDrivers);
-        return $this->addExtension2($newExtension, $commit);
-    }
-
-    public function addExtension2(OglExtension $extension, \Mesamatrix\Git\Commit $commit) {
+    public function addExtension(OglExtension $extension, \Mesamatrix\Git\Commit $commit) {
         $retExt = null;
         $existingExt = $this->getExtensionByName($extension->getName());
         if ($existingExt !== null) {
