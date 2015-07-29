@@ -85,9 +85,9 @@ Symfony is available under the MIT License.
 
 ### Media files
 
-The Mesamatrix banner image was created by Robin McCorkell, and is licensed
-under the Creative Commons Attribution-ShareAlike 4.0 International license.
-Go tweak it, and send us your improvements!
+The Mesamatrix banner image and background image was created by Robin
+McCorkell, and is licensed under the Creative Commons Attribution-ShareAlike
+4.0 International license. Go tweak it, and send us your improvements!
 
 The RSS feed icon is freely available from the Mozilla Foundation at
 http://www.feedicons.com/
