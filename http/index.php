@@ -335,7 +335,7 @@ foreach ($xml->drivers->vendor as $vendor) {
             <header>
                 <img src="images/banner.svg" class="banner" alt="Mesamatrix banner" />
                 <div class="header-icons">
-                    <a href="rss.php"><img src="images/feed.svg" alt="RSS feed" /></a>
+                    <a href="rss.php"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a>
                 </div>
             </header>
             <div class="stats">
