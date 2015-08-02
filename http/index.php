@@ -414,16 +414,6 @@ writeMatrix($glVersions, $xml, $hints, $leaderboard);
             <p>The code is free and licenced under AGPLv3. If you want to report a bug, participate to the project or simply browse the code:</p>
             <p><a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><?= Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
             <p><a href="https://www.gnu.org/licenses/agpl.html"><img src="https://www.gnu.org/graphics/agplv3-155x51.png" alt="Logo AGPLv3" /></a></p>
-            <h2>How to help</h2>
-            <p>If you find this page useful and want to help, you can report issues, or <a href="https://github.com/MightyCreak/mesamatrix">grab the code</a> and add whatever feature you want.</p>
-<?php
-if (Mesamatrix::$config->getValue("flattr", "enabled")) {
-?>
-            <p>You can click here too, if you want to Flattr me:</p>
-            <p><script id='fb5dona'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=<?= Mesamatrix::$config->getValue("flattr", "id") ?>&url='+encodeURIComponent(document.URL)+'&title='+encodeURIComponent('<?= Mesamatrix::$config->getValue("info", "title") ?>')+'&description='+encodeURIComponent('<?= Mesamatrix::$config->getValue("info", "description") ?>')+'&language='+encodeURIComponent('<?= Mesamatrix::$config->getValue("flattr", "language") ?>')+'&tags=<?= Mesamatrix::$config->getValue("flattr", "tags") ?>';f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb5dona');</script></p>
-<?php
-}
-?>
             <h2>See also</h2>
             <p>Here are few links to learn more about the Linux graphics drivers:</p>
             <ul>
