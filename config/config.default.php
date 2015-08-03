@@ -39,13 +39,6 @@ $CONFIG = array(
         "cache_file" => "urlcache.json",
     ),
 
-    "flattr" => array(
-        "enabled" => FALSE,
-        "id" => "your_flattr_id",
-        "language" => "en_US",
-        "tags" => "mesa,opengl",
-    ),
-
     "git" => array(
         "mesa_web" => "http://cgit.freedesktop.org/mesa/mesa",
         "mesa_url" => "git://anongit.freedesktop.org/mesa/mesa",
