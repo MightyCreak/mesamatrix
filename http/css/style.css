@@ -20,12 +20,17 @@
 body {
     font-size: 85%;
     font-family: sans-serif;
-    background-color: #ffffff;
     display: flex;
     justify-content: center;
+    background: url("../images/background.png") left / cover no-repeat fixed;
 }
 
-#main { min-width: 0; }
+#main {
+    min-width: 0;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+}
 
 header {
     display: flex;
