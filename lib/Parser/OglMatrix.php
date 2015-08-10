@@ -22,12 +22,77 @@ namespace Mesamatrix\Parser;
 
 class OglMatrix
 {
+    private $glVersions;
+    private $hints;
+
     public function __construct() {
         $this->glVersions = array();
+        $this->hints = new Hints();
     }
 
-    public function addGlVersion($glVersion) {
+    public function addGlVersion(OglVersion $glVersion) {
         array_push($this->glVersions, $glVersion);
+    }
+
+    public function removeGlVersion(OglVersion $glVersion) {
+        $idx = array_search($glVersion, $this->glVersions);
+        if ($idx !== false) {
+            array_splice($this->glVersions, $idx, 1);
+        }
+    }
+
+    /**
+     * Merge an XML formatted commit.
+     *
+     * @param \SimpleXMLElement $mesa The root element of the XML file.
+     * @param \Mesamatrix\Git\Commit $commit The commit used by the parser.
+     * @remark The merged commit is always considered as more recent than the
+     *         ones already merged.
+     */
+    public function merge(\SimpleXMLElement $mesa, \Mesamatrix\Git\Commit $commit) {
+        $xmlSections = $mesa->xpath('./gl');
+
+        // Remove old sections.
+        $numXmlSections = count($xmlSections);
+        foreach ($this->getGlVersions() as $glSection) {
+            $glName = $glSection->getGlName();
+            $glVersion = $glSection->getGlVersion();
+
+            // Find section in the XML.
+            $i = 0;
+            while ($i < $numXmlSections) {
+                $xmlSection = $xmlSections[$i];
+                if ($glName === (string) $xmlSection['name'] &&
+                    $glVersion === (string) $xmlSection['version']) {
+                    break;
+                }
+
+                ++$i;
+            }
+
+            if ($i === $numXmlSections) {
+                // Section not found in XML, remove it.
+                \Mesamatrix::$logger->debug('Remove GL version: '.$glName.' '.$glVersion);
+                $this->removeGlVersion($glSection);
+            }
+        }
+
+        // Add and merge new sections.
+        foreach ($xmlSections as $xmlSection) {
+            $glName = (string) $xmlSection['name'];
+            $glVersion = (string) $xmlSection['version'];
+
+            $glSection = $this->getGlVersionByName($glName, $glVersion);
+            if (!$glSection) {
+                $glslName = (string) $xmlSection->glsl['name'];
+                $glslVersion = (string) $xmlSection->glsl['version'];
+
+                $glSection = new OglVersion($glName, $glVersion, $glslName, $glslVersion, $this->getHints());
+                $this->addGlVersion($glSection);
+            }
+
+            $glSection->merge($xmlSection, $commit);
+        }
     }
 
     public function getGlVersions() {
@@ -36,13 +101,15 @@ class OglMatrix
 
     public function getGlVersionByName($name, $version) {
         foreach ($this->glVersions as $glVersion) {
-            if ($glVersion->getGlName() === $name
-             && $glVersion->getGlVersion() === $version) {
+            if ($glVersion->getGlName() === $name &&
+                $glVersion->getGlVersion() === $version) {
                 return $glVersion;
             }
         }
         return null;
     }
 
-    private $glVersions;
+    public function getHints() {
+        return $this->hints;
+    }
 };

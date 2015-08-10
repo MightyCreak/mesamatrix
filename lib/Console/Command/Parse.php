@@ -22,6 +22,7 @@
 namespace Mesamatrix\Console\Command;
 
 use \Symfony\Component\Console\Input\InputInterface;
+use \Symfony\Component\Console\Input\InputOption;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \Mesamatrix\Parser\OglParser;
 use \Mesamatrix\Parser\OglMatrix;
@@ -45,10 +46,15 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
     protected function configure() {
         $this->setName('parse')
-             ->setDescription('Parse data and generate XML');
+             ->setDescription('Parse data and generate XML')
+             ->addOption('force', '-f',
+                         InputOption::VALUE_NONE,
+                         'Force to parse all the commits again');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
+        $force = $input->getOption('force');
+
         $this->output = $output;
         $this->gl3Path = \Mesamatrix::$config->getValue('git', 'gl3', 'docs/GL3.txt');
         $this->statuses = array(
@@ -66,12 +72,17 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Get last commit parsed.
         $lastCommitParsed = "";
-        if (file_exists($lastCommitFilename)) {
-            $h = fopen($lastCommitFilename, "r");
-            if ($h !== false) {
-                $lastCommitParsed = fgets($h);
-                fclose($h);
+        if (!$force) {
+            if (file_exists($lastCommitFilename)) {
+                $h = fopen($lastCommitFilename, "r");
+                if ($h !== false) {
+                    $lastCommitParsed = fgets($h);
+                    fclose($h);
+                }
             }
+        }
+        else {
+            \Mesamatrix::$logger->info('Commits parsing forced.');
         }
 
         // Get last commit fetched.
@@ -98,8 +109,6 @@ class Parse extends \Symfony\Component\Console\Command\Command
             }
         }
 
-        $this->loadUrlCache();
-
         // Get list of new commits to parse.
         $firstNewCommitIdx = 0;
         if (!empty($lastCommitParsed)) {
@@ -118,6 +127,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
             $firstNewCommitIdx = $i + 1;
         }
 
+        $this->loadUrlCache();
+
         // Parse each commit.
         $newCommits = array_slice($commits, $firstNewCommitIdx);
         foreach ($newCommits as $commit) {
@@ -130,10 +141,12 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $this->generateMergedXml($commits);
 
         // Save last commit parsed.
-        $h = fopen($lastCommitFilename, "w");
-        if ($h !== false) {
-            fwrite($h, $lastCommitFetched);
-            fclose($h);
+        if (!$force) {
+            $h = fopen($lastCommitFilename, "w");
+            if ($h !== false) {
+                fwrite($h, $lastCommitFetched);
+                fclose($h);
+            }
         }
     }
 
@@ -180,7 +193,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
     /**
      * Parse a commit.
      *
-     * @param \Commit $commit The commit to parse.
+     * @param \Mesamatrix\Git\Commit $commit The commit to parse.
      */
     protected function parseCommit(\Mesamatrix\Git\Commit $commit) {
         // Show content for this commit.
@@ -191,10 +204,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Parse the content.
         \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$hash);
-        $hints = new Hints();
-        $matrix = new OglMatrix();
-        $parser = new OglParser($hints, $matrix);
-        $parser->parseContent($proc->getOutput(), $commit);
+        $parser = new OglParser();
+        $matrix = $parser->parseContent($proc->getOutput(), $commit);
 
         // Create the XML.
         $xml = new \SimpleXMLElement("<mesa></mesa>");
@@ -208,7 +219,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $xmlCommit->addChild('committer-name', $commit->getCommitter());
 
         // Write GL sections.
-        $this->generateGlSections($xml, $matrix, $hints);
+        $this->generateGlSections($xml, $matrix);
 
         // Write file.
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
@@ -223,24 +234,22 @@ class Parse extends \Symfony\Component\Console\Command\Command
     /**
      * Take all the parsed commits and merged them to generate the final XML.
      *
-     * @param array \Commit $commits The commits to merge.
+     * @param array \Mesamatrix\Git\Commit $commits The commits to merge.
      */
     protected function generateMergedXml(array $commits) {
         \Mesamatrix::$logger->info('Merge all the commits.');
 
-        $hints = new Hints();
         $matrix = new OglMatrix();
-        $parser = new OglParser($hints, $matrix);
         foreach ($commits as $commit) {
             $hash = $commit->getHash();
             $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
                      . '/commits/commit_'.$hash.'.xml';
 
             $mesa = simplexml_load_file($xmlPath);
-            $parser->parseXmlCommit($mesa, $commit);
-            unset($mesa);
+            $matrix->merge($mesa, $commit);
         }
 
+        \Mesamatrix::$logger->info('Generating XML file');
         $xml = new \SimpleXMLElement("<mesa></mesa>");
 
         $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir')).'/';
@@ -257,7 +266,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $xmlCommits = $xml->addChild('commits');
         $this->generateCommitsLog($xmlCommits, $commits);
 
-        $this->generateGlSections($xml, $matrix, $hints);
+        $this->generateGlSections($xml, $matrix);
 
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
 
@@ -288,7 +297,6 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
     protected function generateCommitsLog(\SimpleXMLElement $xml, array $commits) {
         foreach (array_reverse($commits) as $commit) {
-            \Mesamatrix::$logger->debug('Processing commit '.$commit->getHash());
             $commitNode = $xml->addChild("commit");
             $commitNode->addAttribute("hash", $commit->getHash());
             $commitNode->addAttribute("timestamp", $commit->getCommitterDate()->getTimestamp());
@@ -296,10 +304,10 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
     }
 
-    protected function generateGlSections(\SimpleXMLElement $xml, OglMatrix $matrix, Hints $hints) {
+    protected function generateGlSections(\SimpleXMLElement $xml, OglMatrix $matrix) {
         foreach ($matrix->getGlVersions() as $glVersion) {
             $gl = $xml->addChild('gl');
-            $this->generateGlSection($gl, $glVersion, $hints);
+            $this->generateGlSection($gl, $glVersion, $matrix->getHints());
         }
     }
 
@@ -311,7 +319,6 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $glsl->addAttribute("version", $glVersion->getGlslVersion());
 
         foreach ($glVersion->getExtensions() as $glExt) {
-            \Mesamatrix::$logger->debug('Processing extension '.$glExt->getName());
             $ext = $gl->addChild("extension");
             $this->generateExtension($ext, $glExt, $hints);
         }

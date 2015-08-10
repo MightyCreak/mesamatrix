@@ -150,6 +150,64 @@ class OglExtension
     }
 
     /**
+     * Remove a sub-extension.
+     *
+     * @param OglExtension $extension The extension to remove.
+     */
+    public function removeSubExtension(OglExtension $extension) {
+        $idx = array_search($extension, $this->subextensions);
+        if ($idx !== false) {
+            array_splice($this->subextensions, $idx, 1);
+        }
+    }
+
+    public function merge(OglVersion $glSection, \SimpleXMLElement $xmlExt, \Mesamatrix\Git\Commit $commit) {
+        $xmlSubExts = $xmlExt->xpath('./subextension');
+
+        // Remove old sub-extensions.
+        $numXmlSubExts = count($xmlSubExts);
+        foreach ($this->getSubExtensions() as $glSubExt) {
+            $glSubExtName = $glSubExt->getName();
+
+            // Find sub-extension in the XML.
+            $i = 0;
+            while ($i < $numXmlSubExts && (string) $xmlSubExts[$i]['name'] !== $glSubExtName) {
+                ++$i;
+            }
+
+            if ($i === $numXmlSubExts) {
+                // Extension not found in XML, remove it.
+                \Mesamatrix::$logger->debug('In '.$glSection->getGlName().' '.$glSection->getGlVersion().
+                                            ', extension '.$this->getName().
+                                            ', remove GL sub-extension: '.$glSubExtName);
+                $this->removeSubExtension($glSubExt);
+            }
+        }
+
+        // Add and merge new sub-extensions.
+        foreach ($xmlSubExts as $xmlSubExt) {
+            $subExtName = (string) $xmlSubExt['name'];
+            $subExtStatus = (string) $xmlSubExt->mesa['status'];
+            $subExtHint = (string) $xmlSubExt->mesa['hint'];
+
+            $newSubExtension = new OglExtension($subExtName, '', $this->hints, array());
+            $newSubExtension->setStatus($subExtStatus);
+            $newSubExtension->setHint($subExtHint);
+            foreach ($xmlSubExt->supported->children() as $driver) {
+                // Create new supported driver.
+                $driverName = $driver->getName();
+                $driverHint = (string) $driver['hint'];
+                $driver = new OglSupportedDriver($driverName, $this->hints);
+                $driver->setHint($driverHint);
+                $newSubExtension->addSupportedDriver($driver);
+            }
+
+            // Add the sub-extension.
+            $glSubExt = $this->addSubExtension($newSubExtension, $commit);
+        }
+    }
+
+    /**
      * Get the list of all sub-extensions.
      *
      * @return OglExtension[] All the sub-extensions.
