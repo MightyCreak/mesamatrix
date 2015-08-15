@@ -22,33 +22,36 @@ namespace Mesamatrix\Parser;
 
 class OglParser
 {
-    private $hints;
-    private $matrix;
-
-    public function __construct($hints, $matrix) {
-        $this->hints = $hints;
-        $this->matrix = $matrix;
-    }
-
     public function parse($filename, $commit = null) {
         $handle = fopen($filename, "r");
         if ($handle === FALSE) {
             return NULL;
         }
 
-        $this->parseStream($handle, $commit);
+        $matrix = $this->parseStream($handle, $commit);
         fclose($handle);
+        return $matrix;
     }
 
     public function parseContent($content, $commit = null) {
         $handle = fopen("php://memory", "r+");
         fwrite($handle, $content);
         rewind($handle);
-        $this->parseStream($handle, $commit);
+        $matrix = $this->parseStream($handle, $commit);
         fclose($handle);
+        return $matrix;
     }
 
+    /**
+     * Parse a stream of GL3.txt.
+     *
+     * @param $handle The stream handle.
+     * @param \Mesamatrix\Git\Commit $commit The commit for the stream.
+     * @return A \Mesamatrix\Parser\OglMatrix.
+     */
     public function parseStream($handle, $commit = null) {
+        $matrix = new OglMatrix();
+
         // Regexp patterns.
         $reTableHeader = "/^Feature([ ]+)Status/";
         $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
@@ -69,10 +72,11 @@ class OglParser
             }
 
             if (preg_match($reVersion, $line, $matches) === 1) {
-                $glVersion = $this->matrix->getGlVersionByName('Open'.$matches[1], $matches[3]);
+                $glVersion = $matrix->getGlVersionByName('Open'.$matches[1], $matches[3]);
                 if (!$glVersion) {
-                    $glVersion = new OglVersion('Open'.$matches[1], $matches[3], $matches[4], $matches[6], $this->hints);
-                    $this->matrix->addGlVersion($glVersion);
+                    $glVersion = new OglVersion('Open'.$matches[1], $matches[3], $matches[4],
+                                                $matches[6], $matrix->getHints());
+                    $matrix->addGlVersion($glVersion);
                 }
 
                 $allSupportedDrivers = array();
@@ -123,12 +127,12 @@ class OglParser
                             $parentDrivers = $supportedDrivers;
 
                             // Add the extension.
-                            $newExtension = new OglExtension($matches[1], $matches[2], $this->hints, $supportedDrivers);
+                            $newExtension = new OglExtension($matches[1], $matches[2], $matrix->getHints(), $supportedDrivers);
                             $lastExt = $glVersion->addExtension($newExtension, $commit);
                         }
                         else {
                             // Add the sub-extension.
-                            $newSubExtension = new OglExtension($matches[1], $matches[2], $this->hints, $supportedDrivers);
+                            $newSubExtension = new OglExtension($matches[1], $matches[2], $matrix->getHints(), $supportedDrivers);
                             $lastExt->addSubExtension($newSubExtension, $commit);
                         }
                     }
@@ -139,9 +143,9 @@ class OglParser
                 $line = $this->skipEmptyLines($line, $handle);
 
                 while ($line !== FALSE && preg_match($reNote, $line, $matches) === 1) {
-                    $idx = array_search($matches[1], $this->hints->allHints);
+                    $idx = array_search($matches[1], $matrix->getHints()->allHints);
                     if ($idx !== FALSE) {
-                        $this->hints->allHints[$idx] = $matches[2];
+                        $matrix->getHints()->allHints[$idx] = $matches[2];
                     }
 
                     $line = fgets($handle);
@@ -151,72 +155,8 @@ class OglParser
                 $line = fgets($handle);
             }
         }
-    }
 
-    /**
-     * Parse a pre-parsed, XML formatted commit.
-     *
-     * @param \SimpleXMLElement $mesa The root element of the XML file.
-     * @param \Mesamatrix\Git\Commit $commit The commit used by the parser.
-     */
-    public function parseXmlCommit(\SimpleXMLElement $mesa, \Mesamatrix\Git\Commit $commit) {
-        foreach ($mesa->gl as $gl) {
-            $glName = (string) $gl['name'];
-            $glVersion = (string) $gl['version'];
-
-            $glSection = $this->matrix->getGlVersionByName($glName, $glVersion);
-            if (!$glSection) {
-                $glslName = (string) $gl->glsl['name'];
-                $glslVersion = (string) $gl->glsl['version'];
-
-                $glSection = new OglVersion($glName, $glVersion, $glslName, $glslVersion, $this->hints);
-                $this->matrix->addGlVersion($glSection);
-            }
-
-            // Add/merge new items in the matrix.
-            foreach ($gl->extension as $extension) {
-                // Create new extension.
-                $extName = (string) $extension['name'];
-                $extStatus = (string) $extension->mesa['status'];
-                $extHint = (string) $extension->mesa['hint'];
-                $newExtension = new OglExtension($extName, '', $this->hints, array());
-                $newExtension->setStatus($extStatus);
-                $newExtension->setHint($extHint);
-                foreach ($extension->supported->children() as $driver) {
-                    // Create new supported driver.
-                    $driverName = $driver->getName();
-                    $driverHint = (string) $driver['hint'];
-                    $driver = new OglSupportedDriver($driverName, $this->hints);
-                    $driver->setHint($driverHint);
-                    $newExtension->addSupportedDriver($driver);
-                }
-
-                // Add the extension.
-                $glExt = $glSection->addExtension($newExtension, $commit);
-                unset($extName, $extStatus, $extHint, $extDrivers, $newExtension);
-
-                foreach ($extension->subextension as $subextension) {
-                    // Create new sub-extension.
-                    $subExtName = (string) $subextension['name'];
-                    $subExtStatus = (string) $subextension->mesa['status'];
-                    $subExtHint = (string) $subextension->mesa['hint'];
-                    $newSubExtension = new OglExtension($subExtName, '', $this->hints, array());
-                    $newSubExtension->setStatus($subExtStatus);
-                    $newSubExtension->setHint($subExtHint);
-                    foreach ($subextension->supported->children() as $driver) {
-                        // Create new supported driver.
-                        $driverName = $driver->getName();
-                        $driverHint = (string) $driver['hint'];
-                        $driver = new OglSupportedDriver($driverName, $this->hints);
-                        $driver->setHint($driverHint);
-                        $newSubExtension->addSupportedDriver($driver);
-                    }
-
-                    // Add the sub-extension.
-                    $glSubExt = $glExt->addSubExtension($newSubExtension, $commit);
-                }
-            }
-        }
+        return $matrix;
     }
 
     private function skipEmptyLines($curLine, $handle) {

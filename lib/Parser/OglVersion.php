@@ -87,6 +87,67 @@ class OglVersion
     }
 
     /**
+     * Remove an extension.
+     *
+     * @param \Mesamatrix\Parser\OglExtension $extension The extension to remove.
+     */
+    public function removeExtension(OglExtension $extension) {
+        $idx = array_search($extension, $this->extensions);
+        if ($idx !== false) {
+            array_splice($this->extensions, $idx, 1);
+        }
+    }
+
+    public function merge(\SimpleXMLElement $xmlSection, \Mesamatrix\Git\Commit $commit) {
+        $xmlExts = $xmlSection->xpath('./extension');
+
+        // Remove old extensions.
+        $glName = $this->getGlName();
+        $glVersion = $this->getGlVersion();
+        $numXmlExts = count($xmlExts);
+        foreach ($this->getExtensions() as $glExt) {
+            $glExtName = $glExt->getName();
+
+            // Find extension in the XML.
+            $i = 0;
+            while ($i < $numXmlExts && (string) $xmlExts[$i]['name'] !== $glExtName) {
+                ++$i;
+            }
+
+            if ($i === $numXmlExts) {
+                // Extension not found in XML, remove it.
+                \Mesamatrix::$logger->debug('In '.$glName.' '.$glVersion.
+                                            ', remove GL extension: '.$glExtName);
+                $this->removeExtension($glExt);
+            }
+        }
+
+        // Add and merge new extensions.
+        foreach ($xmlExts as $xmlExt) {
+            $extName = (string) $xmlExt['name'];
+            $extStatus = (string) $xmlExt->mesa['status'];
+            $extHint = (string) $xmlExt->mesa['hint'];
+
+            $newExtension = new OglExtension($extName, '', $this->hints, array());
+            $newExtension->setStatus($extStatus);
+            $newExtension->setHint($extHint);
+            foreach ($xmlExt->supported->children() as $driver) {
+                // Create new supported driver.
+                $driverName = $driver->getName();
+                $driverHint = (string) $driver['hint'];
+                $driver = new OglSupportedDriver($driverName, $this->hints);
+                $driver->setHint($driverHint);
+                $newExtension->addSupportedDriver($driver);
+            }
+
+            // Add the extension.
+            $glExt = $this->addExtension($newExtension, $commit);
+
+            $glExt->merge($this, $xmlExt, $commit);
+        }
+    }
+
+    /**
      * Get the list of all extensions.
      *
      * @return OglExtension[] All the extensions.
