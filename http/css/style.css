@@ -25,7 +25,10 @@ body {
     justify-content: center;
 }
 
-#main { min-width: 0; }
+#main {
+    min-width: 0;
+    max-width: 1024px;
+}
 
 header {
     display: flex;
@@ -43,8 +46,6 @@ header .header-icons img.rss {
     height: 32px;
     margin: 3px;
 }
-
-p { max-width: 800px; }
 
 .stats {
     display: flex;

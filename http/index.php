@@ -333,11 +333,16 @@ foreach ($xml->drivers->vendor as $vendor) {
     <body>
         <div id="main">
             <header>
-                <img src="images/banner.svg" class="banner" alt="Mesamatrix banner" />
+                <a href="."><img src="images/banner.svg" class="banner" alt="Mesamatrix banner" /></a>
                 <div class="header-icons">
                     <a href="rss.php"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a>
                 </div>
             </header>
+            <p>
+                Mesamatrix is a mere graphical representation of a text file from the Mesa git repository
+                (<a href="http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt">GL3.txt</a>).
+                Some subtleties may lie in the source code, so if you want the most accurate information, you can subscribe to the mailing-list.
+            </p>
             <div class="stats">
                 <div class="stats-commits">
                     <h1>Last commits</h1>
@@ -405,8 +410,6 @@ writeMatrix($glVersions, $xml, $hints, $leaderboard);
 ?>
             <h1>About Mesamatrix</h1>
             <h2>How it works</h2>
-            <p>It is merely a representation of a text file from the Mesa git repository. You can see the raw file here:</p>
-            <p><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?>"><?= Mesamatrix::$config->getValue("git", "mesa_web")."/tree/".Mesamatrix::$config->getValue("git", "gl3") ?></a>.</p>
             <p>Frequently, the Mesa git is fetched and, if there is a new commit for the text file, a PHP script will parse it and format it into XML. Then another PHP script displays the data into the HTML you can see here.</p>
             <p><b>Last time the text file was parsed:</b> <?= writeLocalDate($xml['updated']) ?>.</p>
             <h2>Source code</h2>
