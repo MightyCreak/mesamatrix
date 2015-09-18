@@ -152,7 +152,7 @@ function writeExtensionList(SimpleXMLElement $glVersion, $glUrlId, SimpleXMLElem
     }
 }
 
-function writeMatrix(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints $hints, Mesamatrix\Leaderboard $leaderboard) {
+function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints $hints, Mesamatrix\Leaderboard $leaderboard) {
     foreach ($glVersions as $glVersion) {
         $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
         $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
@@ -181,73 +181,91 @@ function writeMatrix(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints 
 
         // Write OpenGL version header.
 ?>
-        <h1 id="<?= $glUrlId ?>">
-            <?= $text ?> <span class="mesaScore" data-score="<?= $mesaScore ?>"><?= $mesaScore ?>%</span><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
-        </h1>
-        <table class="tableNoSpace">
-            <thead class="tableHeaderLine">
-                <tr>
-                    <th colspan="2"></th>
+            <h2 id="<?= $glUrlId ?>">
+                <?= $text ?> <span class="mesaScore" data-score="<?= $mesaScore ?>"><?= $mesaScore ?>%</span><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
+            </h2>
+            <table class="tableNoSpace">
+                <thead class="tableHeaderLine">
+                    <tr>
+                        <th colspan="2"></th>
 <?php
         foreach ($xml->drivers->vendor as $vendor) {
 ?>
-                    <th></th>
-                    <th class="<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></th>
+                        <th></th>
+                        <th class="<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></th>
 <?php
         }
 ?>
-                </tr>
-                <tr>
-                    <th class="hCellVendor-default hCell-ext">Extension</th>
-                    <th class="hCellVendor-default hCell-driver">mesa</th>
+                    </tr>
+                    <tr>
+                        <th class="hCellVendor-default hCell-ext">Extension</th>
+                        <th class="hCellVendor-default hCell-driver">mesa</th>
 <?php
         foreach ($xml->drivers->vendor as $vendor) {
 ?>
-                    <th class="hCell-sep"></th>
+                        <th class="hCell-sep"></th>
 <?php
             foreach ($vendor->driver as $driver) {
 ?>
-                    <th class="<?= $vendor["class"] ?> hCell-driver"><?= $driver["name"] ?></th>
+                        <th class="<?= $vendor["class"] ?> hCell-driver"><?= $driver["name"] ?></th>
 <?php
             }
         }
 ?>
-                </tr>
-            </thead>
-            <tbody>
+                    </tr>
+                </thead>
+                <tbody>
 <?php
         // Write OpenGL version extensions.
         writeExtensionList($glVersion, $glUrlId, $xml, $hints);
 ?>
-            </tbody>
+                </tbody>
 <?php
 
         // Write OpenGL version footer.
         if ($lbGlVersion !== NULL) {
 ?>
-            <tfoot>
-                <tr class="extension">
-                    <td><b>Total:</b></td>
-                    <td class="hCellVendor-default task"><?= $driverExtsDone["mesa"]."/".$numGlVersionExts ?></td>
+                <tfoot>
+                    <tr class="extension">
+                        <td><b>Total:</b></td>
+                        <td class="hCellVendor-default task"><?= $driverExtsDone["mesa"]."/".$numGlVersionExts ?></td>
 <?php
             foreach ($xml->drivers->vendor as $vendor) {
 ?>
-                    <td></td>
+                        <td></td>
 <?php
                 foreach ($vendor->driver as $driver) {
                     $driverName = (string) $driver["name"];
 ?>
-                    <td class="<?= $vendor["class"] ?> task"><?= $driverExtsDone[$driverName]."/".$numGlVersionExts ?></td>
+                        <td class="<?= $vendor["class"] ?> task"><?= $driverExtsDone[$driverName]."/".$numGlVersionExts ?></td>
 <?php
                 }
             }
 ?>
-                </tr>
-            </tfoot>
-        </table>
+                    </tr>
+                </tfoot>
+            </table>
 <?php
         }
     }
+}
+
+function writeMatrix(array $allVersions, SimpleXMLElement $xml, Mesamatrix\Hints $hints, Mesamatrix\Leaderboard $leaderboard) {
+    $glVersions = array_filter($allVersions, function($v) {
+            return (string) $v["name"] === "OpenGL";
+        });
+?>
+        <h1>OpenGL <a href="#Version_OpenGL" class="permalink">&para;</a></h1>
+<?php
+    writeVersions($glVersions, $xml, $hints, $leaderboard);
+
+    $glVersions = array_filter($allVersions, function($v) {
+            return (string) $v["name"] === "OpenGL ES";
+        });
+?>
+        <h1>OpenGL ES<a href="#Version_OpenGLES" class="permalink">&para;</a></h1>
+<?php
+    writeVersions($glVersions, $xml, $hints, $leaderboard);
 }
 
 /////////////////////////////////////////////////
@@ -279,7 +297,7 @@ usort($glVersions, function($a, $b) {
                 return $diff < 0 ? -1 : 1;
         }
         elseif ((string) $a["name"] === "OpenGL") {
-            return 1;
+            return -1;
         }
         else {
             return 1;

@@ -72,9 +72,10 @@ class OglParser
             }
 
             if (preg_match($reVersion, $line, $matches) === 1) {
-                $glVersion = $matrix->getGlVersionByName('Open'.$matches[1], $matches[3]);
+                $glName = $matches[1] === 'GL' ? 'OpenGL' : 'OpenGL ES';
+                $glVersion = $matrix->getGlVersionByName($glName, $matches[3]);
                 if (!$glVersion) {
-                    $glVersion = new OglVersion('Open'.$matches[1], $matches[3], $matches[4],
+                    $glVersion = new OglVersion($glName, $matches[3], $matches[4],
                                                 $matches[6], $matrix->getHints());
                     $matrix->addGlVersion($glVersion);
                 }
