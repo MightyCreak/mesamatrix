@@ -44,7 +44,7 @@ $CONFIG = array(
         "mesa_url" => "git://anongit.freedesktop.org/mesa/mesa",
         "mesa_dir" => "mesa.git",
 
-        "depth" => 6000,
+        "depth" => 10000,
         // oldest_commit is based on parser compatibility
         "oldest_commit" => "b6ab52b7f941b689753d4b9af7d58083e6917fd6",
 
