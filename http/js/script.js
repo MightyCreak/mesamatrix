@@ -79,7 +79,89 @@ function gaussian(x, a, b, c) {
     return a * Math.exp(- Math.pow(x - b, 2) / (2 * Math.pow(c, 2)));
 }
 
+/**
+ * Commit representation
+ */
+function Commit($tr) {
+    this.$tr = $tr;
+    this.selected = $tr.hasClass('selected');
+}
+Commit.prototype = {
+    $tr: null,
+    selected: false,
+
+    select: function() {
+        if (!this.selected) {
+            this.$tr.addClass('selected');
+            this.selected = true;
+        }
+    },
+    deselect: function() {
+        if (this.selected) {
+            this.$tr.removeClass('selected');
+            this.selected = false;
+        }
+    },
+    toggleSelect: function() {
+        if (this.selected) {
+            this.deselect();
+        } else {
+            this.select();
+        }
+    }
+};
+
+/**
+ * Commits manager
+ */
+function CommitsManager(commitsTable) {
+    this.commitsTable = commitsTable;
+
+    // select the relevant commit if the URL says so
+    var hash = window.location.hash.substr(1);
+    if (hash.substr(0, 7) === 'commit-') {
+        var commit = this.find(hash.substr(7));
+        commit.select();
+    }
+
+    this.initEvents();
+}
+CommitsManager.prototype = {
+    commitsTable: null,
+    commits: [],
+
+    find: function(commitHash) {
+        if (!this.commits[commitHash]) {
+            var commitTr = this.commitsTable.find('tr#' + commitHash);
+            if (commitTr.length === 0) {
+                return null;
+            }
+            this.commits[commitHash] = new Commit(commitTr);
+        }
+        return this.commits[commitHash];
+    },
+    deselectAll: function() {
+        for (var commitHash in this.commits) {
+            this.commits[commitHash].deselect();
+        }
+    },
+
+    initEvents: function() {
+        var self = this;
+        this.commitsTable.on('click', 'tr', function(e) {
+            if (!e.ctrlKey && !e.shiftKey) {
+                self.deselectAll();
+            }
+            var commit = self.find($(this).attr('id'));
+            commit.toggleSelect();
+        });
+    }
+};
+
 $(document).ready(function() {
+    // create CommitsManager singleton
+    CommitsManager.instance = new CommitsManager($('.commits tbody'));
+
     // Add tipsy for the footnote.
     $('.footnote').tipsy({gravity: 'w', fade: true});
 
