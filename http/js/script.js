@@ -47,28 +47,41 @@ function getLocalDate(text) {
 }
 
 function getRelativeDate(text) {
+    const MINS_IN_HOUR = 60;
+    const MINS_IN_DAY = 1440;       // 60 * 24
+    const MINS_IN_WEEK = 10080;     // 60 * 24 * 7
+    const MINS_IN_MONTH = 43200;    // 60 * 24 * 30
+
     var eventDate = new Date(text);
     var relTimeInMin = (Date.now() - eventDate.getTime()) / (1000 * 60);
-    if(relTimeInMin <= 5)               // Less than 5 minutes ago
+
+    if(relTimeInMin < 5)               // Less than 5 minutes ago
         return "just now";
-    if(relTimeInMin <= 60)              // Less than an hour ago
-        return Math.round(((relTimeInMin / 60) / 5) * 5) + " minutes ago";
-    if(relTimeInMin <= 119)             // Less (strictly) than two hours ago
-        return "an hour ago";
-    if(relTimeInMin <= 1440)            // Less than a day ago (60 * 24)
-        return Math.round(relTimeInMin / 60) + " hours ago";
-    if(relTimeInMin <= 2160)            // Less than a day and a half ago (60 * 24 * 1.5)
-        return "a day ago";
-    if(relTimeInMin <= 10080)           // Less than a week ago (60 * 24 * 7)
-        return Math.round(relTimeInMin / 1440) + " days";
-    if(relTimeInMin <= 15120)           // Less than a week and a half ago (60 * 24 * 7 * 1.5)
-        return "a week ago";
-    if(relTimeInMin <= 43200)           // Less than a month ago (60 * 24 * 30)
-        return Math.round(relTimeInMin / 10080) + " weeks ago";
-    if(relTimeInMin <= 64800)           // Less than a month and a half ago (60 * 24 * 30 * 1.5)
-        return "a month ago";
-    if(relTimeInMin <= 259200)          // Less than six months ago (60 * 24 * 30 * 6)
-        return Math.round(relTimeInMin / 43200) + " months ago";
+
+    if(relTimeInMin < MINS_IN_HOUR) {
+        return Math.round(((relTimeInMin / MINS_IN_HOUR) / 5) * 5) + " minutes";
+    }
+
+    if(relTimeInMin < MINS_IN_DAY) {
+        var numHours = Math.round(relTimeInMin / MINS_IN_HOUR);
+        return numHours + " " + (numHours == 1 ? "hour" : "hours");
+    }
+
+    if(relTimeInMin < MINS_IN_WEEK) {
+        var numDays = Math.round(relTimeInMin / MINS_IN_DAY);
+        return numDays + " " + (numDays == 1 ? "day" : "days");
+    }
+
+    if(relTimeInMin < MINS_IN_MONTH) {
+        var numWeeks = Math.round(relTimeInMin / MINS_IN_WEEK);
+        return numWeeks + " " + (numWeeks == 1 ? "week" : "weeks");
+    }
+
+    if(relTimeInMin < MINS_IN_MONTH * 3) {
+        var numMonths = Math.round(relTimeInMin / MINS_IN_MONTH);
+        return numMonths + " " + (numMonths == 1 ? "month" : "months");
+    }
+
     var year = eventDate.getFullYear();
     var month = fillZeros(eventDate.getMonth() + 1, 2);
     var day = fillZeros(eventDate.getDate(), 2);
