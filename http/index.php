@@ -59,16 +59,6 @@ function registerHints(array $glVersions, SimpleXMLElement $xml) {
 /////////////////////////////////////////////////
 // Write HTML functions.
 //
-function writeLocalDate($timestamp) {
-    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
-    return '<script>document.write(getLocalDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
-}
-
-function writeRelativeDate($timestamp) {
-    $rfcTime = date(DATE_RFC2822, (int) $timestamp);
-    return '<script>document.write(getRelativeDate("'.$rfcTime.'"));</script><noscript>'.$rfcTime.'</noscript>';
-}
-
 function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml, Mesamatrix\Hints $hints) {
     $taskClasses = "task";
     if ($glExt->mesa["status"] == "complete") {
@@ -380,14 +370,17 @@ for ($i = 0; $i < $numCommits; ++$i) {
     $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
 ?>
                             <tr>
-                                <td class="commitsAge"><?= writeRelativeDate($commit['timestamp']) ?></td>
+                                <td class="commitsAge toRelativeDate" data-timestamp="<?= date(DATE_RFC2822, (int) $commit['timestamp']) ?>"><?= date('Y-m-d H:i', (int) $commit['timestamp']) ?></td>
                                 <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
                             </tr>
 <?php
 }
 ?>
                             <tr>
-                                <td colspan="2"><a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a></td>
+                                <td colspan="2">
+                                    <noscript>(Dates are UTC)<br/></noscript>
+                                    <a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -429,7 +422,7 @@ writeMatrix($glVersions, $xml, $hints, $leaderboard);
             <h1>About Mesamatrix</h1>
             <h2>How it works</h2>
             <p>Frequently, the Mesa git is fetched and, if there is a new commit for the text file, a PHP script will parse it and format it into XML. Then another PHP script displays the data into the HTML you can see here.</p>
-            <p><b>Last time the text file was parsed:</b> <?= writeLocalDate($xml['updated']) ?>.</p>
+            <p><b>Last time the text file was parsed:</b> <span class="toLocalDate" data-timestamp="<?= date(DATE_RFC2822, (int) $xml['updated']) ?>"><?= date('Y-m-d H:i O', (int) $xml['updated']) ?></span>.</p>
             <h2>Source code</h2>
             <a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
             <p>The code is free and licenced under AGPLv3. If you want to report a bug, participate to the project or simply browse the code:</p>

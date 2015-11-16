@@ -93,6 +93,16 @@ function gaussian(x, a, b, c) {
 }
 
 $(document).ready(function() {
+    // Convert to relative date.
+    $('.toRelativeDate').each(function() {
+        $(this).text(getRelativeDate($(this).data('timestamp')));
+    });
+
+    // Convert to local date.
+    $('.toLocalDate').each(function() {
+        $(this).text(getLocalDate($(this).data('timestamp')));
+    });
+
     // Add tipsy for the footnote.
     $('.footnote').tipsy({gravity: 'w', fade: true});
 
