@@ -139,3 +139,55 @@ header .header-icons img.rss {
     background: repeating-linear-gradient(45deg, #D86758, #D86758 10px, #AA574C 10px, #AA574C 20px);
 }
 
+/*
+ * Menu
+ * Inspired from http://purecss.io/menus/
+ */
+.menu {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+}
+.menu-list, .menu-item {
+    position: relative;
+}
+.menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.menu-item {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+.menu-link {
+    display: block;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.menu-horizontal {
+    width: 100%;
+    white-space: nowrap;
+}
+.menu-horizontal .menu-list {
+    display: inline-block;
+}
+.menu-horizontal .menu-item {
+    display: inline-block;
+    vertical-align: middle;
+}
+.menu-link {
+    color: #777;
+    padding: .5em 1em;
+}
+.menu-selected .menu-link {
+    background-color: #ddd;
+}
+.menu-link:hover, .menu-link:focus {
+    background-color: #eee;
+}
+.menu-selected .menu-link, .menu-selected .menu-link:visited {
+    color: #333;
+}
+

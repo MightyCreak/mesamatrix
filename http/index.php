@@ -346,6 +346,14 @@ foreach ($xml->drivers->vendor as $vendor) {
                     <a href="rss.php"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a>
                 </div>
             </header>
+
+            <div class="menu menu-horizontal">
+                <ul class="menu-list">
+                    <li class="menu-item menu-selected"><a href="." class="menu-link">Home</a></li>
+                    <li class="menu-item"><a href="drivers.php" class="menu-link">Drivers decoder ring</a></li>
+                </ul>
+            </div>
+
             <p>
                 Mesamatrix is a mere graphical representation of a text file from the Mesa git repository
                 (<a href="http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt">GL3.txt</a>).
