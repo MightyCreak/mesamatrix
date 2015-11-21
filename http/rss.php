@@ -52,6 +52,7 @@ foreach ($xml->commits->commit as $commit) {
     $item = new RSSItem();
     $item
         ->title((string)$commit["subject"])
+        ->description((string)$commit)
         //->url($commitWeb . $commit["hash"])
         ->url($baseUrl . '?commit=' . $commit["hash"])
         ->pubDate((int)$commit["timestamp"])

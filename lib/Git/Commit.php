@@ -28,6 +28,7 @@ class Commit
     private $committer;
     private $committerDate;
     private $subject;
+    private $data;
 
     public function getHash() {
         return $this->hash;
@@ -108,6 +109,15 @@ class Commit
 
     public function setSubject($subject) {
         $this->subject = $subject;
+        return $this;
+    }
+
+    public function getData() {
+        return $this->data;
+    }
+
+    public function setData($data) {
+        $this->data = $data;
         return $this;
     }
 }

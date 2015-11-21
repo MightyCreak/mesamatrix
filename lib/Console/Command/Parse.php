@@ -156,16 +156,18 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * @return array|null.
      */
     protected function fetchCommits() {
+        $logSeparator = uniqid('mesamatrix_separator_');
+        $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
         $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
-            'log', '--pretty=format:%H|%at|%aN|%cN|%ct|%s', '--reverse',
+            'log', '--pretty=format:'.$logFormat, '--reverse', '-p',
             \Mesamatrix::$config->getValue('git', 'oldest_commit').'..', '--',
             $this->gl3Path
         ));
         $proc = $gitLog->getProcess();
         $this->getHelper('process')->mustRun($this->output, $proc);
 
-        $commitLines = explode(PHP_EOL, $proc->getOutput());
-        if (empty($commitLines)) {
+        $commitSections = explode($logSeparator . PHP_EOL, $proc->getOutput());
+        if (empty($commitSections)) {
             // No commit? There must be a problem.
             \Mesamatrix::$logger->error("No commit found.");
             return NULL;
@@ -173,16 +175,17 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Create commit list.
         $commits = array();
-        foreach ($commitLines as $commitLine) {
-            $commitData = explode('|', $commitLine, 6);
-            if ($commitData !== FALSE) {
+        foreach ($commitSections as $commitSection) {
+            $commitData = explode(PHP_EOL, $commitSection, 7);
+            if ($commitData !== FALSE && isset($commitData[1])) {
                 $commit = new \Mesamatrix\Git\Commit();
                 $commit->setHash($commitData[0])
                        ->setDate($commitData[1])
                        ->setAuthor($commitData[2])
                        ->setCommitter($commitData[3])
                        ->setCommitterDate($commitData[4])
-                       ->setSubject($commitData[5]);
+                       ->setSubject($commitData[5])
+                       ->setData('<pre>'.$commitData[6].'</pre>');
                 $commits[] = $commit;
             }
         }
@@ -297,7 +300,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
     protected function generateCommitsLog(\SimpleXMLElement $xml, array $commits) {
         foreach (array_reverse($commits) as $commit) {
-            $commitNode = $xml->addChild("commit");
+            $commitNode = $xml->addChild("commit", $commit->getData());
             $commitNode->addAttribute("hash", $commit->getHash());
             $commitNode->addAttribute("timestamp", $commit->getCommitterDate()->getTimestamp());
             $commitNode->addAttribute("subject", $commit->getSubject());
