@@ -39,6 +39,8 @@ class Setup extends \Symfony\Component\Console\Command\Command
           'clone', '--bare', '--depth', \Mesamatrix::$config->getValue('git', 'depth', 6000),
           \Mesamatrix::$config->getValue('git', 'mesa_url'), '@gitDir@'
         ));
-        $this->getHelper('process')->mustRun($output, $git->getProcess());
+        $process = $git->getProcess();
+        $process->setTimeout(null);
+        $this->getHelper('process')->mustRun($output, $process);
     }
 }
