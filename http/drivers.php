@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2015 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2015 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -48,6 +48,7 @@ require_once "../lib/base.php";
                 <ul class="menu-list">
                     <li class="menu-item"><a href="." class="menu-link">Home</a></li>
                     <li class="menu-item menu-selected"><a href="drivers.php" class="menu-link">Drivers decoder ring</a></li>
+                    <li class="menu-item"><a href="about.php" class="menu-link">About</a></li>
                 </ul>
             </div>
 
@@ -64,5 +65,8 @@ require_once "../lib/base.php";
                 <a href="http://xorg.freedesktop.org/wiki/RadeonFeature/#index5h2">FreeDesktop decoder ring</a>.
             </p>
         </div>
+        <footer>
+            <a href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
+        </footer>
     </body>
 </html>
