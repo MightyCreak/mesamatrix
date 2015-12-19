@@ -21,22 +21,18 @@ body {
     font-size: 85%;
     font-family: sans-serif;
     background-color: #ffffff;
-    display: flex;
-    justify-content: center;
 }
 
 #main {
-    min-width: 0;
-    max-width: 1024px;
+    width: 1100px;
+    margin: auto;
 }
 
 header {
     display: flex;
     justify-content: space-between;
 }
-
 header .header-icons {
-    padding: 14px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -50,7 +46,6 @@ header .header-icons img.rss {
 .stats {
     display: flex;
 }
-
 .stats-commits {
     flex: 1;
 }
@@ -102,6 +97,7 @@ header .header-icons img.rss {
 
 .extension-child { padding-left: 1em; }
 .extension:hover { background-color: #babdb6; }
+
 .task {
     position: relative;
     border-radius: 4px;
@@ -111,7 +107,6 @@ header .header-icons img.rss {
     padding: 0;
     cursor: default;
 }
-
 .task span {
     position: absolute;
     bottom: 0;
@@ -191,3 +186,10 @@ header .header-icons img.rss {
     color: #333;
 }
 
+@media screen and (max-width: 1400px) {
+
+#github-ribbon {
+    display: none;
+}
+
+}
