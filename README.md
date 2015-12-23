@@ -14,7 +14,7 @@ Mesamatrix requires the following software:
  * Git
  * PHP 5.3.0 or higher
 
-If you are installing from Git, you need to initialise 3rd party code
+If you are installing from Git, you need to initialise third-party code
 libraries with Composer:
 
     $ php composer.phar install
@@ -73,7 +73,7 @@ automated operation of your Mesamatrix installation.
 Mesamatrix is available under the AGPLv3, a copy of which is available in
 LICENSE.
 
-### 3rd Party code libraries
+### Third-party code libraries
 
 jQuery is available under the MIT License.
 
