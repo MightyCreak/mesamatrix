@@ -156,11 +156,28 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * @return array|null.
      */
     protected function fetchCommits() {
+        // check the oldest parsable commit
+        $oldestCommit = \Mesamatrix::$config->getValue('git', 'oldest_commit');
+        $gitCommitCheck = new \Mesamatrix\Git\ProcessBuilder(array(
+            'cat-file', '-e', $oldestCommit
+        ));
+        $proc = $gitCommitCheck->getProcess();
+        $proc->run();
+        if (!$proc->isSuccessful()) {
+            // fetch the oldest reachable commit instead
+            $gitCommitGet = new \Mesamatrix\Git\ProcessBuilder(array(
+                'rev-list', '--max-parents=0', 'HEAD'
+            ));
+            $proc = $gitCommitGet->getProcess();
+            $proc->run();
+            $oldestCommit = trim($proc->getOutput());
+        }
+
         $logSeparator = uniqid('mesamatrix_separator_');
         $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
         $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
             'log', '--pretty=format:'.$logFormat, '--reverse', '-p',
-            \Mesamatrix::$config->getValue('git', 'oldest_commit').'..', '--',
+            $oldestCommit.'..', '--',
             $this->gl3Path
         ));
         $proc = $gitLog->getProcess();
