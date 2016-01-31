@@ -1,4 +1,8 @@
-/private/
+/private/commits/
+/private/last_commit_parsed
+/private/mesa.git/
+/private/mesamatrix.log
+/private/urlcache.json
 /vendor/
 /http/gl3.xml
 /config/config.php
