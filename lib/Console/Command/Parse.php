@@ -257,7 +257,11 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir')).'/';
         $gitDir .= \Mesamatrix::$config->getValue('git', 'mesa_dir', 'mesa.git');
-        $updated = filemtime($gitDir . '/FETCH_HEAD');
+        if (is_file($gitDir . '/FETCH_HEAD')) {
+            $updated = filemtime($gitDir . '/FETCH_HEAD');
+        } else {
+            $updated = filemtime($gitDir);
+        }
         $xml->addAttribute('updated', $updated);
 
         $drivers = $xml->addChild("drivers");
