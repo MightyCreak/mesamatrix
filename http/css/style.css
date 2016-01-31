@@ -61,9 +61,9 @@ header .header-icons img.rss {
 .lbCol-rank                     { text-align: center; }
 .lbCol-driver                   { min-width: 10em; }
 .lbCol-score                    { text-align: right; }
-.lb tbody tr:nth-child(1) td    { background-color: rgba(195, 255, 155, 1.00); }
-.lb tbody tr:nth-child(2) td    { background-color: rgba(195, 255, 155, 0.67); }
-.lb tbody tr:nth-child(3) td    { background-color: rgba(195, 255, 155, 0.33); }
+.lbCol-1st td                   { background-color: rgba(195, 255, 155, 1.00); }
+.lbCol-2nd td                   { background-color: rgba(195, 255, 155, 0.67); }
+.lbCol-3rd td                   { background-color: rgba(195, 255, 155, 0.33); }
 
 .tableNoSpace {
     border-spacing: 1px;

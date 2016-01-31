@@ -407,17 +407,32 @@ for ($i = 0; $i < $numCommits; ++$i) {
                         </thead>
                         <tbody>
 <?php
+$index = 1;
 $rank = 1;
+$prevNumExtsDone = -1;
 foreach($driversExtsDone as $drivername => $numExtsDone) {
+    $sameRank = $prevNumExtsDone === $numExtsDone;
+    if (!$sameRank) {
+        $rank = $index;
+    }
+    switch ($rank) {
+    case 1: $rankClass = "lbCol-1st"; break;
+    case 2: $rankClass = "lbCol-2nd"; break;
+    case 3: $rankClass = "lbCol-3rd"; break;
+    default: $rankClass = "";
+    }
+    $score = $numExtsDone." / ".$numTotalExts;
+    $pctScore = sprintf("%.1f%%", $numExtsDone / $numTotalExts * 100);
 ?>
-                            <tr>
-                                <th class="lbCol-rank"><?= $rank ?></th>
+                            <tr class="<?= $rankClass ?>">
+                                <th class="lbCol-rank"><?= !$sameRank ? $rank : "" ?></th>
                                 <td class="lbCol-driver"><?= $drivername ?></td>
-                                <td class="lbCol-score"><?= $numExtsDone." / ".$numTotalExts ?></td>
-                                <td class="lbCol-score"><?php printf("%.1f%%", ($numExtsDone / $numTotalExts * 100)) ?></td>
+                                <td class="lbCol-score"><?= $score ?></td>
+                                <td class="lbCol-score"><?= $pctScore ?></td>
                             </tr>
 <?php
-    $rank++;
+    $prevNumExtsDone = $numExtsDone;
+    $index++;
 }
 ?>
                         </tbody>
