@@ -3,7 +3,7 @@
  * This file is part of mesamatrix.
  *
  * Copyright (C) 2014 Robin McCorkell <rmccorkell@karoshi.org.uk>
- * Copyright (C) 2014 Romain "Creak" Failliot
+ * Copyright (C) 2014-2016 Romain "Creak" Failliot
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -25,7 +25,7 @@ class ProcessBuilder extends \Symfony\Component\Process\ProcessBuilder
 {
     public function __construct(array $arguments = array())
     {
-        array_unshift($arguments, 'git');
+        $this->setPrefix('git');
         $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "private_dir"))."/";
         $gitDir .= \Mesamatrix::$config->getValue("git", "mesa_dir", "mesa.git");
         foreach ($arguments as &$arg) {

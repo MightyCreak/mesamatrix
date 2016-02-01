@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2016 Romain "Creak" Failliot.
  * Copyright (C) 2014 Robin McCorkell <rmccorkell@karoshi.org.uk>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -156,12 +156,19 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * @return array|null.
      */
     protected function fetchCommits() {
+        $gitCommitGet = new \Mesamatrix\Git\ProcessBuilder(array(
+            'rev-list', 'master', '--reverse', '--', $this->gl3Path
+        ));
+        $proc = $gitCommitGet->getProcess();
+        $proc->mustRun();
+        $oldestCommit = strtok($proc->getOutput(), "\n");
+        \Mesamatrix::$logger->info('Oldest commit: '.$oldestCommit);
+
         $logSeparator = uniqid('mesamatrix_separator_');
         $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
         $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
             'log', '--pretty=format:'.$logFormat, '--reverse', '-p',
-            \Mesamatrix::$config->getValue('git', 'oldest_commit').'..', '--',
-            $this->gl3Path
+            $oldestCommit.'..', '--', $this->gl3Path
         ));
         $proc = $gitLog->getProcess();
         $this->getHelper('process')->mustRun($this->output, $proc);
@@ -255,9 +262,15 @@ class Parse extends \Symfony\Component\Console\Command\Command
         \Mesamatrix::$logger->info('Generating XML file');
         $xml = new \SimpleXMLElement("<mesa></mesa>");
 
+        // Get time of last fetch.
         $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir')).'/';
         $gitDir .= \Mesamatrix::$config->getValue('git', 'mesa_dir', 'mesa.git');
-        $updated = filemtime($gitDir . '/FETCH_HEAD');
+        $fetchHeadPath = $gitDir . '/FETCH_HEAD';
+        if (!file_exists($fetchHeadPath)) {
+            // If FETCH_HEAD doesn't exists, fallback on HEAD.
+            $fetchHeadPath = $gitDir . '/HEAD';
+        }
+        $updated = filemtime($fetchHeadPath);
         $xml->addAttribute('updated', $updated);
 
         $drivers = $xml->addChild("drivers");
@@ -300,7 +313,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
     protected function generateCommitsLog(\SimpleXMLElement $xml, array $commits) {
         foreach (array_reverse($commits) as $commit) {
-            $commitNode = $xml->addChild("commit", $commit->getData());
+            $commitNode = $xml->addChild("commit", htmlspecialchars($commit->getData()));
             $commitNode->addAttribute("hash", $commit->getHash());
             $commitNode->addAttribute("timestamp", $commit->getCommitterDate()->getTimestamp());
             $commitNode->addAttribute("subject", $commit->getSubject());

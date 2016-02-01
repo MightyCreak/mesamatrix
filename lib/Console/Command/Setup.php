@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2016 Romain "Creak" Failliot.
  * Copyright (C) 2014 Robin McCorkell <rmccorkell@karoshi.org.uk>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,8 +36,8 @@ class Setup extends \Symfony\Component\Console\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $git = new \Mesamatrix\Git\ProcessBuilder(array(
-          'clone', '--bare', '--depth', \Mesamatrix::$config->getValue('git', 'depth', 6000),
-          \Mesamatrix::$config->getValue('git', 'mesa_url'), '@gitDir@'
+            'clone', '--bare', '--branch', 'master',
+            \Mesamatrix::$config->getValue('git', 'mesa_url'), '@gitDir@'
         ));
         $process = $git->getProcess();
         $process->setTimeout(null);

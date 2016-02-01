@@ -41,13 +41,8 @@ $CONFIG = array(
 
     "git" => array(
         "mesa_web" => "http://cgit.freedesktop.org/mesa/mesa",
-        "mesa_url" => "git://anongit.freedesktop.org/mesa/mesa",
+        "mesa_url" => "http://anongit.freedesktop.org/git/mesa/mesa.git",
         "mesa_dir" => "mesa.git",
-
-        "depth" => 10000,
-        // oldest_commit is based on parser compatibility
-        "oldest_commit" => "b6ab52b7f941b689753d4b9af7d58083e6917fd6",
-
         "gl3" => "docs/GL3.txt",
     ),
 );
