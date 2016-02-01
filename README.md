@@ -35,7 +35,17 @@ For the initial setup, run the `mesamatrixctl` tool to clone the Mesa Git
 repository and generate the XML file:
 
     $ ./mesamatrixctl setup
+
+## Update Mesa information
+
+Once setup is done, you can run the two commands that are needed to get
+the latest informations from Mesa:
+
+    $ ./mesamatrixctl fetch
     $ ./mesamatrixctl parse
+
+These commands can be put into a crontab or similar scheduling facility, for
+automated operation of your Mesamatrix installation.
 
 ## Set up the web interface
 
@@ -56,17 +66,6 @@ output respectively.
 
 Run `./mesamatrixctl list` to see the available commands, or
 `./mesamatrixctl help` for more detailed help.
-
-# Update Mesa information
-
-To update the information available to Mesamatrix, the following commands need
-to be run to fetch new commits and regenerate the XML file:
-
-    $ ./mesamatrixctl fetch
-    $ ./mesamatrixctl parse
-
-These commands can be put into a crontab or similar scheduling facility, for
-automated operation of your Mesamatrix installation.
 
 # License
 
