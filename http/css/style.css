@@ -17,6 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+*, *::after, *::before {
+    box-sizing:border-box;
+}
+
 body {
     font-size: 85%;
     font-family: sans-serif;
@@ -47,7 +51,12 @@ header .header-icons img.rss {
     display: flex;
 }
 .stats-commits {
-    flex: 1;
+    order: 0;
+    white-space: nowrap;
+}
+.stats-lb {
+    order: 1;
+    margin-left: 5px;
 }
 
 .commits th                         { text-align: left; }
