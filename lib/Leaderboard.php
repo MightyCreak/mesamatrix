@@ -35,7 +35,8 @@ class Leaderboard {
      */
     public function load(\SimpleXMLElement $xml) {
         foreach($xml->gl as $glVersion) {
-            $lbGlVersion = $this->createGlVersion($glVersion["name"].$glVersion["version"]);
+            $lbGlVersion = $this->createGlVersion((string) $glVersion["name"],
+                                                  (string) $glVersion["version"]);
 
             // Count total extensions and sub-extensions.
             $numTotalExts = count($glVersion->extension);
@@ -88,6 +89,24 @@ class Leaderboard {
                 }
             }
         }
+
+        // Sort by OpenGL versions descending.
+        usort($this->glVersions, function($a, $b) {
+            // Sort OpenGL before OpenGLES and higher versions before lower ones.
+            if ($a->getGlName() === $b->getGlName()) {
+                $diff = (float) $b->getGlVersion() - (float) $a->getGlVersion();
+                if ($diff === 0)
+                    return 0;
+                else
+                    return $diff < 0 ? -1 : 1;
+            }
+            elseif ($a->getGlName() === "OpenGL") {
+                return -1;
+            }
+            else {
+                return 1;
+            }
+        });
     }
 
     /**
@@ -158,16 +177,71 @@ class Leaderboard {
     }
 
     /**
+     * Get latest valid OpenGL version for a driver.
+     *
+     * @param string $drivername Nome of the driver (mesa, r600, ...).
+     * @return string The OpenGL version string; NULL otherwise.
+     */
+    public function getDriverGlVersion($drivername) {
+        $openglVersion = NULL;
+
+        // Parse from first to latest OpenGL version.
+        // Continue as long as all the extensions are done for this driver in
+        // this version, and remember the version.
+        $i = count($this->glVersions);
+        while ($i > 0) {
+            $glVersion = $this->glVersions[--$i];
+            if ($glVersion->getGlName() === "OpenGL") {
+                if ($glVersion->getNumDriverExtsDone($drivername) !== $glVersion->getNumExts()) {
+                    break;
+                }
+
+                $openglVersion = $glVersion->getGlVersion();
+            }
+        }
+
+        return $openglVersion;
+    }
+
+    /**
+     * Get latest valid OpenGL ES version for a driver.
+     *
+     * @param string $drivername Nome of the driver (mesa, r600, ...).
+     * @return string The OpenGL version string; NULL otherwise.
+     */
+    public function getDriverGlesVersion($drivername) {
+        $openglVersion = NULL;
+
+        // Parse from first to latest OpenGL ES version.
+        // Continue as long as all the extensions are done for this driver in
+        // this version, and remember the version.
+        $i = count($this->glVersions);
+        while ($i > 0) {
+            $glVersion = $this->glVersions[--$i];
+            if ($glVersion->getGlName() === "OpenGL ES") {
+                if ($glVersion->getNumDriverExtsDone($drivername) !== $glVersion->getNumExts()) {
+                    break;
+                }
+
+                $openglVersion = $glVersion->getGlVersion();
+            }
+        }
+
+        return $openglVersion;
+    }
+
+    /**
      * Create a new LbGlVersion and add it to the $glVersions array.
      *
-     * @param string $glid OpenGL ID (format example: GL4.5, GL4.4, GLES3.1, ...).
+     * @param string $glname OpenGL name.
+     * @param string $glversion OpenGL version.
      * @return LbGlVersion The new item.
      */
-    private function createGlVersion($glid) {
-        $glVersion = new Leaderboard\LbGlVersion($glid);
+    private function createGlVersion($glname, $glversion) {
+        $glVersion = new Leaderboard\LbGlVersion($glname, $glversion);
         $this->glVersions[] = $glVersion;
         return $glVersion;
     }
 
-    private $glVersions;
+    private $glVersions;    ///< Leaderboard\LbGlVersion[].
 }

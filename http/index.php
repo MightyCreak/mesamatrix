@@ -396,13 +396,16 @@ for ($i = 0; $i < $numCommits; ++$i) {
                 </div>
                 <div class="stats-lb">
                     <h1>Leaderboard</h1>
+                    <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
+                    The ranking is based on the number of extensions done by driver. </p>
                     <table class="lb">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Driver</th>
-                                <th>Score</th>
-                                <th>Completion</th>
+                                <th>Extensions</th>
+                                <th>OpenGL</th>
+                                <th>OpenGL ES</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -421,14 +424,22 @@ foreach($driversExtsDone as $drivername => $numExtsDone) {
     case 3: $rankClass = "lbCol-3rd"; break;
     default: $rankClass = "";
     }
-    $score = $numExtsDone." / ".$numTotalExts;
     $pctScore = sprintf("%.1f%%", $numExtsDone / $numTotalExts * 100);
+    $openglVersion = $leaderboard->getDriverGlVersion($drivername);
+    if ($openglVersion === NULL) {
+        $openglVersion = "N/A";
+    }
+    $openglesVersion = $leaderboard->getDriverGlesVersion($drivername);
+    if ($openglesVersion === NULL) {
+        $openglesVersion = "N/A";
+    }
 ?>
                             <tr class="<?= $rankClass ?>">
                                 <th class="lbCol-rank"><?= !$sameRank ? $rank : "" ?></th>
                                 <td class="lbCol-driver"><?= $drivername ?></td>
-                                <td class="lbCol-score"><?= $score ?></td>
-                                <td class="lbCol-score"><?= $pctScore ?></td>
+                                <td class="lbCol-score"><?= $numExtsDone ?></td>
+                                <td class="lbCol-version"><?= $openglVersion ?></td>
+                                <td class="lbCol-version"><?= $openglesVersion ?></td>
                             </tr>
 <?php
     $prevNumExtsDone = $numExtsDone;

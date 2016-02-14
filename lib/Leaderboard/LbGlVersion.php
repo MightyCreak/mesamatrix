@@ -24,10 +24,15 @@ class LbGlVersion {
     /**
      * LbGlVersion constructor.
      *
-     * @param string $glid OpenGL ID (format example: GL4.5, GL4.4, GLES3.1, ...).
+     * @param string $glname OpenGL name (e.g. OpenGL, OpenGL ES).
+     * @param string $glversion OpenGL version (e.g. 3.1, 4.0).
+     * @remark Versions are identified by `glid` which is the concatenation of
+     *         the name and the version (examples: OpenGL4.5, OpenGL ES3.1, ...).
      */
-    public function __construct($glid) {
-        $this->glid = $glid;
+    public function __construct($glname, $glversion) {
+        $this->glid = $glname.$glversion;
+        $this->glName = $glname;
+        $this->glVersion = $glversion;
         $this->numExts = 0;
         $this->driversExtsDone = array();
     }
@@ -37,6 +42,20 @@ class LbGlVersion {
      */
     public function getGlId() {
         return $this->glid;
+    }
+
+    /**
+     * Get the OpenGL name.
+     */
+    public function getGlName() {
+        return $this->glName;
+    }
+
+    /**
+     * Get the OpenGL version.
+     */
+    public function getGlVersion() {
+        return $this->glVersion;
     }
 
     /**
@@ -86,6 +105,8 @@ class LbGlVersion {
     }
 
     private $glid;
+    private $glName;
+    private $glVersion;
     private $numExts;
     private $driversExtsDone;
 }

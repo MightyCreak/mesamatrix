@@ -69,7 +69,7 @@ header .header-icons img.rss {
 .lb td                          { border: 1px solid #d3d7cf; }
 .lbCol-rank                     { text-align: center; }
 .lbCol-driver                   { min-width: 10em; }
-.lbCol-score                    { text-align: right; }
+.lbCol-score, .lbCol-version    { text-align: right; }
 .lbCol-1st td                   { background-color: rgba(195, 255, 155, 1.00); }
 .lbCol-2nd td                   { background-color: rgba(195, 255, 155, 0.67); }
 .lbCol-3rd td                   { background-color: rgba(195, 255, 155, 0.33); }
