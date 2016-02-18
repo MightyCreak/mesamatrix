@@ -74,6 +74,7 @@ header .header-icons img.rss {
 .lbCol-rank                     { text-align: center; }
 .lbCol-driver                   { min-width: 10em; }
 .lbCol-score, .lbCol-version    { text-align: right; }
+.lbCol-pctScore                 { font-size: 0.8em; color: rgb(120, 120, 120); }
 .lbCol-1st td                   { background-color: rgba(195, 255, 155, 1.00); }
 .lbCol-2nd td                   { background-color: rgba(195, 255, 155, 0.67); }
 .lbCol-3rd td                   { background-color: rgba(195, 255, 155, 0.33); }

@@ -437,7 +437,7 @@ foreach($driversExtsDone as $drivername => $numExtsDone) {
                             <tr class="<?= $rankClass ?>">
                                 <th class="lbCol-rank"><?= !$sameRank ? $rank : "" ?></th>
                                 <td class="lbCol-driver"><?= $drivername ?></td>
-                                <td class="lbCol-score"><?= $numExtsDone ?></td>
+                                <td class="lbCol-score"><span class="lbCol-pctScore">(<?= $pctScore ?>)</span> <?= $numExtsDone ?></td>
                                 <td class="lbCol-version"><?= $openglVersion ?></td>
                                 <td class="lbCol-version"><?= $openglesVersion ?></td>
                             </tr>
