@@ -125,31 +125,38 @@ class OglParser
                     // Is it done?
                     $matches[2] = trim($matches[2]);
                     $isDone = strncmp($matches[2], "DONE", strlen("DONE")) === 0;
-                    if ($isDone && !isset($matches[3])) {
-                        // Done and nothing else precised, it's done for all drivers.
-                        $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
-                    }
-                    elseif ($isDone && isset($matches[4])) {
-                        // Done but something precised in the parenthesis.
-                        $driverFound = FALSE;
-                        $driversList = explode(", ", $matches[4]);
-                        foreach ($driversList as $currentDriver) {
-                            if ($this->isInDriversArray($currentDriver)) {
-                                $this->mergeDrivers($supportedDrivers, [$currentDriver]);
-                                $driverFound = TRUE;
-                            }
-                        }
-                        if (!$driverFound && !empty($matches[4])) {
-                            if (!in_array($matches[4], $ignoreHints)) {
-                                $matches[2] = $matches[2]." ".$matches[4];
-                            }
+
+                    if ($isDone) {
+                        if (!isset($matches[3])) {
+                            // Done and nothing else precised, it's done for all drivers.
                             $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
                         }
+                        elseif (!empty($matches[4])) {
+                            // Done but something is precised in the parenthesis.
+                            $driverFound = FALSE;
+                            $driversList = explode(", ", $matches[4]);
+                            foreach ($driversList as $currentDriver) {
+                                if ($this->isInDriversArray($currentDriver)) {
+                                    $this->mergeDrivers($supportedDrivers, [$currentDriver]);
+                                    $driverFound = TRUE;
+                                }
+                            }
+
+                            if (!$driverFound) {
+                                // Something in the parenthesis, but no drivers.
+                                if (!in_array($matches[4], $ignoreHints)) {
+                                    $matches[2] = $matches[2]." ".$matches[4];
+                                }
+                                $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
+                            }
+                        }
                     }
-                    elseif (isset($matches[4]) && !empty($matches[4])) {
-                        // Not done, but something precised in the parenthesis.
-                        // Put everything in [2], used in OglExtension status parsing.
-                        $matches[2] = $matches[2]." ".$matches[4];
+                    else {
+                        if (!empty($matches[4])) {
+                            // Not done, but something precised in the parenthesis.
+                            // Put everything in [2], used in OglExtension status parsing.
+                            $matches[2] = $matches[2]." ".$matches[4];
+                        }
                     }
 
                     if (!$isSubExt) {
