@@ -61,10 +61,10 @@ function registerHints(array $glVersions, SimpleXMLElement $xml) {
 //
 function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml, Mesamatrix\Hints $hints) {
     $taskClasses = "task";
-    if ($glExt->mesa["status"] == "complete") {
+    if ($glExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_DONE) {
         $taskClasses .= " isDone";
     }
-    elseif ($glExt->mesa["status"] == "incomplete") {
+    elseif ($glExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_NOT_STARTED) {
         $taskClasses .= " isNotStarted";
     }
     else {

@@ -128,9 +128,7 @@ class OglVersion
             $extStatus = (string) $xmlExt->mesa['status'];
             $extHint = (string) $xmlExt->mesa['hint'];
 
-            $newExtension = new OglExtension($extName, '', $this->hints, array());
-            $newExtension->setStatus($extStatus);
-            $newExtension->setHint($extHint);
+            $newExtension = new OglExtension($extName, $extStatus, $extHint, $this->hints, array());
             foreach ($xmlExt->supported->children() as $driver) {
                 // Create new supported driver.
                 $driverName = $driver->getName();

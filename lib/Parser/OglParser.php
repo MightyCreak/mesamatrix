@@ -49,7 +49,7 @@ class OglParser
      * @param \Mesamatrix\Git\Commit $commit The commit for the stream.
      * @return A \Mesamatrix\Parser\OglMatrix.
      */
-    public function parseStream($handle, $commit = null) {
+    public function parseStream($handle, \Mesamatrix\Git\Commit $commit = null) {
         $matrix = new OglMatrix();
 
         // Regexp patterns.
@@ -122,17 +122,30 @@ class OglParser
                         $this->mergeDrivers($supportedDrivers, $parentDrivers);
                     }
 
-                    // Is it done?
+                    // Get the status and eventual hint.
                     $matches[2] = trim($matches[2]);
-                    $isDone = strncmp($matches[2], "DONE", strlen("DONE")) === 0;
+                    $preHint = "";
+                    if (strncmp($matches[2], "DONE", strlen("DONE")) === 0) {
+                        $status = Constants::STATUS_DONE;
+                        $preHint = substr($matches[2], strlen("DONE") + 1);
+                    }
+                    elseif (strncmp($matches[2], "not started", strlen("not started")) === 0) {
+                        $status = Constants::STATUS_NOT_STARTED;
+                        $preHint = substr($matches[2], strlen("not started") + 1);
+                    }
+                    else {
+                        $status = Constants::STATUS_IN_PROGRESS;
+                        $preHint = $matches[2];
+                    }
 
-                    if ($isDone) {
+                    $inHint = "";
+                    if ($status === Constants::STATUS_DONE) {
                         if (!isset($matches[3])) {
                             // Done and nothing else precised, it's done for all drivers.
                             $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
                         }
-                        elseif (!empty($matches[4])) {
-                            // Done but something is precised in the parenthesis.
+                        elseif (isset($matches[4])) {
+                            // Done but there are parenthesis after.
                             $driverFound = FALSE;
                             $driversList = explode(", ", $matches[4]);
                             foreach ($driversList as $currentDriver) {
@@ -142,21 +155,40 @@ class OglParser
                                 }
                             }
 
-                            if (!$driverFound) {
-                                // Something in the parenthesis, but no drivers.
+                            if (!$driverFound && !empty($matches[4])) {
+                                // No driver found in the parenthesis,
+                                // but there's something written.
                                 if (!in_array($matches[4], $ignoreHints)) {
-                                    $matches[2] = $matches[2]." ".$matches[4];
+                                    $inHint = $matches[4];
                                 }
+
                                 $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
                             }
                         }
                     }
-                    else {
+                    elseif ($status === Constants::STATUS_IN_PROGRESS) {
+                        // In progress.
                         if (!empty($matches[4])) {
-                            // Not done, but something precised in the parenthesis.
-                            // Put everything in [2], used in OglExtension status parsing.
-                            $matches[2] = $matches[2]." ".$matches[4];
+                            // There's something precised in the parenthesis.
+                            $inHint = $matches[4];
                         }
+                    }
+                    else /*if ($status === Constants::STATUS_NOT_STARTED)*/ {
+                        if (!empty($matches[4])) {
+                            // Not done, but something is precised in the parenthesis.
+                            $inHint = $matches[4];
+                        }
+                    }
+
+                    // Get hint.
+                    if (!empty($preHint) && !empty($inHint)) {
+                        $hint = $preHint." (".$inHint.")";
+                    }
+                    elseif (!empty($preHint)) {
+                        $hint = $preHint;
+                    }
+                    else {
+                        $hint = $inHint;
                     }
 
                     if (!$isSubExt) {
@@ -164,12 +196,12 @@ class OglParser
                         $parentDrivers = $supportedDrivers;
 
                         // Add the extension.
-                        $newExtension = new OglExtension($matches[1], $matches[2], $matrix->getHints(), $supportedDrivers);
+                        $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
                         $lastExt = $glVersion->addExtension($newExtension, $commit);
                     }
                     else {
                         // Add the sub-extension.
-                        $newSubExtension = new OglExtension($matches[1], $matches[2], $matrix->getHints(), $supportedDrivers);
+                        $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
                         $lastExt->addSubExtension($newSubExtension, $commit);
                     }
                 }

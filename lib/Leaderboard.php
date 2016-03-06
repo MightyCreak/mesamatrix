@@ -50,13 +50,13 @@ class Leaderboard {
             $numDoneExts = 0;
             foreach ($glVersion->extension as $glExt) {
                 // Extension.
-                if ($glExt->mesa["status"] == "complete") {
+                if ($glExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
                     $numDoneExts += 1;
                 }
 
                 // Sub-extensions.
                 foreach ($glExt->subextension as $glSubExt) {
-                    if ($glSubExt->mesa["status"] == "complete") {
+                    if ($glSubExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
                         $numDoneExts += 1;
                     }
                 }

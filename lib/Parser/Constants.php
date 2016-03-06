@@ -20,8 +20,13 @@
 
 namespace Mesamatrix\Parser;
 
-class Constants
+abstract class Constants
 {
+    // Extension statuses.
+    const STATUS_NOT_STARTED = "incomplete";
+    const STATUS_IN_PROGRESS = "started";
+    const STATUS_DONE = "complete";
+
     // List of all the drivers.
     public static $allDrivers = array(
         "softpipe",

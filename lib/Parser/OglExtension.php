@@ -22,11 +22,21 @@ namespace Mesamatrix\Parser;
 
 class OglExtension
 {
-    public function __construct($name, $status, $hints, $supportedDrivers = array()) {
+    /**
+     * OglExtension constructor.
+     *
+     * @param string $name The extension name.
+     * @param string $status The extension status (@see Constants::STATUS_...).
+     * @param string $hint The extension hint.
+     * @param \Mesamatrix\Parser\Hints[] $hints The hint manager.
+     * @param string[] $supportedDrivers The drivers supporting the extension.
+     */
+    public function __construct($name, $status, $hint, $hints, $supportedDrivers = array()) {
         $this->hints = $hints;
         $this->subextensions = array();
         $this->setName($name);
-        $this->parseStatus($status);
+        $this->setStatus($status);
+        $this->setHint($hint);
         $this->setModifiedAt(null);
 
         $this->supportedDrivers = array();
@@ -50,23 +60,6 @@ class OglExtension
     }
     public function getStatus() {
         return $this->status;
-    }
-    public function parseStatus($status) {
-        $hint = "";
-        if (strncmp($status, "DONE", strlen("DONE")) === 0) {
-            $this->status = 'complete';
-            $hint = substr($status, strlen("DONE") + 1);
-        }
-        elseif (strncmp($status, "not started", strlen("not started")) === 0) {
-            $this->status = 'incomplete';
-            $hint = substr($status, strlen("not started") + 1);
-        }
-        else {
-            $this->status = 'started';
-            $hint = $status;
-        }
-
-        $this->setHint($hint);
     }
 
     // hint
@@ -190,9 +183,7 @@ class OglExtension
             $subExtStatus = (string) $xmlSubExt->mesa['status'];
             $subExtHint = (string) $xmlSubExt->mesa['hint'];
 
-            $newSubExtension = new OglExtension($subExtName, '', $this->hints, array());
-            $newSubExtension->setStatus($subExtStatus);
-            $newSubExtension->setHint($subExtHint);
+            $newSubExtension = new OglExtension($subExtName, $subExtStatus, $subExtHint, $this->hints, array());
             foreach ($xmlSubExt->supported->children() as $driver) {
                 // Create new supported driver.
                 $driverName = $driver->getName();
