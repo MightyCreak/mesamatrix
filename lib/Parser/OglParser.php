@@ -141,7 +141,7 @@ class OglParser
                         }
                         if (!$driverFound && !empty($matches[4])) {
                             if (!in_array($matches[4], $ignoreHints)) {
-                                $matches[2] = $matches[2]." ".$matches[4]."";
+                                $matches[2] = $matches[2]." ".$matches[4];
                             }
                             $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
                         }
@@ -149,7 +149,7 @@ class OglParser
                     elseif (isset($matches[4]) && !empty($matches[4])) {
                         // Not done, but something precised in the parenthesis.
                         // Put everything in [2], used in OglExtension status parsing.
-                        $matches[2] = $matches[2]." (".$matches[4].")";
+                        $matches[2] = $matches[2]." ".$matches[4];
                     }
 
                     if (!$isSubExt) {
