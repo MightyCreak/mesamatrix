@@ -141,12 +141,10 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $this->generateMergedXml($commits);
 
         // Save last commit parsed.
-        if (!$force) {
-            $h = fopen($lastCommitFilename, "w");
-            if ($h !== false) {
-                fwrite($h, $lastCommitFetched);
-                fclose($h);
-            }
+        $h = fopen($lastCommitFilename, "w");
+        if ($h !== false) {
+            fwrite($h, $lastCommitFetched);
+            fclose($h);
         }
     }
 
