@@ -64,8 +64,8 @@ class OglParser
         $line = fgets($handle);
         while ($line !== FALSE) {
             if (preg_match($reTableHeader, $line, $matches) === 1) {
-                // Should be $lineWidth-2, but the file has a variable length in column 1
-                $lineWidth = strlen("Feature") + strlen($matches[1]);
+                // Remove 2 because of the first two spaces on each lines.
+                $lineWidth = strlen("Feature") + strlen($matches[1]) - 2;
                 $reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?$/";
                 $line = fgets($handle);
                 continue;
