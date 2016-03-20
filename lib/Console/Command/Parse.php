@@ -343,15 +343,20 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         if ($this->urlCache) {
             if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
-                $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url").urlencode($matches[2])."/";
-                if ($matches[1] === "GL") {
-                    // Found a GL_TYPE_extension.
-                    $openglUrl .= urlencode($matches[3]).".txt";
+                if ($matches[2] === "OES") {
+                    // Found a GL_OES_Extension.
+                    $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url_gles").urlencode($matches[2])."/OES_";
+                }
+                elseif ($matches[1] === "GLX") {
+                    // Found a GLX_TYPE_Extension.
+                    $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url_gl").urlencode($matches[2])."/glx_";
                 }
                 else {
-                    // Found a GLX_TYPE_Extension.
-                    $openglUrl .= "glx_".urlencode($matches[3]).".txt";
+                    // Found a GL_TYPE_extension.
+                    $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url_gl").urlencode($matches[2])."/";
                 }
+
+                $openglUrl .= urlencode($matches[3]).".txt";
 
                 if ($this->urlCache->isValid($openglUrl)) {
                     $linkNode = $xmlExt->addChild("link", $matches[0]);
