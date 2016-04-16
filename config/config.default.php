@@ -28,7 +28,7 @@ $CONFIG = array(
             // Either '$author' or '$author => $website'
             "Romain 'Creak' Failliot",
             "Tobias Droste",
-            "Robin McCorkell" => "mailto:rmccorkell@karoshi.org.uk",
+            "Robin McCorkell",
         ),
         "private_dir" => "private",
     ),
