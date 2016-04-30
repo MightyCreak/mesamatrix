@@ -119,6 +119,7 @@ $(document).ready(function() {
         $(this).css('opacity', gaussian(timeDiff, 1, 0, timeConst));
     });
 
+    // Change mesa score color based on completion
     $('.mesaScore').each(function() {
         var blend = Math.round($(this).data('score'));
         if (blend == 100) {
