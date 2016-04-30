@@ -95,7 +95,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
                     <td id="<?= $extUrlId ?>"<?php if ($isSubExt) { ?> class="extension-child"<?php } ?>>
                         <?= $extNameText ?><a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
                     </td>
-                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).'. '.$glExt->mesa['hint']; ?>"<?php } ?>><?= $cellText ?></td>
+                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= $glExt->mesa['hint']; ?>"<?php } ?>><?= $cellText ?></td>
 <?php
 
     foreach ($xml->drivers->vendor as $vendor) {
@@ -123,7 +123,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
                 $taskClasses .= " isNotStarted";
             }
 ?>
-                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= ($extHintIdx + 1).'. '.$driverNode['hint']; ?>"<?php } ?>><?= $cellText ?></td>
+                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= $driverNode['hint']; ?>"<?php } ?>><?= $cellText ?></td>
 <?php
         }
     }
