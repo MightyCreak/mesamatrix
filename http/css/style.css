@@ -31,6 +31,17 @@ body {
     background-color: #ffffff;
 }
 
+a:link {
+    text-decoration: none;
+    color: rgb(20, 20, 210);
+}
+a:visited{
+    color: rgb(130, 130, 210);
+}
+a:hover, a:active {
+    text-decoration: underline;
+}
+
 #main {
     width: 1100px;
     margin: auto;
