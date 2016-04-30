@@ -120,6 +120,7 @@ header .header-icons img.rss {
     width: 72px;
     padding: 0;
     cursor: default;
+    text-align: center;
 }
 .task span {
     position: absolute;
