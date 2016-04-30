@@ -43,6 +43,7 @@ header {
 header .header-icons {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: flex-end;
 }
 header .header-icons img.rss {
@@ -155,48 +156,33 @@ header .header-icons img.rss {
 .menu {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    box-sizing: border-box
+    box-sizing: border-box;
 }
 .menu-list, .menu-item {
     position: relative;
 }
 .menu-list {
+    display: flex;
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0.3em 0;
 }
 .menu-item {
+    margin: 0 0.3em 0 0;
     padding: 0;
-    margin: 0;
-    height: 100%;
 }
-.menu-link {
-    display: block;
+.menu-item > a {
+    padding: 0.5em 1em;
     text-decoration: none;
-    white-space: nowrap;
-}
-.menu-horizontal {
-    width: 100%;
-    white-space: nowrap;
-}
-.menu-horizontal .menu-list {
-    display: inline-block;
-}
-.menu-horizontal .menu-item {
-    display: inline-block;
-    vertical-align: middle;
-}
-.menu-link {
     color: #777;
-    padding: .5em 1em;
 }
-.menu-selected .menu-link {
-    background-color: #ddd;
-}
-.menu-link:hover, .menu-link:focus {
+.menu-item > a:hover, .menu-item > a:focus {
     background-color: #eee;
 }
-.menu-selected .menu-link, .menu-selected .menu-link:visited {
+.menu-selected > a {
+    background-color: #ddd;
+}
+.menu-selected > a, .menu-selected > a:visited {
     color: #333;
 }
 

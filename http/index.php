@@ -347,11 +347,11 @@ foreach ($xml->drivers->vendor as $vendor) {
                 </div>
             </header>
 
-            <div class="menu menu-horizontal">
+            <div class="menu">
                 <ul class="menu-list">
-                    <li class="menu-item menu-selected"><a href="." class="menu-link">Home</a></li>
-                    <li class="menu-item"><a href="drivers.php" class="menu-link">Drivers decoder ring</a></li>
-                    <li class="menu-item"><a href="about.php" class="menu-link">About</a></li>
+                    <li class="menu-item menu-selected"><a href=".">Home</a></li>
+                    <li class="menu-item"><a href="drivers.php">Drivers decoder ring</a></li>
+                    <li class="menu-item"><a href="about.php">About</a></li>
                 </ul>
             </div>
 
