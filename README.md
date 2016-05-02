@@ -74,13 +74,13 @@ LICENSE.
 
 ### Third-party code libraries
 
-[jQuery](https://jquery.com/) is available under the MIT License.
+* [jQuery](https://jquery.com/) is available under the MIT License.
 
-[jQuery Tipsy](http://onehackoranother.com/projects/jquery/tipsy/) is available under the MIT License.
+* [jQuery Tipsy](http://onehackoranother.com/projects/jquery/tipsy/) is available under the MIT License.
 
-PSR Log is available under the MIT License.
+* PSR Log is available under the MIT License.
 
-[Symfony](https://symfony.com/) is available under the MIT License.
+* [Symfony](https://symfony.com/) is available under the MIT License.
 
 ### Media files
 
