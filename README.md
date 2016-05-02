@@ -15,7 +15,7 @@ Mesamatrix requires the following software:
  * PHP 5.3.0 or higher
 
 If you are installing from Git, you need to initialise third-party code
-libraries with Composer:
+libraries with [Composer](https://getcomposer.org/):
 
     $ php composer.phar install
 
@@ -74,13 +74,13 @@ LICENSE.
 
 ### Third-party code libraries
 
-jQuery is available under the MIT License.
+* [jQuery](https://jquery.com/) is available under the MIT License.
 
-jQuery Tipsy is available under the MIT License.
+* [jQuery Tipsy](http://onehackoranother.com/projects/jquery/tipsy/) is available under the MIT License.
 
-PSR Log is available under the MIT License.
+* PSR Log is available under the MIT License.
 
-Symfony is available under the MIT License.
+* [Symfony](https://symfony.com/) is available under the MIT License.
 
 ### Media files
 
