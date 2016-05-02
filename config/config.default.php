@@ -41,8 +41,8 @@ $CONFIG = array(
     ),
 
     "git" => array(
-        "mesa_web" => "http://cgit.freedesktop.org/mesa/mesa",
-        "mesa_url" => "http://anongit.freedesktop.org/git/mesa/mesa.git",
+        "mesa_web" => "https://cgit.freedesktop.org/mesa/mesa",
+        "mesa_url" => "https://anongit.freedesktop.org/git/mesa/mesa.git",
         "mesa_dir" => "mesa.git",
         "gl3" => "docs/GL3.txt",
     ),
