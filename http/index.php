@@ -312,7 +312,7 @@ foreach ($xml->drivers->vendor as $vendor) {
     switch($vendor["name"]) {
     case "Software": $vendor->addAttribute("class", "hCellVendor-soft"); break;
     case "Intel":    $vendor->addAttribute("class", "hCellVendor-intel"); break;
-    case "nVidia":   $vendor->addAttribute("class", "hCellVendor-nvidia"); break;
+    case "Nvidia":   $vendor->addAttribute("class", "hCellVendor-nvidia"); break;
     case "AMD":      $vendor->addAttribute("class", "hCellVendor-amd"); break;
     default:         $vendor->addAttribute("class", "hCellVendor-default"); break;
     }
