@@ -357,7 +357,7 @@ foreach ($xml->drivers->vendor as $vendor) {
 
             <p>
                 Mesamatrix is a mere graphical representation of a text file from the Mesa git repository
-                (<a href="http://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt">GL3.txt</a>).
+                (<a href="https://cgit.freedesktop.org/mesa/mesa/tree/docs/GL3.txt">GL3.txt</a>).
                 Some subtleties may lie in the source code, so if you want the most accurate information, you can subscribe to the mailing-list.
             </p>
             <div class="stats">
