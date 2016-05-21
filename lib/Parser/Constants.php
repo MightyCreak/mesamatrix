@@ -35,11 +35,12 @@ abstract class Constants
         "nv50",
         "nvc0",
         "r600",
-        "radeonsi"
+        "radeonsi",
+        "swr"
     );
 
     public static $allDriversVendors = array(
-        "Software"  => array("softpipe", "llvmpipe"),
+        "Software"  => array("softpipe", "llvmpipe", "swr"),
         "Intel"     => array("i965"),
         "Nvidia"    => array("nv50", "nvc0"),
         "AMD"       => array("r600", "radeonsi"),
