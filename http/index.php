@@ -144,7 +144,13 @@ function writeExtensionList(SimpleXMLElement $glVersion, $glUrlId, SimpleXMLElem
 
 function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints $hints, Mesamatrix\Leaderboard $leaderboard) {
     foreach ($glVersions as $glVersion) {
-        $text = $glVersion["name"]." ".$glVersion["version"]." - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
+        $text = $glVersion["name"];
+        if (!empty((string) $glVersion["version"])) {
+            $text .= " ".$glVersion["version"];
+        }
+        if (!empty((string) $glVersion->glsl["name"])) {
+            $text .= " - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
+        }
         $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
         $lbGlVersion = $leaderboard->findGlVersion($glVersion["name"].$glVersion["version"]);
 
@@ -244,18 +250,25 @@ function writeMatrix(array $allVersions, SimpleXMLElement $xml, Mesamatrix\Hints
     $glVersions = array_filter($allVersions, function($v) {
             return (string) $v["name"] === "OpenGL";
         });
+    $glesVersions = array_filter($allVersions, function($v) {
+            return (string) $v["name"] === "OpenGL ES";
+        });
+    $otherVersions = array_filter($allVersions, function($v) {
+            $name = (string) $v["name"];
+            return $name !== "OpenGL" && $name !== "OpenGL ES";
+        });
 ?>
         <h1>OpenGL <a href="#Version_OpenGL" class="permalink">&para;</a></h1>
 <?php
     writeVersions($glVersions, $xml, $hints, $leaderboard);
-
-    $glVersions = array_filter($allVersions, function($v) {
-            return (string) $v["name"] === "OpenGL ES";
-        });
 ?>
         <h1>OpenGL ES<a href="#Version_OpenGLES" class="permalink">&para;</a></h1>
 <?php
-    writeVersions($glVersions, $xml, $hints, $leaderboard);
+    writeVersions($glesVersions, $xml, $hints, $leaderboard);
+?>
+        <h1>Other extensions<a href="#Version_OtherExtensions" class="permalink">&para;</a></h1>
+<?php
+    writeVersions($otherVersions, $xml, $hints, $leaderboard);
 }
 
 /////////////////////////////////////////////////

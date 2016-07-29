@@ -79,6 +79,7 @@ class OglVersion
             $retExt = $existingExt;
         }
         else {
+            $extension->setModifiedAt($commit);
             $this->extensions[] = $extension;
             $retExt = $extension;
         }
@@ -135,7 +136,7 @@ class OglVersion
                 $driverHint = (string) $driver['hint'];
                 $driver = new OglSupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);
-                $newExtension->addSupportedDriver($driver);
+                $newExtension->addSupportedDriver($driver, $commit);
             }
 
             // Add the extension.

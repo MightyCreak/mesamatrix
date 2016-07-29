@@ -135,6 +135,7 @@ class OglExtension
             $retSubExt = $existingSubExt;
         }
         else {
+            $extension->setModifiedAt($commit);
             $this->subextensions[] = $extension;
             $retSubExt = $extension;
         }

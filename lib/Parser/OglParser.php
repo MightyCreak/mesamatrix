@@ -55,11 +55,6 @@ class OglParser
         // Regexp patterns.
         $reTableHeader = "/^(Feature[ ]+)Status/";
         $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
-        $reAllDone = "/ --- all DONE: (.*)/";
-        $reExtension = "/^[^.]+$/";
-        $reNote = "/^(\(.+\)) (.*)$/";
-
-        $ignoreHints = array("all drivers");
 
         // Skip header lines.
         $line = fgets($handle);
@@ -71,160 +66,195 @@ class OglParser
         if ($line !== FALSE) {
             // Remove 2 because of the first two spaces on each lines.
             $lineWidth = strlen($matches[1]) - 2;
-            $reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?$/";
-        }
+            $this->reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?$/";
 
-        // Go to next line and start parsing.
-        $line = fgets($handle);
-        while ($line !== FALSE) {
-            // Find version line (i.e. "GL 3.0, GLSL 1.30 ...").
-            if (preg_match($reVersion, $line, $matches) !== 1) {
-                $line = fgets($handle);
-                continue;
-            }
-
-            // Get or create new OpenGL version.
-            $glName = $matches[1] === 'GL' ? 'OpenGL' : 'OpenGL ES';
-            $glVersion = $matrix->getGlVersionByName($glName, $matches[3]);
-            if (!$glVersion) {
-                $glVersion = new OglVersion($glName, $matches[3], $matches[4],
-                    $matches[6], $matrix->getHints());
-                $matrix->addGlVersion($glVersion);
-            }
-
-            // Set "all DONE" drivers.
-            $allSupportedDrivers = array();
-            if (preg_match($reAllDone, $line, $matches) === 1) {
-                $this->mergeDrivers($allSupportedDrivers, explode(", ", $matches[1]));
-            }
-
-            $line = $this->skipEmptyLines(fgets($handle), $handle);
-
-            // Parse OpenGL version extensions.
-            $lastExt = null;
-            $parentDrivers = NULL;
-            while ($line !== FALSE && $line !== "\n") {
-                if (preg_match($reExtension, $line, $matches) === 1) {
-                    // $matches indices:
-                    //   [1]: extension name
-                    //   [2]: DONE, in progress, not started, ...
-                    //   [3]: Whatever is after [2], including parenthesis.
-                    //   [4]: What's inside the parenthesis in [3].
-
-                    // Get supported drivers (from "all DONE").
-                    $supportedDrivers = $allSupportedDrivers;
-
-                    // Is sub-extension?
-                    $matches[1] = trim($matches[1]);
-                    $isSubExt = $matches[1][0] === "-" && $lastExt !== null;
-                    if ($isSubExt) {
-                        // Merge with parent extension supported drivers.
-                        $this->mergeDrivers($supportedDrivers, $parentDrivers);
+            // Go to next line and start parsing.
+            $line = fgets($handle);
+            while ($line !== FALSE) {
+                // Find version line (i.e. "GL 3.0, GLSL 1.30 ...").
+                if (preg_match($reVersion, $line, $matches) === 1) {
+                    // Get or create new OpenGL version.
+                    $glName = $matches[1] === 'GL' ? 'OpenGL' : 'OpenGL ES';
+                    $glVersion = $matrix->getGlVersionByName($glName, $matches[3]);
+                    if (!$glVersion) {
+                        $glVersion = new OglVersion($glName, $matches[3], $matches[4],
+                            $matches[6], $matrix->getHints());
+                        $matrix->addGlVersion($glVersion);
                     }
 
-                    // Get the status and eventual hint.
-                    $matches[2] = trim($matches[2]);
-                    $preHint = "";
-                    if (strncmp($matches[2], "DONE", strlen("DONE")) === 0) {
-                        $status = Constants::STATUS_DONE;
-                        $preHint = substr($matches[2], strlen("DONE") + 1);
-                    }
-                    elseif (strncmp($matches[2], "not started", strlen("not started")) === 0) {
-                        $status = Constants::STATUS_NOT_STARTED;
-                        $preHint = substr($matches[2], strlen("not started") + 1);
-                    }
-                    else {
-                        $status = Constants::STATUS_IN_PROGRESS;
-                        $preHint = $matches[2];
+                    // Set "all DONE" drivers.
+                    $allSupportedDrivers = array();
+                    if (preg_match(self::$reAllDone, $line, $matches) === 1) {
+                        $this->mergeDrivers($allSupportedDrivers, explode(", ", $matches[1]));
                     }
 
-                    $inHint = "";
-                    if ($status === Constants::STATUS_DONE) {
-                        if (!isset($matches[3])) {
-                            // Done and nothing else precised, it's done for all drivers.
-                            $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
-                        }
-                        elseif (isset($matches[4])) {
-                            // Done but there are parenthesis after.
-                            $driverFound = FALSE;
-                            $driversList = explode(", ", $matches[4]);
-                            foreach ($driversList as $currentDriver) {
-                                if ($this->isInDriversArray($currentDriver)) {
-                                    $this->mergeDrivers($supportedDrivers, [$currentDriver]);
-                                    $driverFound = TRUE;
-                                }
-                            }
-
-                            if (!$driverFound && !empty($matches[4])) {
-                                // No driver found in the parenthesis,
-                                // but there's something written.
-                                if (!in_array($matches[4], $ignoreHints)) {
-                                    $inHint = $matches[4];
-                                }
-
-                                $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
-                            }
-                        }
-                    }
-                    elseif ($status === Constants::STATUS_IN_PROGRESS) {
-                        // In progress.
-                        if (!empty($matches[4])) {
-                            // There's something precised in the parenthesis.
-                            $inHint = $matches[4];
-                        }
-                    }
-                    else /*if ($status === Constants::STATUS_NOT_STARTED)*/ {
-                        if (!empty($matches[4])) {
-                            // Not done, but something is precised in the parenthesis.
-                            $inHint = $matches[4];
-                        }
-                    }
-
-                    // Get hint.
-                    if (!empty($preHint) && !empty($inHint)) {
-                        $hint = $preHint." (".$inHint.")";
-                    }
-                    elseif (!empty($preHint)) {
-                        $hint = $preHint;
-                    }
-                    else {
-                        $hint = $inHint;
-                    }
-
-                    if (!$isSubExt) {
-                        // Set supported drivers for future sub-extensions.
-                        $parentDrivers = $supportedDrivers;
-
-                        // Add the extension.
-                        $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
-                        $lastExt = $glVersion->addExtension($newExtension, $commit);
-                    }
-                    else {
-                        // Add the sub-extension.
-                        $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
-                        $lastExt->addSubExtension($newSubExtension, $commit);
-                    }
+                    $line = $this->parseSection($glVersion, $matrix, $commit, $handle, $allSupportedDrivers);
                 }
+                else if($line === self::$otherOfficialExtensions) {
+                    $glName = "Extensions that are not part of any OpenGL or OpenGL ES version";
+                    $glVersion = $matrix->getGlVersionByName($glName, NULL);
+                    if (!$glVersion) {
+                        $glVersion = new OglVersion($glName, NULL, NULL,
+                            NULL, $matrix->getHints());
+                        $matrix->addGlVersion($glVersion);
+                    }
 
-                // Get next line.
-                $line = fgets($handle);
-            }
-
-            $line = $this->skipEmptyLines($line, $handle);
-
-            // Parse notes (i.e. "(*) note").
-            while ($line !== FALSE && preg_match($reNote, $line, $matches) === 1) {
-                $idx = array_search($matches[1], $matrix->getHints()->allHints);
-                if ($idx !== FALSE) {
-                    $matrix->getHints()->allHints[$idx] = $matches[2];
+                    $line = $this->parseSection($glVersion, $matrix, $commit, $handle, $allSupportedDrivers);
                 }
-
-                // Get next line.
-                $line = fgets($handle);
+                else {
+                    //print("Unrecognized line: ".$line);
+                    $line = fgets($handle);
+                }
             }
         }
 
         return $matrix;
+    }
+
+    /**
+     * Parse an OpenGL section.
+     *
+     * @param \Mesamatrix\Parser\OglVersion $glVersion The version section to feed during parsing.
+     * @param \Mesamatrix\Parser\OglMatrix $matrix The matrix to feed during parsing.
+     * @param \Mesamatrix\Git\Commit $commit The commit of this file.
+     * @param $handle The file handle.
+     * @param array() $allSupportedDrivers Drivers that already support all the extension in the section.
+     *
+     * @return The next line unparsed.
+     */
+    private function parseSection(\Mesamatrix\Parser\OglVersion $glVersion,
+                                  \Mesamatrix\Parser\OglMatrix $matrix,
+                                  \Mesamatrix\Git\Commit $commit,
+                                  $handle,
+                                  $allSupportedDrivers = array()) {
+        $line = $this->skipEmptyLines(fgets($handle), $handle);
+
+        // Parse OpenGL version extensions.
+        $lastExt = null;
+        $parentDrivers = NULL;
+        while ($line !== FALSE && $line !== "\n") {
+            if (preg_match($this->reExtension, $line, $matches) === 1) {
+                // $matches indices:
+                //   [1]: extension name
+                //   [2]: DONE, in progress, not started, ...
+                //   [3]: Whatever is after [2], including parenthesis.
+                //   [4]: What's inside the parenthesis in [3].
+
+                // Get supported drivers (from "all DONE").
+                $supportedDrivers = $allSupportedDrivers;
+
+                // Is sub-extension?
+                $matches[1] = trim($matches[1]);
+                $isSubExt = $matches[1][0] === "-" && $lastExt !== null;
+                if ($isSubExt) {
+                    // Merge with parent extension supported drivers.
+                    $this->mergeDrivers($supportedDrivers, $parentDrivers);
+                }
+
+                // Get the status and eventual hint.
+                $matches[2] = trim($matches[2]);
+                $preHint = "";
+                if (strncmp($matches[2], "DONE", strlen("DONE")) === 0) {
+                    $status = Constants::STATUS_DONE;
+                    $preHint = substr($matches[2], strlen("DONE") + 1);
+                }
+                elseif (strncmp($matches[2], "not started", strlen("not started")) === 0) {
+                    $status = Constants::STATUS_NOT_STARTED;
+                    $preHint = substr($matches[2], strlen("not started") + 1);
+                }
+                else {
+                    $status = Constants::STATUS_IN_PROGRESS;
+                    $preHint = $matches[2];
+                }
+
+                $inHint = "";
+                if ($status === Constants::STATUS_DONE) {
+                    if (!isset($matches[3])) {
+                        // Done and nothing else precised, it's done for all drivers.
+                        $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
+                    }
+                    elseif (isset($matches[4])) {
+                        // Done but there are parenthesis after.
+                        $driverFound = FALSE;
+                        $driversList = explode(", ", $matches[4]);
+                        foreach ($driversList as $currentDriver) {
+                            if ($this->isInDriversArray($currentDriver)) {
+                                $this->mergeDrivers($supportedDrivers, [$currentDriver]);
+                                $driverFound = TRUE;
+                            }
+                        }
+
+                        if (!$driverFound && !empty($matches[4])) {
+                            // No driver found in the parenthesis,
+                            // but there's something written.
+                            if (in_array($matches[4], self::$allDriversIgnoreHints)) {
+                                $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
+                            }
+                            else if (in_array($matches[4], self::$allDriversHints)) {
+                                $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
+                                $inHint = $matches[4];
+                            }
+                        }
+                    }
+                }
+                elseif ($status === Constants::STATUS_IN_PROGRESS) {
+                    // In progress.
+                    if (!empty($matches[4])) {
+                        // There's something precised in the parenthesis.
+                        $inHint = $matches[4];
+                    }
+                }
+                else /*if ($status === Constants::STATUS_NOT_STARTED)*/ {
+                    if (!empty($matches[4])) {
+                        // Not done, but something is precised in the parenthesis.
+                        $inHint = $matches[4];
+                    }
+                }
+
+                // Get hint.
+                if (!empty($preHint) && !empty($inHint)) {
+                    $hint = $preHint." (".$inHint.")";
+                }
+                elseif (!empty($preHint)) {
+                    $hint = $preHint;
+                }
+                else {
+                    $hint = $inHint;
+                }
+
+                if (!$isSubExt) {
+                    // Set supported drivers for future sub-extensions.
+                    $parentDrivers = $supportedDrivers;
+
+                    // Add the extension.
+                    $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
+                    $lastExt = $glVersion->addExtension($newExtension, $commit);
+                }
+                else {
+                    // Add the sub-extension.
+                    $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
+                    $lastExt->addSubExtension($newSubExtension, $commit);
+                }
+            }
+
+            // Get next line.
+            $line = fgets($handle);
+        }
+
+        $line = $this->skipEmptyLines($line, $handle);
+
+        // Parse notes (i.e. "(*) note").
+        while ($line !== FALSE && preg_match(self::$reNote, $line, $matches) === 1) {
+            $idx = array_search($matches[1], $matrix->getHints()->allHints);
+            if ($idx !== FALSE) {
+                $matrix->getHints()->allHints[$idx] = $matches[2];
+            }
+
+            // Get next line.
+            $line = fgets($handle);
+        }
+
+        return $line;
     }
 
     private function skipEmptyLines($curLine, $handle) {
@@ -276,4 +306,28 @@ class OglParser
 
         return $dst;
     }
+
+    private static $reAllDone = "/ --- all DONE: (.*)/";
+    private static $reNote = "/^(\(.+\)) (.*)$/";
+    private static $otherOfficialExtensions =
+        "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
+    private static $allDriversIgnoreHints = array(
+        "all drivers"
+    );
+    private static $allDriversHints = array(
+        "0 binary formats",
+        "all drivers that support GLSL",
+        "all drivers that support GLSL 1.30",
+        "all drivers that support GLSL 1.30+",
+        "all drivers that support GLSL 3.30",
+        "all drivers that support GLSL 4.10",
+        "all drivers that support GL_ARB_texture_multisample",
+        "all drivers that support GL_ARB_draw_buffers_blend",
+        "all drivers that support GL_ARB_gpu_shader5",
+        "all drivers that support GL_ARB_shader_image_load_store",
+        "all drivers that support GL_ARB_texture_stencil8",
+        "all - but needs GLX/EGL extension to be useful"
+    );
+
+    private $reExtension = "";
 };
