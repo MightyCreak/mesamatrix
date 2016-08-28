@@ -40,7 +40,6 @@ use \Mesamatrix\Parser\Hints;
 class Parse extends \Symfony\Component\Console\Command\Command
 {
     protected $output;
-    protected $gl3Path;
     protected $statuses;
     protected $urlCache;
 
@@ -56,16 +55,42 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $force = $input->getOption('force');
 
         $this->output = $output;
-        $this->gl3Path = \Mesamatrix::$config->getValue('git', 'gl3', 'docs/GL3.txt');
         $this->statuses = array(
             'complete' => 'DONE*',
             'incomplete' => 'not started*',
             'started' => '*');
 
-        $commits = $this->fetchCommits();
-        if ($commits === NULL) {
+        // Get commits for each files in gl_filepaths.
+        $commits = array();
+        $glFilepaths = \Mesamatrix::$config->getValue('git', 'gl_filepaths', array());
+        foreach ($glFilepaths as $filepath) {
+            $fileCommits = $this->fetchCommits($filepath);
+            if ($fileCommits !== NULL) {
+                foreach ($fileCommits as $commit) {
+                    $commits[] = $commit;
+                }
+            }
+        }
+
+        if (empty($commits)) {
+            // No commit found, exit.
             return 1;
         }
+
+        // Remove first commit in successive duplicates
+        // (it means the file has been renamed).
+        $i = 1;
+        $num = count($commits);
+        while ($i < $num) {
+            if ($commits[$i - 1]->getHash() === $commits[$i]->getHash()) {
+                array_splice($commits, $i - 1, 1);
+                $num--;
+            }
+            else {
+                $i++;
+            }
+        }
+        unset($i, $num);
 
         $lastCommitFilename = \Mesamatrix::$config->getValue('info', 'private_dir', 'private')
                             . '/last_commit_parsed';
@@ -97,8 +122,6 @@ class Parse extends \Symfony\Component\Console\Command\Command
             return 0;
         }
 
-        \Mesamatrix::$logger->info("New commit found, let's parse!");
-
         // Ensure existence of the commits directory.
         $commitsDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
                    . '/commits';
@@ -127,10 +150,12 @@ class Parse extends \Symfony\Component\Console\Command\Command
             $firstNewCommitIdx = $i + 1;
         }
 
+        $newCommits = array_slice($commits, $firstNewCommitIdx);
+        \Mesamatrix::$logger->info("New commit(s) found: ".count($newCommits).".");
+
         $this->loadUrlCache();
 
-        // Parse each commit.
-        $newCommits = array_slice($commits, $firstNewCommitIdx);
+        // Parse each new commit.
         foreach ($newCommits as $commit) {
             $this->parseCommit($commit);
         }
@@ -151,11 +176,12 @@ class Parse extends \Symfony\Component\Console\Command\Command
     /**
      * Fetch commits from mesa's git.
      *
-     * @return array|null.
+     * @param string $filepath GL text file path.
+     * @return \Mesamatrix\Git\Commit[]|null Array of commits.
      */
-    protected function fetchCommits() {
+    protected function fetchCommits($filepath) {
         $gitCommitGet = new \Mesamatrix\Git\ProcessBuilder(array(
-            'rev-list', 'master', '--reverse', '--', $this->gl3Path
+            'rev-list', 'master', '--reverse', '--', $filepath
         ));
         $proc = $gitCommitGet->getProcess();
         $proc->mustRun();
@@ -166,7 +192,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
         $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
             'log', '--pretty=format:'.$logFormat, '--reverse', '-p',
-            $oldestCommit.'..', '--', $this->gl3Path
+            $oldestCommit.'^..', '--', $filepath
         ));
         $proc = $gitLog->getProcess();
         $this->getHelper('process')->mustRun($this->output, $proc);
@@ -184,7 +210,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
             $commitData = explode(PHP_EOL, $commitSection, 7);
             if ($commitData !== FALSE && isset($commitData[1])) {
                 $commit = new \Mesamatrix\Git\Commit();
-                $commit->setHash($commitData[0])
+                $commit->setFilepath($filepath)
+                       ->setHash($commitData[0])
                        ->setDate($commitData[1])
                        ->setAuthor($commitData[2])
                        ->setCommitter($commitData[3])
@@ -205,8 +232,9 @@ class Parse extends \Symfony\Component\Console\Command\Command
      */
     protected function parseCommit(\Mesamatrix\Git\Commit $commit) {
         // Show content for this commit.
+        $filepath = $commit->getFilepath();
         $hash = $commit->getHash();
-        $cat = new \Mesamatrix\Git\ProcessBuilder(array('show', $hash.':'.$this->gl3Path));
+        $cat = new \Mesamatrix\Git\ProcessBuilder(array('show', $hash.':'.$filepath));
         $proc = $cat->getProcess();
         $this->getHelper('process')->mustRun($this->output, $proc);
 
@@ -220,6 +248,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Write commit info.
         $xmlCommit = $xml->addChild('commit');
+        $xmlCommit->addChild('filepath', $filepath);
         $xmlCommit->addChild('hash', $hash);
         //$xmlCommit->addChild('subject', $commit->getSubject());
         $xmlCommit->addChild('author', $commit->getAuthor());

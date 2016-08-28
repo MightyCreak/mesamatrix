@@ -22,6 +22,7 @@ namespace Mesamatrix\Git;
 
 class Commit
 {
+    private $filepath;
     private $hash;
     private $date;
     private $author;
@@ -29,6 +30,15 @@ class Commit
     private $committerDate;
     private $subject;
     private $data;
+
+    public function getFilepath() {
+        return $this->filepath;
+    }
+
+    public function setFilepath($filepath) {
+        $this->filepath = $filepath;
+        return $this;
+    }
 
     public function getHash() {
         return $this->hash;
