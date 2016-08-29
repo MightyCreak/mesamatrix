@@ -28,6 +28,10 @@ require_once "../lib/base.php";
 
         <title><?= Mesamatrix::$config->getValue("info", "title") ?></title>
 
+        <meta property="og:title" content="Mesamatrix · <?= Mesamatrix::$config->getValue("info", "title") ?>" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="images/mesamatrix-logo.png" />
+
         <link rel="shortcut icon" href="images/gears.png" />
         <link rel="alternate" type="application/rss+xml" title="rss feed" href="rss.php" />
         <link rel="stylesheet" type="text/css" href="css/style.css?v=<?= Mesamatrix::$config->getValue("info", "version") ?>" media="all"/>
