@@ -401,7 +401,7 @@ for ($i = 0; $i < $numCommits; ++$i) {
                             <tr>
                                 <td colspan="2">
                                     <noscript>(Dates are UTC)<br/></noscript>
-                                    <a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/GL3.txt" ?>">More...</a>
+                                    <a href="<?= Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/features.txt" ?>">More...</a>
                                 </td>
                             </tr>
                         </tbody>
