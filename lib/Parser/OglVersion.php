@@ -99,6 +99,17 @@ class OglVersion
         }
     }
 
+    /**
+     * Parse all the extensions in the version and solve them.
+     *
+     * @param \Mesamatrix\Parser\OglMatrix $glMatrix The entire matrix.
+     */
+    public function solveExtensionDependencies($glMatrix) {
+        foreach ($this->getExtensions() as $glExt) {
+            $glExt->solveExtensionDependencies($glMatrix);
+        }
+    }
+
     public function merge(\SimpleXMLElement $xmlSection, \Mesamatrix\Git\Commit $commit) {
         $xmlExts = $xmlSection->xpath('./extension');
 
@@ -165,6 +176,22 @@ class OglVersion
     public function getExtensionByName($name) {
         foreach ($this->extensions as $extension) {
             if ($extension->getName() === $name) {
+                return $extension;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find the extensions with the given substring.
+     *
+     * @param string $str The substring to find in the extension name.
+     *
+     * @return OglExtension The extension or null if not found.
+     */
+    public function getExtensionBySubstr($substr) {
+        foreach ($this->extensions as $extension) {
+            if (strstr($extension->getName(), $substr) !== FALSE) {
                 return $extension;
             }
         }

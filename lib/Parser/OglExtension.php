@@ -155,6 +155,28 @@ class OglExtension
         }
     }
 
+    /**
+     * Detects if the current extension depends on another one and merge the drivers.
+     *
+     * @param \Mesamatrix\Parser\OglMatrix $glMatrix The entire matrix.
+     */
+    public function solveExtensionDependencies($glMatrix) {
+        if ($this->getHintIdx() === -1) {
+            return;
+        }
+
+        $hint = $this->hints->allHints[$this->getHintIdx()];
+        $re = preg_match("/^all drivers that support (GL_[_[:alnum:]]+)$/", $hint, $matches);
+        if ($re === 1) {
+            $glDepExt = $glMatrix->getExtensionBySubstr($matches[1]);
+            if ($glDepExt !== NULL) {
+                foreach ($glDepExt->supportedDrivers as $supportedDriver) {
+                    $this->addSupportedDriver($supportedDriver, $this->getModifiedAt());
+                }
+            }
+        }
+    }
+
     public function merge(OglVersion $glSection, \SimpleXMLElement $xmlExt, \Mesamatrix\Git\Commit $commit) {
         $xmlSubExts = $xmlExt->xpath('./subextension');
 

@@ -42,6 +42,33 @@ class OglMatrix
     }
 
     /**
+     * Find the first extension containing a given string.
+     *
+     * @param string $substr The substring to find.
+     *
+     * @return \Mesamatrix\Parser\OglExtension The extension if found; NULL otherwise.
+     */
+    public function getExtensionBySubstr($substr) {
+        foreach ($this->getGlVersions() as $glVersion) {
+            $glExt = $glVersion->getExtensionBySubstr($substr);
+            if ($glExt !== NULL) {
+                return $glExt;
+            }
+        }
+
+        return NULL;
+    }
+
+    /**
+     * Parse all the GL versions and solve their extensions.
+     */
+    public function solveExtensionDependencies() {
+        foreach ($this->getGlVersions() as $glVersion) {
+            $glVersion->solveExtensionDependencies($this);
+        }
+    }
+
+    /**
      * Merge an XML formatted commit.
      *
      * @param \SimpleXMLElement $mesa The root element of the XML file.

@@ -108,6 +108,9 @@ class OglParser
             }
         }
 
+        // Parsing is done, now solve potential dependencies.
+        $matrix->solveExtensionDependencies();
+
         return $matrix;
     }
 
@@ -175,24 +178,12 @@ class OglParser
                     }
                     elseif (isset($matches[4])) {
                         // Done but there are parenthesis after.
-                        $driverFound = FALSE;
-                        $driversList = explode(", ", $matches[4]);
-                        foreach ($driversList as $currentDriver) {
-                            if ($this->isInDriversArray($currentDriver)) {
-                                $this->mergeDrivers($supportedDrivers, [$currentDriver]);
-                                $driverFound = TRUE;
-                            }
-                        }
-
-                        if (!$driverFound && !empty($matches[4])) {
-                            // No driver found in the parenthesis,
-                            // but there's something written.
-                            $useHint = false;
-                            if ($this->isForAllDrivers($matches[4], $useHint)) {
-                                $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
-                                if ($useHint) {
-                                    $inHint = $matches[4];
-                                }
+                        $useHint = FALSE;
+                        $hintDrivers = $this->getDriversFromHint($matches[4], $useHint);
+                        if ($hintDrivers !== NULL) {
+                            $this->mergeDrivers($supportedDrivers, $hintDrivers);
+                            if ($useHint) {
+                                $inHint = $matches[4];
                             }
                         }
                     }
@@ -308,34 +299,66 @@ class OglParser
     }
 
     /**
-     * Is the hint saying that it is for all the drivers?
+     * Parse the hint and extract the drivers from it.
      *
      * @param string $hint The hint to test.
-     * @param bool $useHint[out] If function returns true, say if the hint should be displayed.
+     * @param bool $useHint[out] Should the hint be displayed?
      *
-     * @return True is for all drivers; false otherwise.
+     * @return array() The drivers list, or NULL.
      */
-    private function isForAllDrivers($hint, &$useHint) {
-        foreach (self::$allDriversHints as $allDriversHint) {
-            if (preg_match($allDriversHint[0], $hint) === 1) {
-                $useHint = $allDriversHint[1];
-                return TRUE;
+    private function getDriversFromHint($hint, &$useHint) {
+        if (empty($hint)) {
+            return NULL;
+        }
+
+        $useHint = FALSE;
+
+        // Find drivers considering the hint as a list of drivers.
+        $drivers = array();
+        $driversList = explode(", ", $hint);
+        foreach ($driversList as $hintDriver) {
+            if ($this->isInDriversArray($hintDriver)) {
+                $drivers[] = $hintDriver;
             }
         }
 
-        return FALSE;
+        if (count($drivers) > 0) {
+	    // Driver found.
+            return $drivers;
+        }
+
+        // Is the hint saying it's supporting all drivers?
+        foreach (self::$reAllDriversHints as $reAllDriversHint) {
+            if (preg_match($reAllDriversHint[0], $hint) === 1) {
+                $useHint = $reAllDriversHint[1];
+                return Constants::$allDrivers;
+            }
+        }
+
+        // Is the hint saying it depends on something else?
+        foreach (self::$reDepDriversHints as $reDepDriversHint) {
+            if (preg_match($reDepDriversHint[0], $hint) === 1) {
+                $useHint = $reDepDriversHint[1];
+                return array();
+            }
+        }
+
+        return NULL;
     }
 
     private static $reAllDone = "/ --- all DONE: (.*)/";
     private static $reNote = "/^(\(.+\)) (.*)$/";
     private static $otherOfficialExtensions =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
-    private static $allDriversHints = [
+    private static $reAllDriversHints = [
         [ "/^all drivers$/", FALSE ],
         [ "/^0 binary formats$/", TRUE ],
         [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/", TRUE ],
-        [ "/^all drivers that support GL_[_[:alnum:]]+$/", TRUE ],
         [ "/^all - but needs GLX\/EGL extension to be useful$/", TRUE ]
+    ];
+
+    private static $reDepDriversHints = [
+        [ "/^all drivers that support GL_[_[:alnum:]]+$/", TRUE ]
     ];
 
     private $reExtension = "";
