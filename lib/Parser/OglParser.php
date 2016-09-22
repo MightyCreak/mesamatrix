@@ -187,12 +187,12 @@ class OglParser
                         if (!$driverFound && !empty($matches[4])) {
                             // No driver found in the parenthesis,
                             // but there's something written.
-                            if (in_array($matches[4], self::$allDriversIgnoreHints)) {
+                            $useHint = false;
+                            if ($this->isForAllDrivers($matches[4], $useHint)) {
                                 $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
-                            }
-                            else if (in_array($matches[4], self::$allDriversHints)) {
-                                $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
-                                $inHint = $matches[4];
+                                if ($useHint) {
+                                    $inHint = $matches[4];
+                                }
                             }
                         }
                     }
@@ -307,27 +307,36 @@ class OglParser
         return $dst;
     }
 
+    /**
+     * Is the hint saying that it is for all the drivers?
+     *
+     * @param string $hint The hint to test.
+     * @param bool $useHint[out] If function returns true, say if the hint should be displayed.
+     *
+     * @return True is for all drivers; false otherwise.
+     */
+    private function isForAllDrivers($hint, &$useHint) {
+        foreach (self::$allDriversHints as $allDriversHint) {
+            if (preg_match($allDriversHint[0], $hint) === 1) {
+                $useHint = $allDriversHint[1];
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+    }
+
     private static $reAllDone = "/ --- all DONE: (.*)/";
     private static $reNote = "/^(\(.+\)) (.*)$/";
     private static $otherOfficialExtensions =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
-    private static $allDriversIgnoreHints = array(
-        "all drivers"
-    );
-    private static $allDriversHints = array(
-        "0 binary formats",
-        "all drivers that support GLSL",
-        "all drivers that support GLSL 1.30",
-        "all drivers that support GLSL 1.30+",
-        "all drivers that support GLSL 3.30",
-        "all drivers that support GLSL 4.10",
-        "all drivers that support GL_ARB_texture_multisample",
-        "all drivers that support GL_ARB_draw_buffers_blend",
-        "all drivers that support GL_ARB_gpu_shader5",
-        "all drivers that support GL_ARB_shader_image_load_store",
-        "all drivers that support GL_ARB_texture_stencil8",
-        "all - but needs GLX/EGL extension to be useful"
-    );
+    private static $allDriversHints = [
+        [ "/^all drivers$/", FALSE ],
+        [ "/^0 binary formats$/", TRUE ],
+        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/", TRUE ],
+        [ "/^all drivers that support GL_[_[:alnum:]]+$/", TRUE ],
+        [ "/^all - but needs GLX\/EGL extension to be useful$/", TRUE ]
+    ];
 
     private $reExtension = "";
 };
