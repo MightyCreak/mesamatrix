@@ -58,9 +58,9 @@ require_once "../lib/base.php";
 
             <h1>Easy decoder ring</h1>
             <p>Note: this is a beta, it only works for AMD graphics cards (for now).</p>
-            <p>Enter the commercial name of your GPU (e.g. HD 6870):</p>
+            <p>Enter the commercial name of your <abbr title="Graphics processing unit">GPU</abbr> (e.g. HD 6870):</p>
             <form id="driverform" action="#">
-                <input type="text" value="" />
+                <input type="text" value="" required="" />
                 <input type="submit" value="Find my driver" />
             </form>
             <p id="result"></p>
