@@ -99,7 +99,7 @@ class OglParser
                         $matrix->addGlVersion($glVersion);
                     }
 
-                    $line = $this->parseSection($glVersion, $matrix, $commit, $handle, $allSupportedDrivers);
+                    $line = $this->parseSection($glVersion, $matrix, $commit, $handle);
                 }
                 else {
                     //print("Unrecognized line: ".$line);
