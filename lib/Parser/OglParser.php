@@ -346,7 +346,7 @@ class OglParser
         return NULL;
     }
 
-    private static $reAllDone = "/ --- all DONE: (.*)/";
+    private static $reAllDone = "/ -+ all DONE: (.*)/";
     private static $reNote = "/^(\(.+\)) (.*)$/";
     private static $otherOfficialExtensions =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
