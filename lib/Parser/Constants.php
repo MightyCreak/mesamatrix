@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2016 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -36,7 +36,8 @@ abstract class Constants
         "nvc0",
         "r600",
         "radeonsi",
-        "swr"
+        "swr",
+        "freedreno"
     );
 
     public static $allDriversVendors = array(
@@ -44,5 +45,6 @@ abstract class Constants
         "Intel"     => array("i965"),
         "Nvidia"    => array("nv50", "nvc0"),
         "AMD"       => array("r600", "radeonsi"),
+        "Qualcomm"  => array("freedreno"),
     );
 }
