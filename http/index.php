@@ -157,7 +157,6 @@ function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hint
         $numGlVersionExts = 0;
         $numGlVersionExtsDone = 0;
         $driverExtsDone = array();
-        $mesaScore = 0.0;
         if ($lbGlVersion !== NULL) {
             $numGlVersionExts = $lbGlVersion->getNumExts();
 
@@ -172,20 +171,18 @@ function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hint
                 }
             }
 
-            $mesaScore = sprintf("%.1f", $driverExtsDone["mesa"] / $numGlVersionExts * 100.0);
-        }
 
-        // Write OpenGL version header.
+            // Write OpenGL version header.
 ?>
                 <tr>
                     <td colspan="14" class="hCellGlVersion" id="<?= $glUrlId ?>">
-                        <?= $text ?> <span class="mesaScore" data-score="<?= $mesaScore ?>"><?= $mesaScore ?>%</span><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
+                        <?= $text ?><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2"></td>
 <?php
-        foreach ($xml->drivers->vendor as $vendor) {
+            foreach ($xml->drivers->vendor as $vendor) {
 ?>
                     <td class="hCellSep"></td>
                     <td class="hCellHeader hCellVendor-<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></td>
@@ -197,28 +194,26 @@ function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hint
                     <td class="hCellHeader hCellVendor-default">Extension</td>
                     <td class="hCellHeader hCellVendor-default hCellDriver">mesa</td>
 <?php
-        foreach ($xml->drivers->vendor as $vendor) {
+            foreach ($xml->drivers->vendor as $vendor) {
 ?>
                     <td class="hCellSep"></td>
 <?php
-            foreach ($vendor->driver as $driver) {
+                foreach ($vendor->driver as $driver) {
 ?>
-                    <td class="hCellHeader hCellVendor-<?= $vendor["class"] ?> hCellDriver"><?= $driver["name"] ?></td>
+                    <td class="hCellHeader hCellVendor-<?= $vendor["class"] ?>"><?= $driver["name"] ?></td>
 <?php
+                }
             }
-        }
 ?>
                 </tr>
 <?php
-        // Write OpenGL version extensions.
-        writeExtensionList($glVersion, $glUrlId, $xml, $hints);
 
-        // Write OpenGL version footer.
-        if ($lbGlVersion !== NULL) {
+            // Write drivers scores.
+            $driverScore = sprintf("%.1f", $driverExtsDone["mesa"] / $numGlVersionExts * 100.0);
 ?>
-                <tr class="extension">
-                    <td><b>Total:</b></td>
-                    <td class="hCellVendor-default task"><?= $driverExtsDone["mesa"]."/".$numGlVersionExts ?></td>
+                <tr>
+                    <td></td>
+                    <td class="hCellHeader hCellDriverScore" data-score="<?= $driverScore ?>"><?= $driverScore ?>%</td>
 <?php
             foreach ($xml->drivers->vendor as $vendor) {
 ?>
@@ -226,14 +221,19 @@ function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hint
 <?php
                 foreach ($vendor->driver as $driver) {
                     $driverName = (string) $driver["name"];
+                    $driverScore = sprintf("%.1f", $driverExtsDone[$driverName] / $numGlVersionExts * 100.0);
 ?>
-                    <td class="hCellVendor-<?= $vendor["class"] ?> task"><?= $driverExtsDone[$driverName]."/".$numGlVersionExts ?></td>
+                    <td class="hCellHeader hCellDriverScore" data-score="<?= $driverScore ?>"><?= $driverScore ?>%</td>
 <?php
                 }
             }
 ?>
                 </tr>
 <?php
+
+            // Write OpenGL version extensions.
+            writeExtensionList($glVersion, $glUrlId, $xml, $hints);
+
         }
     }
 }

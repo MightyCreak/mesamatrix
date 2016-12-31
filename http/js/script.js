@@ -106,12 +106,6 @@ $(document).ready(function() {
     // Add tipsy for the footnote.
     $('.footnote').tipsy({gravity: 'w', fade: true});
 
-    $('.mesaScore').tipsy({
-        fallback: 'It represents the completion status of `mesa` only',
-        gravity: 'n',
-        fade: true
-    });
-
     // adjust the opacity of the 'modified' text based on age
     var timeConst = 1.2e7;
     $('.task span').each(function() {
@@ -120,16 +114,16 @@ $(document).ready(function() {
     });
 
     // Change mesa score color based on completion
-    $('.mesaScore').each(function() {
+    $('.hCellDriverScore').each(function() {
         var blend = Math.round($(this).data('score'));
         if (blend == 100) {
-            $(this).addClass('mesaScore-done');
+            $(this).addClass('hCellDriverScore-done');
         }
-        else if (blend < 90) {
-            $(this).addClass('mesaScore-notyet');
+        else if (blend < 75) {
+            $(this).addClass('hCellDriverScore-notyet');
         }
         else {
-            $(this).addClass('mesaScore-almost');
+            $(this).addClass('hCellDriverScore-almost');
         }
     });
 });
