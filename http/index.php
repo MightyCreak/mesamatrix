@@ -171,11 +171,19 @@ function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hint
                 }
             }
 
+            // Compute number of columns in the table.
+            $numColumns = 2;
+            foreach ($xml->drivers->vendor as $vendor) {
+                ++$numColumns;
+                foreach ($vendor->driver as $driver) {
+                    ++$numColumns;
+                }
+            }
 
             // Write OpenGL version header.
 ?>
                 <tr>
-                    <td colspan="14" class="hCellGlVersion" id="<?= $glUrlId ?>">
+                    <td colspan="<?= $numColumns ?>" class="hCellGlVersion" id="<?= $glUrlId ?>">
                         <?= $text ?><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
                     </td>
                 </tr>
@@ -248,11 +256,34 @@ function writeMatrix(array $allVersions, SimpleXMLElement $xml, Mesamatrix\Hints
     $otherVersions = array_filter($allVersions, function($v) {
             $name = (string) $v["name"];
             return $name !== "OpenGL" && $name !== "OpenGL ES";
-        });
+    });
+
+    // Compute number of columns in the table.
+    $numColumns = 2;
+    foreach ($xml->drivers->vendor as $vendor) {
+        ++$numColumns;
+        foreach ($vendor->driver as $driver) {
+            ++$numColumns;
+        }
+    }
 ?>
             <table class="matrix">
+                <colgroup>
+                <colgroup class="hl">
+<?php
+    foreach ($xml->drivers->vendor as $vendor) {
+?>
+                <colgroup>
+<?php
+        foreach ($vendor->driver as $driver) {
+?>
+                <colgroup class="hl">
+<?php
+        }
+    }
+?>
                 <tr>
-                    <td colspan="14" class="hCellGl">
+                    <td colspan="<?= $numColumns ?>" class="hCellGl">
                         OpenGL <a href="#Version_OpenGL" class="permalink">&para;</a>
                     </td>
                 </tr>
@@ -260,7 +291,7 @@ function writeMatrix(array $allVersions, SimpleXMLElement $xml, Mesamatrix\Hints
     writeVersions($glVersions, $xml, $hints, $leaderboard);
 ?>
                 <tr>
-                    <td colspan="14" class="hCellGl">
+                <td colspan="<?= $numColumns ?>" class="hCellGl">
                         OpenGL ES<a href="#Version_OpenGLES" class="permalink">&para;</a>
                     </td>
                 </tr>
@@ -268,7 +299,7 @@ function writeMatrix(array $allVersions, SimpleXMLElement $xml, Mesamatrix\Hints
     writeVersions($glesVersions, $xml, $hints, $leaderboard);
 ?>
                 <tr>
-                    <td colspan="14" class="hCellGl">
+                    <td colspan="<?= $numColumns ?>" class="hCellGl">
                         Other extensions<a href="#Version_OtherExtensions" class="permalink">&para;</a>
                     </td>
                 </tr>

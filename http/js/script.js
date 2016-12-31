@@ -126,4 +126,44 @@ $(document).ready(function() {
             $(this).addClass('hCellDriverScore-almost');
         }
     });
+
+    $('.matrix').delegate('td', 'mouseover mouseleave', function(e) {
+        // Should highlight row
+        var row = $(this).parent();
+        var highlightRow = row.hasClass('extension');
+
+        // Should highlight column
+        var columnIdx = $(this).index();
+        var highlightCol = $('.matrix colgroup').eq(columnIdx).hasClass('hl');
+        if (highlightCol) {
+            highlightCol = $(this).hasClass('task');
+            if (!highlightCol)
+                highlightCol = $(this).hasClass('hCellHeader') && !$(this).attr('colspan');
+        }
+
+        if (e.type == 'mouseover') {
+            if (row.hasClass('extension')) {
+                row.find('td').each(function() {
+                    $(this).addClass('hover');
+                });
+            }
+            if (highlightCol) {
+                $('.matrix .extension td:nth-child(' + (columnIdx + 1) + ')').each(function() {
+                    $(this).addClass('hover');
+                });
+            }
+        }
+        else {
+            if (highlightRow) {
+                row.find('td').each(function() {
+                    $(this).removeClass('hover');
+                });
+            }
+            if (highlightCol) {
+                $('.matrix .extension td:nth-child(' + (columnIdx + 1) + ')').each(function() {
+                    $(this).removeClass("hover");
+                });
+            }
+        }
+    });
 });

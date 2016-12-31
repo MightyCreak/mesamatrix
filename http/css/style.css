@@ -145,7 +145,15 @@ header .header-icons img.rss {
 :hover > .permalink { display: inline; }
 
 .extension-child { padding-left: 1em; }
-.extension:hover { background-color: #babdb6; }
+
+.extension > td.hover {
+    opacity: 0.75;
+}
+
+.extension > td:nth-child(1).hover {
+    background-color: #ededed;
+    opacity: 1.0;
+}
 
 .task {
     position: relative;
