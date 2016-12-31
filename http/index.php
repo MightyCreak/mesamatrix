@@ -100,7 +100,7 @@ function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml
 
     foreach ($xml->drivers->vendor as $vendor) {
 ?>
-                    <td></td>
+                    <td class="hCellSep"></td>
 <?php
         foreach ($vendor->driver as $driver) {
             $driverNode = $glExt->supported->{$driver["name"]};
@@ -177,70 +177,62 @@ function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hint
 
         // Write OpenGL version header.
 ?>
-            <h2 id="<?= $glUrlId ?>">
-                <?= $text ?> <span class="mesaScore" data-score="<?= $mesaScore ?>"><?= $mesaScore ?>%</span><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
-            </h2>
-            <table class="tableNoSpace">
-                <thead class="tableHeaderLine">
-                    <tr>
-                        <th colspan="2"></th>
+                <tr>
+                    <td colspan="14" class="hCellGlVersion" id="<?= $glUrlId ?>">
+                        <?= $text ?> <span class="mesaScore" data-score="<?= $mesaScore ?>"><?= $mesaScore ?>%</span><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"></td>
 <?php
         foreach ($xml->drivers->vendor as $vendor) {
 ?>
-                        <th></th>
-                        <th class="<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></th>
+                    <td class="hCellSep"></td>
+                    <td class="hCellHeader hCellVendor-<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></td>
 <?php
         }
 ?>
-                    </tr>
-                    <tr>
-                        <th class="hCellVendor-default hCell-ext">Extension</th>
-                        <th class="hCellVendor-default hCell-driver">mesa</th>
+                </tr>
+                <tr>
+                    <td class="hCellHeader hCellVendor-default">Extension</td>
+                    <td class="hCellHeader hCellVendor-default hCellDriver">mesa</td>
 <?php
         foreach ($xml->drivers->vendor as $vendor) {
 ?>
-                        <th class="hCell-sep"></th>
+                    <td class="hCellSep"></td>
 <?php
             foreach ($vendor->driver as $driver) {
 ?>
-                        <th class="<?= $vendor["class"] ?> hCell-driver"><?= $driver["name"] ?></th>
+                    <td class="hCellHeader hCellVendor-<?= $vendor["class"] ?> hCellDriver"><?= $driver["name"] ?></td>
 <?php
             }
         }
 ?>
-                    </tr>
-                </thead>
-                <tbody>
+                </tr>
 <?php
         // Write OpenGL version extensions.
         writeExtensionList($glVersion, $glUrlId, $xml, $hints);
-?>
-                </tbody>
-<?php
 
         // Write OpenGL version footer.
         if ($lbGlVersion !== NULL) {
 ?>
-                <tfoot>
-                    <tr class="extension">
-                        <td><b>Total:</b></td>
-                        <td class="hCellVendor-default task"><?= $driverExtsDone["mesa"]."/".$numGlVersionExts ?></td>
+                <tr class="extension">
+                    <td><b>Total:</b></td>
+                    <td class="hCellVendor-default task"><?= $driverExtsDone["mesa"]."/".$numGlVersionExts ?></td>
 <?php
             foreach ($xml->drivers->vendor as $vendor) {
 ?>
-                        <td></td>
+                    <td class="hCellSep"></td>
 <?php
                 foreach ($vendor->driver as $driver) {
                     $driverName = (string) $driver["name"];
 ?>
-                        <td class="<?= $vendor["class"] ?> task"><?= $driverExtsDone[$driverName]."/".$numGlVersionExts ?></td>
+                    <td class="hCellVendor-<?= $vendor["class"] ?> task"><?= $driverExtsDone[$driverName]."/".$numGlVersionExts ?></td>
 <?php
                 }
             }
 ?>
-                    </tr>
-                </tfoot>
-            </table>
+                </tr>
 <?php
         }
     }
@@ -258,17 +250,33 @@ function writeMatrix(array $allVersions, SimpleXMLElement $xml, Mesamatrix\Hints
             return $name !== "OpenGL" && $name !== "OpenGL ES";
         });
 ?>
-        <h1>OpenGL <a href="#Version_OpenGL" class="permalink">&para;</a></h1>
+            <table class="matrix">
+                <tr>
+                    <td colspan="14" class="hCellGl">
+                        OpenGL <a href="#Version_OpenGL" class="permalink">&para;</a>
+                    </td>
+                </tr>
 <?php
     writeVersions($glVersions, $xml, $hints, $leaderboard);
 ?>
-        <h1>OpenGL ES<a href="#Version_OpenGLES" class="permalink">&para;</a></h1>
+                <tr>
+                    <td colspan="14" class="hCellGl">
+                        OpenGL ES<a href="#Version_OpenGLES" class="permalink">&para;</a>
+                    </td>
+                </tr>
 <?php
     writeVersions($glesVersions, $xml, $hints, $leaderboard);
 ?>
-        <h1>Other extensions<a href="#Version_OtherExtensions" class="permalink">&para;</a></h1>
+                <tr>
+                    <td colspan="14" class="hCellGl">
+                        Other extensions<a href="#Version_OtherExtensions" class="permalink">&para;</a>
+                    </td>
+                </tr>
 <?php
     writeVersions($otherVersions, $xml, $hints, $leaderboard);
+?>
+            </table>
+<?php
 }
 
 /////////////////////////////////////////////////
@@ -323,11 +331,11 @@ $numTotalExts = $leaderboard->getNumTotalExts();
 //
 foreach ($xml->drivers->vendor as $vendor) {
     switch($vendor["name"]) {
-    case "Software": $vendor->addAttribute("class", "hCellVendor-soft"); break;
-    case "Intel":    $vendor->addAttribute("class", "hCellVendor-intel"); break;
-    case "Nvidia":   $vendor->addAttribute("class", "hCellVendor-nvidia"); break;
-    case "AMD":      $vendor->addAttribute("class", "hCellVendor-amd"); break;
-    default:         $vendor->addAttribute("class", "hCellVendor-default"); break;
+    case "Software": $vendor->addAttribute("class", "soft"); break;
+    case "Intel":    $vendor->addAttribute("class", "intel"); break;
+    case "Nvidia":   $vendor->addAttribute("class", "nvidia"); break;
+    case "AMD":      $vendor->addAttribute("class", "amd"); break;
+    default:         $vendor->addAttribute("class", "default"); break;
     }
 }
 

@@ -91,10 +91,34 @@ header .header-icons img.rss {
 .lbCol-2nd td                   { background-color: rgba(195, 255, 155, 0.67); }
 .lbCol-3rd td                   { background-color: rgba(195, 255, 155, 0.33); }
 
-.tableNoSpace {
+/**
+ * Matrix table
+ */
+
+.matrix {
     border-spacing: 1px;
     border-collapse: separate;
     width: 100%;
+}
+
+.hCellGl {
+    padding: 0.8em 0 0 0;
+    font-weight: bold;
+    font-size: 2em;
+    text-align: left;
+}
+
+.hCellGlVersion {
+    padding: 0.8em 0 0.8em 0;
+    font-weight: bold;
+    font-size: 1.5em;
+    text-align: left;
+}
+
+.hCellHeader {
+    padding: 0.2em;
+    font-weight: bold;
+    text-align: center;
 }
 
 .mesaScore {
@@ -102,6 +126,7 @@ header .header-icons img.rss {
     color: #DDDDDD;
     cursor: help;
 }
+
 .mesaScore-done { color: #99D75F; }
 .mesaScore-almost { color: #E1A25E; }
 .mesaScore-notyet { color: #B94B3D; }
@@ -112,9 +137,8 @@ header .header-icons img.rss {
 .hCellVendor-nvidia  { background-color: #fcf3ad; }
 .hCellVendor-amd     { background-color: #f4cbbe; }
 
-.hCell-ext       { min-width: 33em; }
-.hCell-sep       { width: 0.3em; }
-.hCell-driver    { min-width: 5.1em; }
+.hCellSep       { width: 0px; }
+.hCellDriver    { min-width: 5.1em; }
 
 .permalink { margin-left: 0.3em; display: none; }
 .permalink:link { text-decoration: none; color: #DDDDDD; }
@@ -160,7 +184,7 @@ header .header-icons img.rss {
     background: repeating-linear-gradient(45deg, #D86758, #D86758 10px, #AA574C 10px, #AA574C 20px);
 }
 
-/*
+/**
  * Menu
  * Inspired from http://purecss.io/menus/
  */
