@@ -119,6 +119,7 @@ header .header-icons img.rss {
     padding: 0.2em;
     font-weight: bold;
     text-align: center;
+    cursor: default;
 }
 
 .hCellDriverScore {
@@ -131,11 +132,11 @@ header .header-icons img.rss {
 .hCellDriverScore-almost { color: #E1A25E; }
 .hCellDriverScore-notyet { color: #B94B3D; }
 
-.hCellVendor-default { background-color: #d3d7cf; }
-.hCellVendor-soft    { background-color: #d1b4ce; }
-.hCellVendor-intel   { background-color: #b9cee4; }
-.hCellVendor-nvidia  { background-color: #fcf3ad; }
-.hCellVendor-amd     { background-color: #f4cbbe; }
+.hCellVendor-default    { background-color: #d3d7cf; }
+.hCellVendor-software   { background-color: #d1b4ce; }
+.hCellVendor-intel      { background-color: #b9cee4; }
+.hCellVendor-nvidia     { background-color: #fcf3ad; }
+.hCellVendor-amd        { background-color: #f4cbbe; }
 
 .hCellSep       { width: 0px; }
 

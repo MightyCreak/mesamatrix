@@ -21,296 +21,6 @@
 require_once "../lib/base.php";
 
 /////////////////////////////////////////////////
-// Hints functions.
-//
-function registerExtensionHints(SimpleXMLElement $glExt, SimpleXMLElement $xml, Mesamatrix\Hints $hints) {
-    if ($glExt->mesa["hint"]) {
-        $hints->addHint((string) $glExt->mesa["hint"]);
-    }
-
-    foreach ($xml->drivers->vendor as $vendor) {
-        foreach ($vendor->driver as $driver) {
-            $driverNode = $glExt->supported->{$driver["name"]};
-            if ($driverNode) {
-                // Driver found.
-                if ($driverNode["hint"]) {
-                    $hints->addHint((string) $driverNode["hint"]);
-                }
-            }
-        }
-    }
-}
-
-function registerHints(array $glVersions, SimpleXMLElement $xml) {
-    $hints = new Mesamatrix\Hints();
-    foreach ($glVersions as $glVersion) {
-        foreach ($glVersion->extension as $glExt) {
-            registerExtensionHints($glExt, $xml, $hints);
-
-            foreach ($glExt->subextension as $glSubExt) {
-                registerExtensionHints($glSubExt, $xml, $hints);
-            }
-        }
-    }
-
-    return $hints;
-}
-
-/////////////////////////////////////////////////
-// Write HTML functions.
-//
-function writeExtension(SimpleXMLElement $glExt, $glUrlId, SimpleXMLElement $xml, Mesamatrix\Hints $hints) {
-    $taskClasses = "task";
-    if ($glExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_DONE) {
-        $taskClasses .= " isDone";
-    }
-    elseif ($glExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_NOT_STARTED) {
-        $taskClasses .= " isNotStarted";
-    }
-    else {
-        $taskClasses .= " isInProgress";
-    }
-
-    $cellText = '';
-    if (!empty($glExt->mesa->modified)) {
-        $cellText = '<span data-timestamp="' . $glExt->mesa->modified->date . '">'.date('Y-m-d', (int) $glExt->mesa->modified->date).'</span>';
-    }
-
-    $extUrlId = str_replace(" ", "_", $glExt["name"]);
-    $extUrlId = preg_replace('/[^A-Za-z0-9_]/', '', $extUrlId);
-    $extUrlId = $glUrlId."_Extension_".$extUrlId;
-    $extHintIdx = $hints->findHint($glExt->mesa["hint"]);
-    if ($extHintIdx !== -1) {
-        $taskClasses .= " footnote";
-    }
-
-    $extNameText = $glExt["name"];
-    if (isset($glExt->link)) {
-        $extNameText = str_replace($glExt->link, '<a href="'.$glExt->link['href'].'">'.$glExt->link.'</a>', $extNameText);
-    }
-
-    $isSubExt = strncmp($glExt["name"], "-", 1) === 0;
-?>
-                <tr class="extension">
-                    <td id="<?= $extUrlId ?>"<?php if ($isSubExt) { ?> class="extension-child"<?php } ?>>
-                        <?= $extNameText ?><a href="#<?= $extUrlId ?>" class="permalink">&para;</a>
-                    </td>
-                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= $glExt->mesa['hint']; ?>"<?php } ?>><?= $cellText ?></td>
-<?php
-
-    foreach ($xml->drivers->vendor as $vendor) {
-?>
-                    <td class="hCellSep"></td>
-<?php
-        foreach ($vendor->driver as $driver) {
-            $driverNode = $glExt->supported->{$driver["name"]};
-            $extHintIdx = -1;
-            $taskClasses = "task";
-            $cellText = '';
-            if ($driverNode) {
-                // Driver found.
-                $taskClasses .= " isDone";
-                $driver["done"] += 1;
-                $extHintIdx = $hints->findHint($driverNode["hint"]);
-                if ($extHintIdx !== -1) {
-                    $taskClasses .= " footnote";
-                }
-                if (!empty($driverNode->modified)) {
-                    $cellText = '<span data-timestamp="' . $driverNode->modified->date . '">'.date('Y-m-d', (int) $driverNode->modified->date).'</span>';
-                }
-            }
-            else {
-                $taskClasses .= " isNotStarted";
-            }
-?>
-                    <td class="<?= $taskClasses ?>"<?php if ($extHintIdx !== -1) { ?> title="<?= $driverNode['hint']; ?>"<?php } ?>><?= $cellText ?></td>
-<?php
-        }
-    }
-?>
-                </tr>
-<?php
-}
-
-function writeExtensionList(SimpleXMLElement $glVersion, $glUrlId, SimpleXMLElement $xml, Mesamatrix\Hints $hints) {
-    foreach ($glVersion->extension as $glExt) {
-        writeExtension($glExt, $glUrlId, $xml, $hints);
-
-        foreach ($glExt->subextension as $glSubExt) {
-            writeExtension($glSubExt, $glUrlId, $xml, $hints);
-        }
-    }
-}
-
-function writeVersions(array $glVersions, SimpleXMLElement $xml, Mesamatrix\Hints $hints, Mesamatrix\Leaderboard $leaderboard) {
-    foreach ($glVersions as $glVersion) {
-        $text = $glVersion["name"];
-        if (!empty((string) $glVersion["version"])) {
-            $text .= " ".$glVersion["version"];
-        }
-        if (!empty((string) $glVersion->glsl["name"])) {
-            $text .= " - ".$glVersion->glsl["name"]." ".$glVersion->glsl["version"];
-        }
-        $glUrlId = "Version_".urlencode(str_replace(" ", "", $text));
-        $lbGlVersion = $leaderboard->findGlVersion($glVersion["name"].$glVersion["version"]);
-
-        $numGlVersionExts = 0;
-        $numGlVersionExtsDone = 0;
-        $driverExtsDone = array();
-        if ($lbGlVersion !== NULL) {
-            $numGlVersionExts = $lbGlVersion->getNumExts();
-
-            $numGlVersionExtsDone = $lbGlVersion->getNumDriverExtsDone("mesa");
-            $driverExtsDone["mesa"] = $numGlVersionExtsDone;
-            foreach ($xml->drivers->vendor as $vendor) {
-                foreach ($vendor->driver as $driver) {
-                    $driverName = (string) $driver["name"];
-                    $extsDone = $lbGlVersion->getNumDriverExtsDone($driverName);
-                    $numGlVersionExtsDone += $extsDone;
-                    $driverExtsDone[$driverName] = $extsDone;
-                }
-            }
-
-            // Compute number of columns in the table.
-            $numColumns = 2;
-            foreach ($xml->drivers->vendor as $vendor) {
-                ++$numColumns;
-                foreach ($vendor->driver as $driver) {
-                    ++$numColumns;
-                }
-            }
-
-            // Write OpenGL version header.
-?>
-                <tr>
-                    <td colspan="<?= $numColumns ?>" class="hCellGlVersion" id="<?= $glUrlId ?>">
-                        <?= $text ?><a href="#<?= $glUrlId ?>" class="permalink">&para;</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2"></td>
-<?php
-            foreach ($xml->drivers->vendor as $vendor) {
-?>
-                    <td class="hCellSep"></td>
-                    <td class="hCellHeader hCellVendor-<?= $vendor["class"] ?>" colspan="<?= count($vendor->driver) ?>"><?= $vendor["name"] ?></td>
-<?php
-        }
-?>
-                </tr>
-                <tr>
-                    <td class="hCellHeader hCellVendor-default">Extension</td>
-                    <td class="hCellHeader hCellVendor-default hCellDriver">mesa</td>
-<?php
-            foreach ($xml->drivers->vendor as $vendor) {
-?>
-                    <td class="hCellSep"></td>
-<?php
-                foreach ($vendor->driver as $driver) {
-?>
-                    <td class="hCellHeader hCellVendor-<?= $vendor["class"] ?>"><?= $driver["name"] ?></td>
-<?php
-                }
-            }
-?>
-                </tr>
-<?php
-
-            // Write drivers scores.
-            $driverScore = sprintf("%.1f", $driverExtsDone["mesa"] / $numGlVersionExts * 100.0);
-?>
-                <tr>
-                    <td></td>
-                    <td class="hCellHeader hCellDriverScore" data-score="<?= $driverScore ?>"><?= $driverScore ?>%</td>
-<?php
-            foreach ($xml->drivers->vendor as $vendor) {
-?>
-                    <td class="hCellSep"></td>
-<?php
-                foreach ($vendor->driver as $driver) {
-                    $driverName = (string) $driver["name"];
-                    $driverScore = sprintf("%.1f", $driverExtsDone[$driverName] / $numGlVersionExts * 100.0);
-?>
-                    <td class="hCellHeader hCellDriverScore" data-score="<?= $driverScore ?>"><?= $driverScore ?>%</td>
-<?php
-                }
-            }
-?>
-                </tr>
-<?php
-
-            // Write OpenGL version extensions.
-            writeExtensionList($glVersion, $glUrlId, $xml, $hints);
-
-        }
-    }
-}
-
-function writeMatrix(array $allVersions, SimpleXMLElement $xml, Mesamatrix\Hints $hints, Mesamatrix\Leaderboard $leaderboard) {
-    $glVersions = array_filter($allVersions, function($v) {
-            return (string) $v["name"] === "OpenGL";
-        });
-    $glesVersions = array_filter($allVersions, function($v) {
-            return (string) $v["name"] === "OpenGL ES";
-        });
-    $otherVersions = array_filter($allVersions, function($v) {
-            $name = (string) $v["name"];
-            return $name !== "OpenGL" && $name !== "OpenGL ES";
-    });
-
-    // Compute number of columns in the table.
-    $numColumns = 2;
-    foreach ($xml->drivers->vendor as $vendor) {
-        ++$numColumns;
-        foreach ($vendor->driver as $driver) {
-            ++$numColumns;
-        }
-    }
-?>
-            <table class="matrix">
-                <colgroup>
-                <colgroup class="hl">
-<?php
-    foreach ($xml->drivers->vendor as $vendor) {
-?>
-                <colgroup>
-<?php
-        foreach ($vendor->driver as $driver) {
-?>
-                <colgroup class="hl">
-<?php
-        }
-    }
-?>
-                <tr>
-                    <td colspan="<?= $numColumns ?>" class="hCellGl">
-                        OpenGL <a href="#Version_OpenGL" class="permalink">&para;</a>
-                    </td>
-                </tr>
-<?php
-    writeVersions($glVersions, $xml, $hints, $leaderboard);
-?>
-                <tr>
-                <td colspan="<?= $numColumns ?>" class="hCellGl">
-                        OpenGL ES<a href="#Version_OpenGLES" class="permalink">&para;</a>
-                    </td>
-                </tr>
-<?php
-    writeVersions($glesVersions, $xml, $hints, $leaderboard);
-?>
-                <tr>
-                    <td colspan="<?= $numColumns ?>" class="hCellGl">
-                        Other extensions<a href="#Version_OtherExtensions" class="permalink">&para;</a>
-                    </td>
-                </tr>
-<?php
-    writeVersions($otherVersions, $xml, $hints, $leaderboard);
-?>
-            </table>
-<?php
-}
-
-/////////////////////////////////////////////////
 // Load XML.
 //
 $gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
@@ -346,9 +56,6 @@ usort($glVersions, function($a, $b) {
         }
     });
 
-// Register hints.
-$hints = registerHints($glVersions, $xml);
-
 /////////////////////////////////////////////////
 // Leaderboard.
 //
@@ -358,24 +65,206 @@ $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
 $numTotalExts = $leaderboard->getNumTotalExts();
 
 /////////////////////////////////////////////////
-// Drivers CSS classes.
+// Create matrix model.
 //
-foreach ($xml->drivers->vendor as $vendor) {
-    switch($vendor["name"]) {
-    case "Software": $vendor->addAttribute("class", "soft"); break;
-    case "Intel":    $vendor->addAttribute("class", "intel"); break;
-    case "Nvidia":   $vendor->addAttribute("class", "nvidia"); break;
-    case "AMD":      $vendor->addAttribute("class", "amd"); break;
-    default:         $vendor->addAttribute("class", "default"); break;
+function createColumns(array &$matrix) {
+    global $xml;
+
+    // Set up columns
+    $matrix['column_groups'][] = array(
+        'name' => '',
+        'columns' => array(
+            array(
+                'name' => 'Extension',
+                'type' => 'extension'
+            )
+        )
+    );
+    $matrix['column_groups'][] = array(
+        'name' => '',
+        'vendor_class' => 'default',
+        'columns' => array(
+            array(
+                'name' => 'mesa',
+                'type' => 'driver'
+            )
+        )
+    );
+
+    $numColumns = 2;
+    foreach ($xml->drivers->vendor as $vendor) {
+        // Add separator
+        ++$numColumns;
+        $matrix['column_groups'][] = array(
+            'name' => '',
+            'columns' => array(
+                array(
+                    'name' => '',
+                    'type' => 'separator'
+                )
+            )
+        );
+
+        // Add new column group
+        $colgroup = array(
+            'name' => (string) $vendor['name'],
+            'vendor_class' => strtolower((string) $vendor['name']),
+            'columns' => array()
+        );
+        foreach ($vendor->driver as $driver) {
+            ++$numColumns;
+            $colgroup['columns'][] = array(
+                'name' => (string) $driver['name'],
+                'type' => 'driver'
+            );
+        }
+        $matrix['column_groups'][] = $colgroup;
     }
+
+    $matrix['num_columns'] = $numColumns;
 }
+
+function addExtension(array &$subsection, SimpleXMLElement $glExt, $isSubExt) {
+    global $xml;
+
+    $extension = array(
+        'name' => $glExt['name'],
+    );
+
+    $extUrlId = str_replace(" ", "_", $glExt["name"]);
+    $extUrlId = preg_replace('/[^A-Za-z0-9_]/', '', $extUrlId);
+    $extUrlId = $subsection['target']."_Extension_".$extUrlId;
+    $extension['target'] = $extUrlId;
+    $extension['is_subext'] = $isSubExt;
+
+    if (isset($glExt->link)) {
+        $extension['url_href'] = $glExt->link['href'];
+        $extension['url_text'] = $glExt->link;
+    }
+
+    $extTask = array();
+    if ($glExt->mesa['status'] == \Mesamatrix\Parser\Constants::STATUS_DONE)
+        $extTask['class'] = 'isDone';
+    elseif ($glExt->mesa['status'] == \Mesamatrix\Parser\Constants::STATUS_NOT_STARTED)
+        $extTask['class'] = 'isNotStarted';
+    else
+        $extTask['class'] = 'isInProgress';
+    if (!empty($glExt->mesa->modified))
+        $extTask['timestamp'] = (int) $glExt->mesa->modified->date;
+    $extTask['hint'] = $glExt->mesa['hint'];
+    $extension['tasks']['mesa'] = $extTask;
+
+    foreach ($xml->drivers->vendor as $vendor) {
+        foreach ($vendor->driver as $driver) {
+            $driverName = (string) $driver['name'];
+
+            $extTask = array();
+            $driverNode = $glExt->supported->{$driverName};
+            if ($driverNode) {
+                $extTask['class'] = 'isDone';
+                $extTask['timestamp'] = (int) $driverNode->modified->date;
+            }
+            else {
+                $extTask['class'] = 'isNotStarted';
+            }
+            $extTask['hint'] = $driverNode['hint'];
+            $extension['tasks'][$driverName] = $extTask;
+        }
+    }
+
+    $subsection['extensions'][] = $extension;
+}
+
+function addSubsection(array &$section, SimpleXMLElement $glSubsection) {
+    global $leaderboard, $xml;
+
+    $text = $glSubsection['name'];
+    if (!empty((string) $glSubsection['version'])) {
+        $text .= ' '.$glSubsection['version'];
+    }
+    if (!empty((string) $glSubsection->glsl['name'])) {
+        $text .= ' - '.$glSubsection->glsl['name'].' '.$glSubsection->glsl['version'];
+    }
+
+    $subsection = array(
+        'name' => $text,
+        'target' => 'Version_'.urlencode(str_replace(' ', '', $text)),
+        'scores' => array(),
+        'extensions' => array()
+    );
+
+    $lbGlVersion = $leaderboard->findGlVersion($glSubsection['name'].$glSubsection['version']);
+    if ($lbGlVersion !== NULL) {
+        $numGlVersionExts = $lbGlVersion->getNumExts();
+
+        $driverScores = array();
+        $driverScores['mesa'] = $lbGlVersion->getNumDriverExtsDone('mesa') / $numGlVersionExts;
+        foreach ($xml->drivers->vendor as $vendor) {
+            foreach ($vendor->driver as $driver) {
+                $driverName = (string) $driver['name'];
+                $driverScores[$driverName] = $lbGlVersion->getNumDriverExtsDone($driverName) / $numGlVersionExts;
+            }
+        }
+
+        $subsection['scores'] = $driverScores;
+
+        foreach ($glSubsection->extension as $glExt) {
+            addExtension($subsection, $glExt, false);
+            foreach ($glExt->subextension as $glSubExt)
+                addExtension($subsection, $glSubExt, true);
+        }
+    }
+
+    $section['subsections'][] = $subsection;
+}
+
+function addSection(array &$matrix, $name, array $glSubsections) {
+    $section = array(
+        'name' => $name,
+        'target' => 'Version_'.urlencode(str_replace(' ', '', $name)),
+        'subsections' => array()
+    );
+
+    foreach ($glSubsections as $glSubsection) {
+        addSubsection($section, $glSubsection);
+    }
+
+    $matrix['sections'][] = $section;
+}
+
+$matrix = array(
+    'column_groups' => array(),
+    'num_columns' => 0,
+    'sections' => array()
+);
+
+createColumns($matrix, $xml);
+
+addSection($matrix, 'OpenGL',
+    array_filter($glVersions, function($v) {
+        return (string) $v['name'] === 'OpenGL';
+    })
+);
+
+addSection($matrix, 'OpenGL ES',
+    array_filter($glVersions, function($v) {
+        return (string) $v['name'] === 'OpenGL ES';
+    })
+);
+
+addSection($matrix, 'Other extensions',
+    array_filter($glVersions, function($v) {
+        $name = (string) $v["name"];
+        return $name !== "OpenGL" && $name !== "OpenGL ES";
+    })
+);
 
 /////////////////////////////////////////////////
 // HTML code.
 //
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="utf-8"/>
         <meta name="description" content="<?= Mesamatrix::$config->getValue("info", "description") ?>"/>
@@ -506,10 +395,157 @@ foreach($driversExtsDone as $drivername => $numExtsDone) {
                     </table>
                 </div>
             </div>
+            <table class="matrix">
 <?php
-// Write the OpenGL matrix.
-writeMatrix($glVersions, $xml, $hints, $leaderboard);
+// Colgroups.
+foreach($matrix['column_groups'] as $colgroup):
+    foreach($colgroup['columns'] as $col):
+        if ($col['type'] === 'driver'):
 ?>
+                <colgroup class="hl">
+<?php
+        else:
+?>
+                <colgroup>
+<?php
+        endif;
+    endforeach;
+endforeach;
+
+// Sections.
+foreach($matrix['sections'] as $section):
+?>
+                <tr>
+                    <td id="<?= $section['target'] ?>" colspan="<?= $matrix['num_columns'] ?>" class="hCellGl">
+                        <?= $section['name'] ?><a href="#<?= $section['target'] ?>" class="permalink">&para;</a>
+                    </td>
+                </tr>
+<?php
+    // Sub-sections/
+    foreach($section['subsections'] as $subsection):
+?>
+                <tr>
+                    <td id="<?= $subsection['target'] ?>" colspan="<?= $matrix['num_columns'] ?>" class="hCellGlVersion">
+                        <?= $subsection['name'] ?><a href="#<?= $subsection['target'] ?>" class="permalink">&para;</a>
+                    </td>
+                </tr>
+                <tr>
+<?php
+        // Header (vendors).
+        foreach($matrix['column_groups'] as $colgroup):
+            if (empty($colgroup['name'])):
+?>
+                    <td></td>
+<?php
+            else:
+?>
+                    <td colspan="<?= count($colgroup['columns']) ?>" class="hCellHeader hCellVendor-<?= $colgroup['vendor_class'] ?>"><?= $colgroup['name'] ?></td>
+<?php
+            endif;
+        endforeach;
+?>
+                </tr>
+                <tr>
+<?php
+        // Header (drivers).
+        foreach($matrix['column_groups'] as $colgroup):
+            foreach($colgroup['columns'] as $col):
+                if ($col['type'] === 'extension'):
+?>
+                    <td class="hCellHeader hCellVendor-default"><?= $col['name'] ?></td>
+<?php
+                elseif ($col['type'] === 'driver'):
+?>
+                    <td class="hCellHeader hCellVendor-<?= $colgroup['vendor_class'] ?>"><?= $col['name'] ?></td>
+<?php
+                elseif ($col['type'] === 'separator'):
+?>
+                    <td class="hCellSep"></td>
+<?php
+                else:
+?>
+                    <td><?= $col['name'] ?></td>
+<?php
+                endif;
+            endforeach;
+        endforeach;
+?>
+                </tr>
+                <tr>
+<?php
+        // Scores.
+        foreach($matrix['column_groups'] as $colgroup):
+            foreach($colgroup['columns'] as $col):
+                if ($col['type'] === 'driver'):
+                    $scoreStr = sprintf('%.1f', $subsection['scores'][$col['name']] * 100);
+?>
+                    <td class="hCellHeader hCellDriverScore" data-score="<?= $scoreStr ?>"><?= $scoreStr ?>%</td>
+<?php
+                else:
+?>
+                    <td></td>
+<?php
+                endif;
+            endforeach;
+        endforeach;
+?>
+                </tr>
+<?php
+        // Extensions.
+        foreach ($subsection['extensions'] as $extension):
+?>
+                <tr class="extension">
+<?php
+            foreach($matrix['column_groups'] as $colgroup):
+                foreach($colgroup['columns'] as $col):
+                    if ($col['type'] === 'extension'):
+                        $extNameText = $extension['name'];
+                        if (isset($extension['url_text'])):
+                            $extNameText = str_replace($extension['url_text'], '<a href="'.$extension['url_href'].'">'.$extension['url_text'].'</a>', $extNameText);
+                        endif;
+                        $cssClass = '';
+                        if ($extension['is_subext']):
+                            $cssClass = ' class="extension-child"';
+                        endif;
+?>
+                    <td id="<?= $extension['target'] ?>"<?= $cssClass ?>>
+                        <?= $extNameText ?><a href="#<?= $extension['target'] ?>" class="permalink">&para;</a>
+                    </td>
+<?php
+                    elseif ($col['type'] === 'driver'):
+                        $driverTask = $extension['tasks'][$col['name']];
+                        $cssClasses = array($driverTask['class']);
+                        $title = '';
+                        if (isset($driverTask['hint'])):
+                            $cssClasses[] = 'footnote';
+                            $title = ' title="'.$driverTask['hint'].'"';
+                        endif;
+                        if (isset($driverTask['timestamp'])):
+?>
+                    <td class="task <?= join($cssClasses, ' ') ?>"<?= $title ?>>
+                        <span data-timestamp="<?= $driverTask['timestamp'] ?>"><?= date('Y-m-d', $driverTask['timestamp']) ?></span>
+                    </td>
+<?php
+                        else:
+?>
+                    <td class="task <?= $driverTask['class'] ?>"></td>
+<?php
+                        endif;
+                    else:
+?>
+                    <td></td>
+<?php
+                    endif;
+                endforeach;
+            endforeach;
+?>
+                </tr>
+<?php
+        endforeach;
+    endforeach;
+endforeach;
+?>
+            </table>
             <p><b>Last time features.txt was parsed:</b> <span class="toLocalDate" data-timestamp="<?= date(DATE_RFC2822, (int) $xml['updated']) ?>"><?= date('Y-m-d H:i O', (int) $xml['updated']) ?></span>.</p>
 
             <footer>
