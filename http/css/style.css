@@ -135,8 +135,8 @@ header .header-icons img.rss {
 .hCellVendor-default    { background-color: #d3d7cf; }
 .hCellVendor-software   { background-color: #d1b4ce; }
 .hCellVendor-intel      { background-color: #b9cee4; }
-.hCellVendor-nvidia     { background-color: #fcf3ad; }
-.hCellVendor-amd        { background-color: #f4cbbe; }
+.hCellVendor-nvidia     { background-color: #d5f796; }
+.hCellVendor-amd        { background-color: #f7b5b2; }
 .hCellVendor-qualcomm   { background-color: #c7dce8; }
 
 .hCellSep       { width: 0px; }
