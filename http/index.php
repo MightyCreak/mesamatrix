@@ -48,60 +48,63 @@ function createColumns(array &$matrix) {
     global $xml;
 
     $matrix['column_groups'] = array();
-    $matrix['num_columns'] = 0;
+    $matrix['columns'] = array();
 
-    // Set up columns
-    $matrix['column_groups'][] = array(
-        'name' => '',
-        'columns' => array(
-            array(
-                'name' => 'Extension',
-                'type' => 'extension'
-            )
-        )
-    );
+    $columnIdx = 0;
+
+    // Add "extension" columon.
     $matrix['column_groups'][] = array(
         'name' => '',
         'vendor_class' => 'default',
-        'columns' => array(
-            array(
-                'name' => 'mesa',
-                'type' => 'driver'
-            )
-        )
+        'columns' => array($columnIdx++)
+    );
+    $matrix['columns'][] = array(
+        'name' => 'Extension',
+        'type' => 'extension',
+        'vendor_class' => 'default'
     );
 
-    $numColumns = 2;
+    // Add "mesa" column.
+    $matrix['column_groups'][] = array(
+        'name' => '',
+        'vendor_class' => 'default',
+        'columns' => array($columnIdx++)
+    );
+    $matrix['columns'][] = array(
+        'name' => 'mesa',
+        'type' => 'driver',
+        'vendor_class' => 'default'
+
+    );
+
     foreach ($xml->drivers->vendor as $vendor) {
-        // Add separator
-        ++$numColumns;
+        // Add separator before each vendor.
         $matrix['column_groups'][] = array(
             'name' => '',
-            'columns' => array(
-                array(
-                    'name' => '',
-                    'type' => 'separator'
-                )
-            )
+            'columns' => array($columnIdx++)
+        );
+        $matrix['columns'][] = array(
+            'name' => '',
+            'type' => 'separator',
         );
 
-        // Add new column group
+        // Add vendor drivers columns.
         $colgroup = array(
             'name' => (string) $vendor['name'],
             'vendor_class' => strtolower((string) $vendor['name']),
             'columns' => array()
         );
         foreach ($vendor->driver as $driver) {
-            ++$numColumns;
-            $colgroup['columns'][] = array(
+            $colgroup['columns'][] = $columnIdx++;
+            $matrix['columns'][] = array(
                 'name' => (string) $driver['name'],
-                'type' => 'driver'
+                'type' => 'driver',
+                'vendor_class' => $colgroup['vendor_class']
             );
         }
+
         $matrix['column_groups'][] = $colgroup;
     }
-
-    $matrix['num_columns'] = $numColumns;
 }
 
 function addExtension(array &$subsection, SimpleXMLElement $glExt, $isSubExt) {
@@ -416,7 +419,8 @@ foreach($driversExtsDone as $drivername => $numExtsDone) {
 <?php
 // Colgroups.
 foreach($matrix['column_groups'] as $colgroup):
-    foreach($colgroup['columns'] as $col):
+    foreach($colgroup['columns'] as $colIdx):
+        $col = $matrix['columns'][$colIdx];
         if ($col['type'] === 'driver'):
 ?>
                 <colgroup class="hl">
@@ -433,16 +437,16 @@ endforeach;
 foreach($matrix['sections'] as $section):
 ?>
                 <tr>
-                    <td id="<?= $section['target'] ?>" colspan="<?= $matrix['num_columns'] ?>" class="hCellGl">
+                    <td id="<?= $section['target'] ?>" colspan="<?= count($matrix['columns']) ?>" class="hCellGl">
                         <?= $section['name'] ?><a href="#<?= $section['target'] ?>" class="permalink">&para;</a>
                     </td>
                 </tr>
 <?php
-    // Sub-sections/
+    // Sub-sections.
     foreach($section['subsections'] as $subsection):
 ?>
                 <tr>
-                    <td id="<?= $subsection['target'] ?>" colspan="<?= $matrix['num_columns'] ?>" class="hCellGlVersion">
+                    <td id="<?= $subsection['target'] ?>" colspan="<?= count($matrix['columns']) ?>" class="hCellGlVersion">
                         <?= $subsection['name'] ?><a href="#<?= $subsection['target'] ?>" class="permalink">&para;</a>
                     </td>
                 </tr>
@@ -465,45 +469,41 @@ foreach($matrix['sections'] as $section):
                 <tr>
 <?php
         // Header (drivers).
-        foreach($matrix['column_groups'] as $colgroup):
-            foreach($colgroup['columns'] as $col):
-                if ($col['type'] === 'extension'):
+        foreach($matrix['columns'] as $col):
+            if ($col['type'] === 'extension'):
 ?>
                     <td class="hCellHeader hCellVendor-default"><?= $col['name'] ?></td>
 <?php
-                elseif ($col['type'] === 'driver'):
+            elseif ($col['type'] === 'driver'):
 ?>
-                    <td class="hCellHeader hCellVendor-<?= $colgroup['vendor_class'] ?>"><?= $col['name'] ?></td>
+                    <td class="hCellHeader hCellVendor-<?= $col['vendor_class'] ?>"><?= $col['name'] ?></td>
 <?php
-                elseif ($col['type'] === 'separator'):
+            elseif ($col['type'] === 'separator'):
 ?>
                     <td class="hCellSep"></td>
 <?php
-                else:
+            else:
 ?>
                     <td><?= $col['name'] ?></td>
 <?php
-                endif;
-            endforeach;
+            endif;
         endforeach;
 ?>
                 </tr>
                 <tr>
 <?php
         // Scores.
-        foreach($matrix['column_groups'] as $colgroup):
-            foreach($colgroup['columns'] as $col):
-                if ($col['type'] === 'driver'):
-                    $scoreStr = sprintf('%.1f', $subsection['scores'][$col['name']] * 100);
+        foreach($matrix['columns'] as $col):
+            if ($col['type'] === 'driver'):
+                $scoreStr = sprintf('%.1f', $subsection['scores'][$col['name']] * 100);
 ?>
                     <td class="hCellHeader hCellDriverScore" data-score="<?= $scoreStr ?>"><?= $scoreStr ?>%</td>
 <?php
-                else:
+            else:
 ?>
                     <td></td>
 <?php
-                endif;
-            endforeach;
+            endif;
         endforeach;
 ?>
                 </tr>
@@ -513,47 +513,45 @@ foreach($matrix['sections'] as $section):
 ?>
                 <tr class="extension">
 <?php
-            foreach($matrix['column_groups'] as $colgroup):
-                foreach($colgroup['columns'] as $col):
-                    if ($col['type'] === 'extension'):
-                        $extNameText = $extension['name'];
-                        if (isset($extension['url_text'])):
-                            $extNameText = str_replace($extension['url_text'], '<a href="'.$extension['url_href'].'">'.$extension['url_text'].'</a>', $extNameText);
-                        endif;
-                        $cssClass = '';
-                        if ($extension['is_subext']):
-                            $cssClass = ' class="extension-child"';
-                        endif;
+            foreach($matrix['columns'] as $col):
+                if ($col['type'] === 'extension'):
+                    $extNameText = $extension['name'];
+                    if (isset($extension['url_text'])):
+                        $extNameText = str_replace($extension['url_text'], '<a href="'.$extension['url_href'].'">'.$extension['url_text'].'</a>', $extNameText);
+                    endif;
+                    $cssClass = '';
+                    if ($extension['is_subext']):
+                        $cssClass = ' class="extension-child"';
+                    endif;
 ?>
                     <td id="<?= $extension['target'] ?>"<?= $cssClass ?>>
                         <?= $extNameText ?><a href="#<?= $extension['target'] ?>" class="permalink">&para;</a>
                     </td>
 <?php
-                    elseif ($col['type'] === 'driver'):
-                        $driverTask = $extension['tasks'][$col['name']];
-                        $cssClasses = array($driverTask['class']);
-                        $title = '';
-                        if (isset($driverTask['hint'])):
-                            $cssClasses[] = 'footnote';
-                            $title = ' title="'.$driverTask['hint'].'"';
-                        endif;
-                        if (isset($driverTask['timestamp'])):
+                elseif ($col['type'] === 'driver'):
+                    $driverTask = $extension['tasks'][$col['name']];
+                    $cssClasses = array($driverTask['class']);
+                    $title = '';
+                    if (isset($driverTask['hint'])):
+                        $cssClasses[] = 'footnote';
+                        $title = ' title="'.$driverTask['hint'].'"';
+                    endif;
+                    if (isset($driverTask['timestamp'])):
 ?>
                     <td class="task <?= join($cssClasses, ' ') ?>"<?= $title ?>>
                         <span data-timestamp="<?= $driverTask['timestamp'] ?>"><?= date('Y-m-d', $driverTask['timestamp']) ?></span>
                     </td>
 <?php
-                        else:
+                    else:
 ?>
                     <td class="task <?= $driverTask['class'] ?>"></td>
 <?php
-                        endif;
-                    else:
+                    endif;
+                else:
 ?>
                     <td></td>
 <?php
-                    endif;
-                endforeach;
+                endif;
             endforeach;
 ?>
                 </tr>
