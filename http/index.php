@@ -21,54 +21,13 @@
 require_once "../lib/base.php";
 
 /////////////////////////////////////////////////
-// Load XML.
-//
-$gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
-
-// Read "xml_file".
-$xml = simplexml_load_file($gl3Path);
-if (!$xml) {
-    \Mesamatrix::$logger->critical("Can't read ".$gl3Path);
-    exit();
-}
-
-// Set all the versions in an array so that it can be sorted out.
-$glVersions = array();
-foreach ($xml->gl as $glVersion) {
-    $glVersions[] = $glVersion;
-}
-
-// Sort the versions.
-usort($glVersions, function($a, $b) {
-        // Sort OpenGL before OpenGLES and higher versions before lower ones.
-        if ((string) $a["name"] === (string) $b["name"]) {
-            $diff = (float) $b["version"] - (float) $a["version"];
-            if ($diff === 0)
-                return 0;
-            else
-                return $diff < 0 ? -1 : 1;
-        }
-        elseif ((string) $a["name"] === "OpenGL") {
-            return -1;
-        }
-        else {
-            return 1;
-        }
-    });
-
-/////////////////////////////////////////////////
-// Leaderboard.
-//
-$leaderboard = new Mesamatrix\Leaderboard();
-$leaderboard->load($xml);
-$driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
-$numTotalExts = $leaderboard->getNumTotalExts();
-
-/////////////////////////////////////////////////
 // Create matrix model.
 //
 function createColumns(array &$matrix) {
     global $xml;
+
+    $matrix['column_groups'] = array();
+    $matrix['num_columns'] = 0;
 
     // Set up columns
     $matrix['column_groups'][] = array(
@@ -219,6 +178,16 @@ function addSubsection(array &$section, SimpleXMLElement $glSubsection) {
 }
 
 function addSection(array &$matrix, $name, array $glSubsections) {
+    // Sort the versions.
+    usort($glSubsections, function($a, $b) {
+        // Sort OpenGL before OpenGLES and higher versions before lower ones.
+        $diff = (float) $b["version"] - (float) $a["version"];
+        if ($diff === 0)
+            return 0;
+        else
+            return $diff < 0 ? -1 : 1;
+    });
+
     $section = array(
         'name' => $name,
         'target' => 'Version_'.urlencode(str_replace(' ', '', $name)),
@@ -232,32 +201,61 @@ function addSection(array &$matrix, $name, array $glSubsections) {
     $matrix['sections'][] = $section;
 }
 
-$matrix = array(
-    'column_groups' => array(),
-    'num_columns' => 0,
-    'sections' => array()
-);
+function createMatrixModel(SimpleXMLElement $xml) {
+    // Set all the versions in an array so that it can be sorted out.
+    $glVersions = array();
+    foreach ($xml->gl as $glVersion) {
+        $glVersions[] = $glVersion;
+    }
 
-createColumns($matrix, $xml);
+    $matrix = array();
+    createColumns($matrix, $xml);
 
-addSection($matrix, 'OpenGL',
-    array_filter($glVersions, function($v) {
-        return (string) $v['name'] === 'OpenGL';
-    })
-);
+    $matrix['sections'] = array();
+    addSection($matrix, 'OpenGL',
+        array_filter($glVersions, function($v) {
+            return (string) $v['name'] === 'OpenGL';
+        })
+    );
 
-addSection($matrix, 'OpenGL ES',
-    array_filter($glVersions, function($v) {
-        return (string) $v['name'] === 'OpenGL ES';
-    })
-);
+    addSection($matrix, 'OpenGL ES',
+        array_filter($glVersions, function($v) {
+            return (string) $v['name'] === 'OpenGL ES';
+        })
+    );
 
-addSection($matrix, 'Other extensions',
-    array_filter($glVersions, function($v) {
-        $name = (string) $v["name"];
-        return $name !== "OpenGL" && $name !== "OpenGL ES";
-    })
-);
+    addSection($matrix, 'Other extensions',
+        array_filter($glVersions, function($v) {
+            $name = (string) $v["name"];
+            return $name !== "OpenGL" && $name !== "OpenGL ES";
+        })
+    );
+
+    return $matrix;
+}
+
+/////////////////////////////////////////////////
+// Load XML.
+//
+$gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
+
+// Read "xml_file".
+$xml = simplexml_load_file($gl3Path);
+if (!$xml) {
+    \Mesamatrix::$logger->critical("Can't read ".$gl3Path);
+    exit();
+}
+
+/////////////////////////////////////////////////
+// Leaderboard.
+//
+$leaderboard = new Mesamatrix\Leaderboard();
+$leaderboard->load($xml);
+$driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
+$numTotalExts = $leaderboard->getNumTotalExts();
+
+// Matrix model.
+$matrix = createMatrixModel($xml);
 
 /////////////////////////////////////////////////
 // HTML code.
