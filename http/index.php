@@ -255,6 +255,8 @@ function createMatrixModel(SimpleXMLElement $xml) {
         })
     );
 
+    $matrix['last_updated'] = (int) $xml['updated'];
+
     return $matrix;
 }
 
@@ -279,6 +281,11 @@ $numTotalExts = $leaderboard->getNumTotalExts();
 // Create models from XML.
 $commits = createCommitsModel($xml);
 $matrix = createMatrixModel($xml);
+
+/////////////////////////////////////////////////
+// Unset non-HTML variables.
+//
+unset($xml);
 
 /////////////////////////////////////////////////
 // HTML code.
@@ -559,7 +566,7 @@ foreach($matrix['sections'] as $section):
 endforeach;
 ?>
             </table>
-            <p><b>Last time features.txt was parsed:</b> <span class="toLocalDate" data-timestamp="<?= date(DATE_RFC2822, (int) $xml['updated']) ?>"><?= date('Y-m-d H:i O', (int) $xml['updated']) ?></span>.</p>
+            <p><b>Last time features.txt was parsed:</b> <span class="toLocalDate" data-timestamp="<?= date(DATE_RFC2822, $matrix['last_updated']) ?>"><?= date('Y-m-d H:i O', $matrix['last_updated']) ?></span>.</p>
 
             <footer>
                 <a id="github-ribbon" href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
