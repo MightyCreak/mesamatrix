@@ -18,7 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once "../lib/base.php";
+require_once '../lib/base.php';
+
+/////////////////////////////////////////////////
+// Create commits model.
+//
+
+function createCommitsModel(SimpleXMLElement $xml) {
+    $commits = array();
+
+    $numCommits = \Mesamatrix::$config->getValue('info', 'commitlog_length', 10);
+    $numCommits = min($numCommits, $xml->commits->commit->count());
+    for ($i = 0; $i < $numCommits; ++$i) {
+        $xmlCommit = $xml->commits->commit[$i];
+        $commits[] = array(
+            'url' => Mesamatrix::$config->getValue('git', 'mesa_web').'/commit/'.Mesamatrix::$config->getValue('git', 'gl3').'?id='.$xmlCommit['hash'],
+            'timestamp' => (int) $xmlCommit['timestamp'],
+            'subject' => $xmlCommit['subject']
+        );
+    }
+
+    return $commits;
+}
 
 /////////////////////////////////////////////////
 // Create matrix model.
@@ -90,9 +111,9 @@ function addExtension(array &$subsection, SimpleXMLElement $glExt, $isSubExt) {
         'name' => $glExt['name'],
     );
 
-    $extUrlId = str_replace(" ", "_", $glExt["name"]);
+    $extUrlId = str_replace(' ', '_', $glExt['name']);
     $extUrlId = preg_replace('/[^A-Za-z0-9_]/', '', $extUrlId);
-    $extUrlId = $subsection['target']."_Extension_".$extUrlId;
+    $extUrlId = $subsection['target'].'_Extension_'.$extUrlId;
     $extension['target'] = $extUrlId;
     $extension['is_subext'] = $isSubExt;
 
@@ -181,7 +202,7 @@ function addSection(array &$matrix, $name, array $glSubsections) {
     // Sort the versions.
     usort($glSubsections, function($a, $b) {
         // Sort OpenGL before OpenGLES and higher versions before lower ones.
-        $diff = (float) $b["version"] - (float) $a["version"];
+        $diff = (float) $b['version'] - (float) $a['version'];
         if ($diff === 0)
             return 0;
         else
@@ -226,8 +247,8 @@ function createMatrixModel(SimpleXMLElement $xml) {
 
     addSection($matrix, 'Other extensions',
         array_filter($glVersions, function($v) {
-            $name = (string) $v["name"];
-            return $name !== "OpenGL" && $name !== "OpenGL ES";
+            $name = (string) $v['name'];
+            return $name !== 'OpenGL' && $name !== 'OpenGL ES';
         })
     );
 
@@ -237,12 +258,12 @@ function createMatrixModel(SimpleXMLElement $xml) {
 /////////////////////////////////////////////////
 // Load XML.
 //
-$gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
+$gl3Path = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'xml_file'));
 
-// Read "xml_file".
+// Read 'xml_file'.
 $xml = simplexml_load_file($gl3Path);
 if (!$xml) {
-    \Mesamatrix::$logger->critical("Can't read ".$gl3Path);
+    \Mesamatrix::$logger->critical('Can\'t read '.$gl3Path);
     exit();
 }
 
@@ -254,7 +275,8 @@ $leaderboard->load($xml);
 $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
 $numTotalExts = $leaderboard->getNumTotalExts();
 
-// Matrix model.
+// Create models from XML.
+$commits = createCommitsModel($xml);
 $matrix = createMatrixModel($xml);
 
 /////////////////////////////////////////////////
@@ -315,18 +337,15 @@ $matrix = createMatrixModel($xml);
                         </thead>
                         <tbody>
 <?php
-$numCommits = \Mesamatrix::$config->getValue('info', 'commitlog_length', 10);
-$numCommits = min($numCommits, $xml->commits->commit->count());
-for ($i = 0; $i < $numCommits; ++$i) {
-    $commit = $xml->commits->commit[$i];
-    $commitUrl = Mesamatrix::$config->getValue("git", "mesa_web")."/commit/".Mesamatrix::$config->getValue("git", "gl3")."?id=".$commit["hash"];
+// Commit list.
+foreach ($commits as $commit):
 ?>
                             <tr>
-                                <td class="commitsAge toRelativeDate" data-timestamp="<?= date(DATE_RFC2822, (int) $commit['timestamp']) ?>"><?= date('Y-m-d H:i', (int) $commit['timestamp']) ?></td>
-                                <td><a href="<?= $commitUrl ?>"><?= $commit["subject"] ?></a></td>
+                                <td class="commitsAge toRelativeDate" data-timestamp="<?= date(DATE_RFC2822, $commit['timestamp']) ?>"><?= date('Y-m-d H:i', $commit['timestamp']) ?></td>
+                                <td><a href="<?= $commit['url'] ?>"><?= $commit['subject'] ?></a></td>
                             </tr>
 <?php
-}
+endforeach;
 ?>
                             <tr>
                                 <td colspan="2">
