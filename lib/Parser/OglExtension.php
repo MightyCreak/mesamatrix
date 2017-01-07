@@ -42,7 +42,7 @@ class OglExtension
         $this->supportedDrivers = array();
         foreach ($supportedDrivers as $driverName) {
             $driver = new OglSupportedDriver($driverName, $this->hints);
-            $this->addSupportedDriver($driver);
+            $this->addSupportedDriver($driver, null);
         }
     }
 
@@ -213,7 +213,7 @@ class OglExtension
                 $driverHint = (string) $driver['hint'];
                 $driver = new OglSupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);
-                $newSubExtension->addSupportedDriver($driver);
+                $newSubExtension->addSupportedDriver($driver, $commit);
             }
 
             // Add the sub-extension.
