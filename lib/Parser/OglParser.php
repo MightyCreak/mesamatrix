@@ -323,7 +323,7 @@ class OglParser
         }
 
         if (count($drivers) > 0) {
-	    // Driver found.
+            // Driver found.
             return $drivers;
         }
 
@@ -346,19 +346,19 @@ class OglParser
         return NULL;
     }
 
-    private static $reAllDone = "/ -+ all DONE: (.*)/";
+    private static $reAllDone = "/ -+ all DONE: (.*)/i";
     private static $reNote = "/^(\(.+\)) (.*)$/";
     private static $otherOfficialExtensions =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
     private static $reAllDriversHints = [
-        [ "/^all drivers$/", FALSE ],
-        [ "/^0 binary formats$/", TRUE ],
-        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/", TRUE ],
-        [ "/^all - but needs GLX\/EGL extension to be useful$/", TRUE ]
+        [ "/^all drivers$/i", FALSE ],
+        [ "/^0 binary formats$/i", TRUE ],
+        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", TRUE ],
+        [ "/^all - but needs GLX\/EGL extension to be useful$/i", TRUE ]
     ];
 
     private static $reDepDriversHints = [
-        [ "/^all drivers that support GL_[_[:alnum:]]+$/", TRUE ]
+        [ "/^all drivers that support GL_[_[:alnum:]]+$/i", TRUE ]
     ];
 
     private $reExtension = "";
