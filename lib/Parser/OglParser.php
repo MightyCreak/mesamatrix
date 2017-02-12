@@ -182,9 +182,9 @@ class OglParser
                         $hintDrivers = $this->getDriversFromHint($matches[4], $useHint);
                         if ($hintDrivers !== NULL) {
                             $this->mergeDrivers($supportedDrivers, $hintDrivers);
-                            if ($useHint) {
-                                $inHint = $matches[4];
-                            }
+                        }
+                        if ($useHint) {
+                            $inHint = $matches[4];
                         }
                     }
                 }
@@ -339,7 +339,7 @@ class OglParser
         foreach (self::$reDepDriversHints as $reDepDriversHint) {
             if (preg_match($reDepDriversHint[0], $hint) === 1) {
                 $useHint = $reDepDriversHint[1];
-                return array();
+                return NULL;
             }
         }
 
@@ -350,15 +350,23 @@ class OglParser
     private static $reNote = "/^(\(.+\)) (.*)$/";
     private static $otherOfficialExtensions =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
+
+    // Hints enabling for all drivers.
+    // 0: regexp
+    // 1: use hint?
     private static $reAllDriversHints = [
         [ "/^all drivers$/i", FALSE ],
         [ "/^0 binary formats$/i", TRUE ],
         [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", TRUE ],
-        [ "/^all - but needs GLX\/EGL extension to be useful$/i", TRUE ]
+        [ "/^all - but needs GLX\/EGL extension to be useful$/i", TRUE ],
     ];
 
+    // Hints depending on another feature.
+    // 0: regexp
+    // 1: use hint?
     private static $reDepDriversHints = [
-        [ "/^all drivers that support GL_[_[:alnum:]]+$/i", TRUE ]
+        [ "/^all drivers that support GL_[_[:alnum:]]+$/i", TRUE ],
+        [ "/^all drivers that support GLES( \d+\.\d+\+?)?$/i", TRUE ],
     ];
 
     private $reExtension = "";
