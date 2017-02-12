@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2017 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -84,13 +84,13 @@ class OglParser
 
                     // Set "all DONE" drivers.
                     $allSupportedDrivers = array();
-                    if (preg_match(self::$reAllDone, $line, $matches) === 1) {
+                    if (preg_match(self::RE_ALL_DONE, $line, $matches) === 1) {
                         $this->mergeDrivers($allSupportedDrivers, explode(", ", $matches[1]));
                     }
 
                     $line = $this->parseSection($glVersion, $matrix, $commit, $handle, $allSupportedDrivers);
                 }
-                else if($line === self::$otherOfficialExtensions) {
+                else if($line === self::OTHER_OFFICIAL_EXTENSIONS) {
                     $glName = "Extensions that are not part of any OpenGL or OpenGL ES version";
                     $glVersion = $matrix->getGlVersionByName($glName, NULL);
                     if (!$glVersion) {
@@ -174,7 +174,7 @@ class OglParser
                 if ($status === Constants::STATUS_DONE) {
                     if (!isset($matches[3])) {
                         // Done and nothing else precised, it's done for all drivers.
-                        $this->mergeDrivers($supportedDrivers, Constants::$allDrivers);
+                        $this->mergeDrivers($supportedDrivers, Constants::ALL_DRIVERS);
                     }
                     elseif (isset($matches[4])) {
                         // Done but there are parenthesis after.
@@ -235,7 +235,7 @@ class OglParser
         $line = $this->skipEmptyLines($line, $handle);
 
         // Parse notes (i.e. "(*) note").
-        while ($line !== FALSE && preg_match(self::$reNote, $line, $matches) === 1) {
+        while ($line !== FALSE && preg_match(self::RE_NOTE, $line, $matches) === 1) {
             $idx = array_search($matches[1], $matrix->getHints()->allHints);
             if ($idx !== FALSE) {
                 $matrix->getHints()->allHints[$idx] = $matches[2];
@@ -257,7 +257,7 @@ class OglParser
     }
 
     private function isInDriversArray($name) {
-        foreach (Constants::$allDrivers as $driverName) {
+        foreach (Constants::ALL_DRIVERS as $driverName) {
             if (strncmp($name, $driverName, strlen($driverName)) === 0) {
                 return TRUE;
             }
@@ -267,7 +267,7 @@ class OglParser
     }
 
     private function getDriverName($name) {
-        foreach (Constants::$allDrivers as $driver) {
+        foreach (Constants::ALL_DRIVERS as $driver) {
             $driverLen = strlen($driver);
             if (strncmp($name, $driver, $driverLen) === 0) {
                 return $driver;
@@ -328,15 +328,15 @@ class OglParser
         }
 
         // Is the hint saying it's supporting all drivers?
-        foreach (self::$reAllDriversHints as $reAllDriversHint) {
+        foreach (Constants::RE_ALL_DRIVERS_HINTS as $reAllDriversHint) {
             if (preg_match($reAllDriversHint[0], $hint) === 1) {
                 $useHint = $reAllDriversHint[1];
-                return Constants::$allDrivers;
+                return Constants::ALL_DRIVERS;
             }
         }
 
         // Is the hint saying it depends on something else?
-        foreach (self::$reDepDriversHints as $reDepDriversHint) {
+        foreach (Constants::RE_DEP_DRIVERS_HINTS as $reDepDriversHint) {
             if (preg_match($reDepDriversHint[0], $hint) === 1) {
                 $useHint = $reDepDriversHint[1];
                 return NULL;
@@ -346,28 +346,11 @@ class OglParser
         return NULL;
     }
 
-    private static $reAllDone = "/ -+ all DONE: (.*)/i";
-    private static $reNote = "/^(\(.+\)) (.*)$/";
-    private static $otherOfficialExtensions =
+    private $reExtension = "";
+
+    const OTHER_OFFICIAL_EXTENSIONS =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
 
-    // Hints enabling for all drivers.
-    // 0: regexp
-    // 1: use hint?
-    private static $reAllDriversHints = [
-        [ "/^all drivers$/i", FALSE ],
-        [ "/^0 binary formats$/i", TRUE ],
-        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", TRUE ],
-        [ "/^all - but needs GLX\/EGL extension to be useful$/i", TRUE ],
-    ];
-
-    // Hints depending on another feature.
-    // 0: regexp
-    // 1: use hint?
-    private static $reDepDriversHints = [
-        [ "/^all drivers that support GL_[_[:alnum:]]+$/i", TRUE ],
-        [ "/^all drivers that support GLES( \d+\.\d+\+?)?$/i", TRUE ],
-    ];
-
-    private $reExtension = "";
+    const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
+    const RE_NOTE = "/^(\(.+\)) (.*)$/";
 };

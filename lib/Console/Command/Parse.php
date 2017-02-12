@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014-2016 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2017 Romain "Creak" Failliot.
  * Copyright (C) 2014 Robin McCorkell <rmccorkell@karoshi.org.uk>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -321,7 +321,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
     }
 
     protected function populateDrivers(\SimpleXMLElement $drivers) {
-        foreach (\Mesamatrix\Parser\Constants::$allDriversVendors as $glVendor => $glDrivers) {
+        foreach (\Mesamatrix\Parser\Constants::ALL_DRIVERS_VENDORS as $glVendor => $glDrivers) {
             $vendor = $drivers->addChild("vendor");
             $vendor->addAttribute("name", $glVendor);
             foreach ($glDrivers as $glDriver) {

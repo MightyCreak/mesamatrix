@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014-2016 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2017 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -28,7 +28,7 @@ abstract class Constants
     const STATUS_DONE = "complete";
 
     // List of all the drivers.
-    public static $allDrivers = array(
+    const ALL_DRIVERS = [
         "softpipe",
         "llvmpipe",
         "i965",
@@ -38,13 +38,33 @@ abstract class Constants
         "radeonsi",
         "swr",
         "freedreno"
-    );
+    ];
 
-    public static $allDriversVendors = array(
-        "Software"  => array("softpipe", "llvmpipe", "swr"),
-        "Intel"     => array("i965"),
-        "Nvidia"    => array("nv50", "nvc0"),
-        "AMD"       => array("r600", "radeonsi"),
-        "Qualcomm"  => array("freedreno"),
-    );
+    const ALL_DRIVERS_VENDORS = [
+        "Software"  => [ "softpipe", "llvmpipe", "swr" ],
+        "Intel"     => [ "i965" ],
+        "Nvidia"    => [ "nv50", "nvc0" ],
+        "AMD"       => [ "r600", "radeonsi" ],
+        "Qualcomm"  => [ "freedreno" ],
+    ];
+
+    // Hints enabling for all drivers.
+    // 0: regexp
+    // 1: use hint?
+    const RE_ALL_DRIVERS_HINTS = [
+        [ "/^all drivers$/i", FALSE ],
+        [ "/^0 binary formats$/i", TRUE ],
+        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", TRUE ],
+        [ "/^all - but needs GLX\/EGL extension to be useful$/i", TRUE ],
+    ];
+
+    // Hints depending on another feature.
+    // 0: regexp
+    // 1: use hint?
+    // 2: dependency type
+    // 3: dependency match index
+    const RE_DEP_DRIVERS_HINTS = [
+        [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", TRUE, DependsOn::Extension, 1 ],
+        [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", TRUE, DependsOn::GlesVersion, 1 ],
+    ];
 }

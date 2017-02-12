@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2017 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -28,7 +28,7 @@ class OglSupportedDriver
         $this->hintIdx = -1;
         $this->setModifiedAt(null);
 
-        foreach (Constants::$allDrivers as $driver) {
+        foreach (Constants::ALL_DRIVERS as $driver) {
             $driverLen = strlen($driver);
             if (strncmp($name, $driver, $driverLen) === 0) {
                 $this->name = $driver;
