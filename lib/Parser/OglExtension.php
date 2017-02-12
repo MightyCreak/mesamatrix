@@ -166,12 +166,19 @@ class OglExtension
         }
 
         $hint = $this->hints->allHints[$this->getHintIdx()];
-        $re = preg_match("/^all drivers that support (GL_[_[:alnum:]]+)$/", $hint, $matches);
-        if ($re === 1) {
-            $glDepExt = $glMatrix->getExtensionBySubstr($matches[1]);
-            if ($glDepExt !== NULL) {
-                foreach ($glDepExt->supportedDrivers as $supportedDriver) {
-                    $this->addSupportedDriver($supportedDriver, $this->getModifiedAt());
+        foreach (Constants::RE_DEP_DRIVERS_HINTS as $reDepDriversHint) {
+            if (preg_match($reDepDriversHint[0], $hint, $matches) === 1) {
+                switch ($reDepDriversHint[2]) {
+                    case DependsOn::Extension:
+                    {
+                        $glDepExt = $glMatrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
+                        if ($glDepExt !== NULL) {
+                            foreach ($glDepExt->supportedDrivers as $supportedDriver) {
+                                $this->addSupportedDriver($supportedDriver, $this->getModifiedAt());
+                            }
+                        }
+                    }
+                    break;
                 }
             }
         }
