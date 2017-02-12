@@ -100,6 +100,31 @@ class OglVersion
     }
 
     /**
+     * Get the drivers supporting this version.
+     *
+     * @return string[] The list of supported drivers names.
+     */
+    public function getSupportedDrivers() {
+        $supportedDrivers = [];
+
+        foreach (Constants::ALL_DRIVERS as $driverName) {
+            $driver = NULL;
+            foreach ($this->getExtensions() as $glExt) {
+                $driver = $glExt->getSupportedDriverByName($driverName);
+                if ($driver === NULL) {
+                    break;
+                }
+            }
+
+            if ($driver !== NULL) {
+                $supportedDrivers[] = $driverName;
+            }
+        }
+
+        return $supportedDrivers;
+    }
+
+    /**
      * Parse all the extensions in the version and solve them.
      *
      * @param \Mesamatrix\Parser\OglMatrix $glMatrix The entire matrix.

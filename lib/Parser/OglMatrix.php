@@ -60,6 +60,24 @@ class OglMatrix
     }
 
     /**
+     * Get the list of drivers supporting a specific version of OpenGL ES.
+     *
+     * @param int $version The GL ES version to look for.
+     *
+     * @return string[] The list of drivers that supports
+     *         the OpenGL ES; NULL otherwise.
+     */
+    public function getDriversSupportingGlesVersion($version) {
+        foreach ($this->getGlVersions() as $glVersion) {
+            if ($glVersion->getGlName() === 'OpenGL ES' && $glVersion->getGlVersion() === $version) {
+                return $glVersion->getSupportedDrivers();
+            }
+        }
+
+        return NULL;
+    }
+
+    /**
      * Parse all the GL versions and solve their extensions.
      */
     public function solveExtensionDependencies() {

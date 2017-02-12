@@ -92,6 +92,8 @@ class OglExtension
                 return $supportedDriver;
             }
         }
+
+        return NULL;
     }
 
     // modified at
@@ -174,6 +176,22 @@ class OglExtension
                         $glDepExt = $glMatrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
                         if ($glDepExt !== NULL) {
                             foreach ($glDepExt->supportedDrivers as $supportedDriver) {
+                                $this->addSupportedDriver($supportedDriver, $this->getModifiedAt());
+                            }
+                        }
+                    }
+                    break;
+
+                    case DependsOn::GlesVersion:
+                    {
+                        $supportedDriverNames = $glMatrix->getDriversSupportingGlesVersion($matches[$reDepDriversHint[3]]);
+                        if ($supportedDriverNames !== NULL) {
+                            foreach ($supportedDriverNames as $supportedDriverName) {
+                                $supportedDriver = new OglSupportedDriver($supportedDriverName, $this->hints);
+                                if ($reDepDriversHint[2]) {
+                                    $supportedDriver->setHint($hint);
+                                }
+
                                 $this->addSupportedDriver($supportedDriver, $this->getModifiedAt());
                             }
                         }
