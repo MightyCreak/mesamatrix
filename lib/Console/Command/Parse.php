@@ -239,7 +239,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $this->getHelper('process')->mustRun($this->output, $proc);
 
         // Parse the content.
-        \Mesamatrix::$logger->info('Parsing GL3.txt for commit '.$hash);
+        \Mesamatrix::$logger->info('Parsing '.(basename($filepath)).' for commit '.$hash);
         $parser = new OglParser();
         $matrix = $parser->parseContent($proc->getOutput(), $commit);
 
