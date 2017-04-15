@@ -35,8 +35,7 @@ $CONFIG = array(
 
     "opengl_links" => array(
         "enabled" => TRUE,
-        "url_gl" => "https://www.opengl.org/registry/specs/",
-        "url_gles" => "https://www.khronos.org/registry/gles/extensions/",
+        "url_gl" => "https://www.khronos.org/registry/OpenGL/extensions/",
         "cache_file" => "urlcache.json",
     ),
 
