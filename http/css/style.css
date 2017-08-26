@@ -138,6 +138,7 @@ header .header-icons img.rss {
 .hCellVendor-nvidia     { background-color: #d5f796; }
 .hCellVendor-amd        { background-color: #f7b5b2; }
 .hCellVendor-qualcomm   { background-color: #c7dce8; }
+.hCellVendor-vivante    { background-color: #7dbb46; }
 
 .hCellSep       { width: 0px; }
 
