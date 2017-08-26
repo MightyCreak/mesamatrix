@@ -37,7 +37,8 @@ abstract class Constants
         "r600",
         "radeonsi",
         "swr",
-        "freedreno"
+        "freedreno",
+        "etnaviv"
     ];
 
     const ALL_DRIVERS_VENDORS = [
@@ -46,6 +47,7 @@ abstract class Constants
         "Nvidia"    => [ "nv50", "nvc0" ],
         "AMD"       => [ "r600", "radeonsi" ],
         "Qualcomm"  => [ "freedreno" ],
+        "Vivante"   => [ "etnaviv" ],
     ];
 
     // Hints enabling for all drivers.
