@@ -44,9 +44,7 @@ function createCommitsModel(SimpleXMLElement $xml) {
 /////////////////////////////////////////////////
 // Create matrix model.
 //
-function createColumns(array &$matrix) {
-    global $xml;
-
+function createColumns(array &$matrix, array $apis) {
     $matrix['column_groups'] = array();
     $matrix['columns'] = array();
 
@@ -77,7 +75,28 @@ function createColumns(array &$matrix) {
 
     );
 
-    foreach ($xml->drivers->vendor as $vendor) {
+    // Get all the vendors and all their drivers.
+    $vendors = array();
+    foreach ($apis as $api) {
+        foreach ($api->drivers->vendor as $vendor) {
+            $vendorName = (string) $vendor['name'];
+            if (!array_key_exists($vendorName, $vendors)) {
+                $vendors[$vendorName] = array();
+            }
+
+            $driverNames = &$vendors[$vendorName];
+            foreach ($vendor->driver as $driver) {
+                $driverName = (string) $driver['name'];
+                if (!in_array($driverName, $driverNames)) {
+                    $driverNames[] = $driverName;
+                }
+            }
+        }
+    }
+
+    unset($driverNames);
+
+    foreach ($vendors as $vendorName => $driverNames) {
         // Add separator before each vendor.
         $matrix['column_groups'][] = array(
             'name' => '',
@@ -90,14 +109,14 @@ function createColumns(array &$matrix) {
 
         // Add vendor drivers columns.
         $colgroup = array(
-            'name' => (string) $vendor['name'],
-            'vendor_class' => strtolower((string) $vendor['name']),
+            'name' => $vendorName,
+            'vendor_class' => strtolower($vendorName),
             'columns' => array()
         );
-        foreach ($vendor->driver as $driver) {
+        foreach ($driverNames as $driverName) {
             $colgroup['columns'][] = $columnIdx++;
             $matrix['columns'][] = array(
-                'name' => (string) $driver['name'],
+                'name' => $driverName,
                 'type' => 'driver',
                 'vendor_class' => $colgroup['vendor_class']
             );
@@ -107,7 +126,7 @@ function createColumns(array &$matrix) {
     }
 }
 
-function addExtension(array &$subsection, SimpleXMLElement $glExt, $isSubExt) {
+function addExtension(array &$subsection, SimpleXMLElement $glExt, $isSubExt, SimpleXMLElement $drivers) {
     global $xml;
 
     $extension = array(
@@ -137,7 +156,7 @@ function addExtension(array &$subsection, SimpleXMLElement $glExt, $isSubExt) {
     $extTask['hint'] = $glExt->mesa['hint'];
     $extension['tasks']['mesa'] = $extTask;
 
-    foreach ($xml->drivers->vendor as $vendor) {
+    foreach ($drivers->vendor as $vendor) {
         foreach ($vendor->driver as $driver) {
             $driverName = (string) $driver['name'];
 
@@ -158,31 +177,34 @@ function addExtension(array &$subsection, SimpleXMLElement $glExt, $isSubExt) {
     $subsection['extensions'][] = $extension;
 }
 
-function addSubsection(array &$section, SimpleXMLElement $glSubsection) {
+function addSection(array &$section, SimpleXMLElement $glSection, SimpleXMLElement $drivers) {
     global $leaderboard, $xml;
 
-    $text = $glSubsection['name'];
-    if (!empty((string) $glSubsection['version'])) {
-        $text .= ' '.$glSubsection['version'];
-    }
-    if (!empty((string) $glSubsection->glsl['name'])) {
-        $text .= ' - '.$glSubsection->glsl['name'].' '.$glSubsection->glsl['version'];
+    $text = "";
+    if (!empty($glSection['version'])) {
+        $text = $glSection['name'];
+        if (!empty((string) $glSection['version'])) {
+            $text .= ' '.$glSection['version'];
+        }
+        if (!empty((string) $glSection->glsl['name'])) {
+            $text .= ' - '.$glSection->glsl['name'].' '.$glSection->glsl['version'];
+        }
     }
 
     $subsection = array(
         'name' => $text,
-        'target' => 'Version_'.urlencode(str_replace(' ', '', $text)),
+        'target' => !empty($text) ? 'Version_'.urlencode(str_replace(' ', '', $text)) : '',
         'scores' => array(),
         'extensions' => array()
     );
 
-    $lbGlVersion = $leaderboard->findGlVersion($glSubsection['name'].$glSubsection['version']);
+    $lbGlVersion = $leaderboard->findGlVersion($glSection['name'].$glSection['version']);
     if ($lbGlVersion !== NULL) {
         $numGlVersionExts = $lbGlVersion->getNumExts();
 
         $driverScores = array();
         $driverScores['mesa'] = $lbGlVersion->getNumDriverExtsDone('mesa') / $numGlVersionExts;
-        foreach ($xml->drivers->vendor as $vendor) {
+        foreach ($drivers->vendor as $vendor) {
             foreach ($vendor->driver as $driver) {
                 $driverName = (string) $driver['name'];
                 $driverScores[$driverName] = $lbGlVersion->getNumDriverExtsDone($driverName) / $numGlVersionExts;
@@ -191,20 +213,27 @@ function addSubsection(array &$section, SimpleXMLElement $glSubsection) {
 
         $subsection['scores'] = $driverScores;
 
-        foreach ($glSubsection->extension as $glExt) {
-            addExtension($subsection, $glExt, false);
+        foreach ($glSection->extension as $glExt) {
+            addExtension($subsection, $glExt, false, $drivers);
             foreach ($glExt->subextension as $glSubExt)
-                addExtension($subsection, $glSubExt, true);
+                addExtension($subsection, $glSubExt, true, $drivers);
         }
     }
 
     $section['subsections'][] = $subsection;
 }
 
-function addSection(array &$matrix, $name, array $glSubsections) {
-    // Sort the versions.
-    usort($glSubsections, function($a, $b) {
-        // Sort OpenGL before OpenGLES and higher versions before lower ones.
+function addApi(array &$matrix, \SimpleXmlElement $xmlApi) {
+    $glVersions = array();
+    foreach ($xmlApi->version as $glVersion) {
+        $glVersions[] = $glVersion;
+    }
+
+    if (empty($glVersions))
+        return;
+
+    // Sort the versions descending.
+    usort($glVersions, function($a, $b) {
         $diff = (float) $b['version'] - (float) $a['version'];
         if ($diff === 0)
             return 0;
@@ -212,48 +241,38 @@ function addSection(array &$matrix, $name, array $glSubsections) {
             return $diff < 0 ? -1 : 1;
     });
 
-    $section = array(
-        'name' => $name,
-        'target' => 'Version_'.urlencode(str_replace(' ', '', $name)),
+    $api = array(
+        'name' => $xmlApi['name'],
+        'target' => 'Version_'.urlencode(str_replace(' ', '', $xmlApi['name'])),
         'subsections' => array()
     );
 
-    foreach ($glSubsections as $glSubsection) {
-        addSubsection($section, $glSubsection);
+    foreach ($glVersions as $glVersion) {
+        addSection($api, $glVersion, $xmlApi->drivers);
     }
 
-    $matrix['sections'][] = $section;
+    $matrix['sections'][] = $api;
 }
 
 function createMatrixModel(SimpleXMLElement $xml) {
-    // Set all the versions in an array so that it can be sorted out.
-    $glVersions = array();
-    foreach ($xml->gl as $glVersion) {
-        $glVersions[] = $glVersion;
+    $openglApis = array();
+    foreach ($xml->apis->api as $api) {
+        switch ((string) $api['name']) {
+        case 'OpenGL':
+        case 'OpenGL ES':
+        case \Mesamatrix\Parser\Constants::GL_OR_ES_EXTRA_NAME:
+            $openglApis[] = $api;
+            break;
+        }
     }
 
     $matrix = array();
-    createColumns($matrix, $xml);
+    createColumns($matrix, $openglApis);
 
     $matrix['sections'] = array();
-    addSection($matrix, 'OpenGL',
-        array_filter($glVersions, function($v) {
-            return (string) $v['name'] === 'OpenGL';
-        })
-    );
-
-    addSection($matrix, 'OpenGL ES',
-        array_filter($glVersions, function($v) {
-            return (string) $v['name'] === 'OpenGL ES';
-        })
-    );
-
-    addSection($matrix, 'Other extensions',
-        array_filter($glVersions, function($v) {
-            $name = (string) $v['name'];
-            return $name !== 'OpenGL' && $name !== 'OpenGL ES';
-        })
-    );
+    foreach ($openglApis as $api) {
+        addApi($matrix, $api);
+    }
 
     $matrix['last_updated'] = (int) $xml['updated'];
 
@@ -452,7 +471,13 @@ foreach($matrix['sections'] as $section):
 ?>
                 <tr>
                     <td id="<?= $subsection['target'] ?>" colspan="<?= count($matrix['columns']) ?>" class="hCellGlVersion">
+<?php
+        if (!empty($subsection['name'])):
+?>
                         <?= $subsection['name'] ?><a href="#<?= $subsection['target'] ?>" class="permalink">&para;</a>
+<?php
+        endif;
+?>
                     </td>
                 </tr>
                 <tr>

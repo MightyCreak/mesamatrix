@@ -48,6 +48,16 @@ abstract class Constants
         "Qualcomm"  => [ "freedreno" ],
     ];
 
+    const VK_ALL_DRIVERS = [
+        "anv",
+        "radv",
+    ];
+
+    const VK_ALL_DRIVERS_VENDORS = [
+        "Intel"     => [ "anv" ],
+        "AMD"       => [ "radv" ],
+    ];
+
     // Hints enabling for all drivers.
     // 0: regexp
     // 1: use hint?
@@ -67,4 +77,7 @@ abstract class Constants
         [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", TRUE, DependsOn::Extension, 1 ],
         [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", TRUE, DependsOn::GlesVersion, 1 ],
     ];
+
+    const GL_OR_ES_EXTRA_NAME = "Extensions that are not part of any OpenGL or OpenGL ES version";
+    const VK_EXTRA_NAME = "Extensions that are not part of any Vulkan version";
 }

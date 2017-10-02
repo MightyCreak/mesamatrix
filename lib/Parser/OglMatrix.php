@@ -95,20 +95,27 @@ class OglMatrix
      *         ones already merged.
      */
     public function merge(\SimpleXMLElement $mesa, \Mesamatrix\Git\Commit $commit) {
-        $xmlSections = $mesa->xpath('./gl');
+        foreach ($mesa->apis->api as $api) {
+            $this->mergeApi($api, $commit);
+        }
+    }
+
+    private function mergeApi(\SimpleXMLElement $api, \Mesamatrix\Git\Commit $commit) {
+        $xmlSections = $api->version;
 
         // Remove old sections.
         $numXmlSections = count($xmlSections);
         foreach ($this->getGlVersions() as $glSection) {
             $glName = $glSection->getGlName();
-            $glVersion = $glSection->getGlVersion();
+            if ($glName !== (string) $api['name'])
+                break;
 
             // Find section in the XML.
+            $glVersion = $glSection->getGlVersion();
             $i = 0;
             while ($i < $numXmlSections) {
                 $xmlSection = $xmlSections[$i];
-                if ($glName === (string) $xmlSection['name'] &&
-                    $glVersion === (string) $xmlSection['version']) {
+                if ($glVersion === (string) $xmlSection['version']) {
                     break;
                 }
 
