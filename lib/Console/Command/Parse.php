@@ -48,11 +48,15 @@ class Parse extends \Symfony\Component\Console\Command\Command
              ->setDescription('Parse data and generate XML')
              ->addOption('force', '-f',
                          InputOption::VALUE_NONE,
-                         'Force to parse all the commits again');
+                         'Force to parse all the commits again')
+             ->addOption('regenerate-xml', '-r',
+                         InputOption::VALUE_NONE,
+                         'Regenerate the XML based on the already parsed commits');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $force = $input->getOption('force');
+        $regenXml = $input->getOption('regenerate-xml');
 
         $this->output = $output;
         $this->statuses = array(
@@ -119,7 +123,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
         \Mesamatrix::$logger->debug("Last commit parsed:  ${lastCommitParsed}");
         if ($lastCommitFetched === $lastCommitParsed) {
             \Mesamatrix::$logger->info("No new commit, no need to parse.");
-            return 0;
+            if (!$regenXml)
+                return 0;
         }
 
         // Ensure existence of the commits directory.
@@ -140,11 +145,6 @@ class Parse extends \Symfony\Component\Console\Command\Command
             $i = 0;
             while ($i < $numCommits - 1 && $commits[$i]->getHash() !== $lastCommitParsed) {
                 ++$i;
-            }
-
-            if ($i === $numCommits - 1) {
-                \Mesamatrix::$logger->error('The last parsed commit ('.$lastCommitParsed.') could not be found in the list of commits.');
-                return 1;
             }
 
             $firstNewCommitIdx = $i + 1;
@@ -375,7 +375,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
                 $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url_gl").urlencode($matches[2])."/";
                 if ($matches[1] === "GLX") {
                     // Found a GLX_TYPE_Extension.
-				    $openglUrl .= "GLX_";
+                    $openglUrl .= "GLX_";
                 }
 
                 $openglUrl .= urlencode($matches[2]."_".$matches[3]).".txt";
