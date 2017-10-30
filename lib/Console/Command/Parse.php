@@ -321,7 +321,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
     }
 
     protected function populateDrivers(\SimpleXMLElement $drivers) {
-        foreach (\Mesamatrix\Parser\Constants::ALL_DRIVERS_VENDORS as $glVendor => $glDrivers) {
+        foreach (\Mesamatrix\Parser\Constants::GL_ALL_DRIVERS_VENDORS as $glVendor => $glDrivers) {
             $vendor = $drivers->addChild("vendor");
             $vendor->addAttribute("name", $glVendor);
             foreach ($glDrivers as $glDriver) {

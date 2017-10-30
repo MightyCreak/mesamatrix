@@ -90,7 +90,7 @@ class OglParser
 
                     $line = $this->parseSection($glVersion, $matrix, $commit, $handle, $allSupportedDrivers);
                 }
-                else if($line === self::OTHER_OFFICIAL_EXTENSIONS) {
+                else if($line === self::OTHER_OFFICIAL_GL_EXTENSIONS) {
                     $glName = "Extensions that are not part of any OpenGL or OpenGL ES version";
                     $glVersion = $matrix->getGlVersionByName($glName, NULL);
                     if (!$glVersion) {
@@ -174,7 +174,7 @@ class OglParser
                 if ($status === Constants::STATUS_DONE) {
                     if (!isset($matches[3])) {
                         // Done and nothing else precised, it's done for all drivers.
-                        $this->mergeDrivers($supportedDrivers, Constants::ALL_DRIVERS);
+                        $this->mergeDrivers($supportedDrivers, Constants::GL_ALL_DRIVERS);
                     }
                     elseif (isset($matches[4])) {
                         // Done but there are parenthesis after.
@@ -257,7 +257,7 @@ class OglParser
     }
 
     private function isInDriversArray($name) {
-        foreach (Constants::ALL_DRIVERS as $driverName) {
+        foreach (Constants::GL_ALL_DRIVERS as $driverName) {
             if (strncmp($name, $driverName, strlen($driverName)) === 0) {
                 return TRUE;
             }
@@ -267,7 +267,7 @@ class OglParser
     }
 
     private function getDriverName($name) {
-        foreach (Constants::ALL_DRIVERS as $driver) {
+        foreach (Constants::GL_ALL_DRIVERS as $driver) {
             $driverLen = strlen($driver);
             if (strncmp($name, $driver, $driverLen) === 0) {
                 return $driver;
@@ -331,7 +331,7 @@ class OglParser
         foreach (Constants::RE_ALL_DRIVERS_HINTS as $reAllDriversHint) {
             if (preg_match($reAllDriversHint[0], $hint) === 1) {
                 $useHint = $reAllDriversHint[1];
-                return Constants::ALL_DRIVERS;
+                return Constants::GL_ALL_DRIVERS;
             }
         }
 
@@ -348,7 +348,7 @@ class OglParser
 
     private $reExtension = "";
 
-    const OTHER_OFFICIAL_EXTENSIONS =
+    const OTHER_OFFICIAL_GL_EXTENSIONS =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
 
     const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";

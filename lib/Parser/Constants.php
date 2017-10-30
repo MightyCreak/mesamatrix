@@ -28,7 +28,7 @@ abstract class Constants
     const STATUS_DONE = "complete";
 
     // List of all the drivers.
-    const ALL_DRIVERS = [
+    const GL_ALL_DRIVERS = [
         "softpipe",
         "llvmpipe",
         "i965",
@@ -40,7 +40,7 @@ abstract class Constants
         "freedreno"
     ];
 
-    const ALL_DRIVERS_VENDORS = [
+    const GL_ALL_DRIVERS_VENDORS = [
         "Software"  => [ "softpipe", "llvmpipe", "swr" ],
         "Intel"     => [ "i965" ],
         "Nvidia"    => [ "nv50", "nvc0" ],

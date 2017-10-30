@@ -28,7 +28,7 @@ class OglSupportedDriver
         $this->hintIdx = -1;
         $this->setModifiedAt(null);
 
-        foreach (Constants::ALL_DRIVERS as $driver) {
+        foreach (Constants::GL_ALL_DRIVERS as $driver) {
             $driverLen = strlen($driver);
             if (strncmp($name, $driver, $driverLen) === 0) {
                 $this->name = $driver;

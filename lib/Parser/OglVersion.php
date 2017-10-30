@@ -107,7 +107,7 @@ class OglVersion
     public function getSupportedDrivers() {
         $supportedDrivers = [];
 
-        foreach (Constants::ALL_DRIVERS as $driverName) {
+        foreach (Constants::GL_ALL_DRIVERS as $driverName) {
             $driver = NULL;
             foreach ($this->getExtensions() as $glExt) {
                 $driver = $glExt->getSupportedDriverByName($driverName);
