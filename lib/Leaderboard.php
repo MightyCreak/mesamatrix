@@ -32,15 +32,13 @@ class Leaderboard {
      * Load leaderboard from data.
      *
      * @param SimpleXMLElement $xml Root of the XML data.
+     * @param string[] $apis APIs to show (order is important).
      */
-    public function load(\SimpleXMLElement $xml) {
-        foreach ($xml->apis->api as $api) {
-            switch ((string) $api['name']) {
-            case 'OpenGL':
-            case 'OpenGL ES':
-            case \Mesamatrix\Parser\Constants::GL_OR_ES_EXTRA_NAME:
-                $this->loadApi($api);
-                break;
+    public function load(\SimpleXMLElement $xml, array $apis) {
+        foreach ($apis as $api) {
+            foreach ($xml->apis->api as $xmlApi) {
+                if ((string) $xmlApi['name'] === $api)
+                    $this->loadApi($xmlApi);
             }
         }
 
@@ -54,7 +52,7 @@ class Leaderboard {
                 else
                     return $diff < 0 ? -1 : 1;
             }
-            elseif ($a->getGlName() === "OpenGL") {
+            elseif ($a->getGlName() === "OpenGL" || $a->getGlName() === "Vulkan") {
                 return -1;
             }
             else {

@@ -293,7 +293,7 @@ if (!$xml) {
 // Leaderboard.
 //
 $leaderboard = new Mesamatrix\Leaderboard();
-$leaderboard->load($xml);
+$leaderboard->load($xml, [ 'OpenGL', 'OpenGL ES', \Mesamatrix\Parser\Constants::GL_OR_ES_EXTRA_NAME ]);
 $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
 $numTotalExts = $leaderboard->getNumTotalExts();
 
