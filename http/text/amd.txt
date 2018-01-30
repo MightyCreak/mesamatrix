@@ -1,0 +1,173 @@
+# Master List of All AMD/ATI GPUS
+# TODO: Do all of HD 5000 Series and previous
+
+Radeon 3000,
+Radeon 3100,
+Radeon 8500, R200
+Radeon 9500, R300
+Radeon X700, R420
+Radeon X1300, R520
+Radeon HD 2350, R600
+Radeon HD 2400 Pro, R600
+Radeon HD 2400 XT, R600
+Radeon HD 2600 Pro, R600
+Radeon HD 2600 XT, R600
+Radeon HD 2900 GT, R600
+Radeon HD 2900 Pro, R600
+Radeon HD 2900 XT, R600
+Radeon HD 3200, RV670
+Radeon HD 3300, RV670
+Radeon HD 3410, R600
+Radeon HD 3450, RV670
+Radeon HD 3470, RV670
+Radeon HD 3550, RV670
+Radeon HD 3570, RV670
+Radeon HD 3610, RV670
+Radeon HD 3650, RV670
+Radeon HD 3730, RV670
+Radeon HD 3750, RV670
+Radeon HD 3830, RV670
+Radeon HD 3850, RV670
+Radeon HD 3850 X2, RV670
+Radeon HD 3870, RV670
+Radeon HD 3870 X2, RV670
+Radeon HD 4200, RV620
+Radeon HD 4250, RV620
+Radeon HD 4290, RV620
+Radeon HD 4350, RV770
+Radeon HD 4550, RV770
+Radeon HD 4570, RV770
+Radeon HD 4580, RV770
+Radeon HD 4650, RV770
+Radeon HD 4670, RV770
+Radeon HD 4730, RV770
+Radeon HD 4750, RV770
+Radeon HD 4770, RV770
+Radeon HD 4810, RV770
+Radeon HD 4830, RV770
+Radeon HD 4850, RV770 
+Radeon HD 4850 X2, RV770
+Radeon HD 4870, RV770
+Radeon HD 4870 X2, RV770
+Radeon HD 4890, RV770
+Radeon HD 5450, Evergreen
+Radeon HD 5550, Evergreen
+Radeon HD 5570, Evergreen
+Radeon HD 5610, Evergreen
+Radeon HD 5670, Evergreen
+Radeon HD 5750, Evergreen
+Radeon HD 5770, Evergreen
+Radeon HD 5830, Evergreen
+Radeon HD 5850, Evergreen
+Radeon HD 5870, Evergreen
+Radeon HD 5970, Evergreen
+Radeon HD 6350, Evergreen
+Radeon HD 6450, Evergreen
+Radeon HD 6570, Evergreen
+Radeon HD 6670, Evergreen
+Radeon HD 6750, Evergreen
+Radeon HD 6770, Evergreen
+Radeon HD 6790, Evergreen
+Radeon HD 6850, Evergreen
+Radeon HD 6870, Evergreen
+Radeon HD 6930, Northern Islands
+Radeon HD 6950, Northern Islands
+Radeon HD 6970, Northern Islands
+Radeon HD 6990, Northern Islands
+Radeon HD 6370D, Evergreen
+Radeon HD 6410D, Evergreen
+Radeon HD 6530D, Evergreen
+Radeon HD 6550D, Evergreen
+Radeon HD 7350, Evergreen
+Radeon HD 7450, Evergreen
+Radeon HD 7470, Evergreen
+Radeon HD 7510, Evergreen
+Radeon HD 7570, Evergreen
+Radeon HD 7670, Evergreen
+Radeon HD 7730, Southern Islands
+Radeon HD 7750, Southern Islands
+Radeon HD 7770, Southern Islands
+Radeon HD 7790, Sea Islands
+Radeon HD 7850, Southern Islands
+Radeon HD 7870, Southern Islands
+Radeon HD 7870 XT, Southern Islands
+Radeon HD 7950, Southern Islands
+Radeon HD 7950 Boost, Southern Islands
+Radeon HD 7970, Southern Islands
+Radeon HD 7970 GHz, Southern Islands
+Radeon HD 7990, Southern Islands
+Radeon HD 7480D, Northern Islands
+Radeon HD 7540D, Northern Islands
+Radeon HD 7560D, Northern Islands
+Radeon HD 7600D, Northern Islands
+Radeon HD 8350, Evergreen
+Radeon HD 8450, Evergreen
+Radeon HD 8470, Evergreen
+Radeon HD 8490, Evergreen
+Radeon HD 8570, Southern Islands
+Radeon HD 8670, Southern Islands
+Radeon HD 8730, Southern Islands
+Radeon HD 8760, Southern Islands
+Radeon HD 8770, Sea Islands
+Radeon HD 8870, Southern Islands
+Radeon HD 8950, Southern Islands
+Radeon HD 8970, Southern Islands
+Radeon HD 8990, Southern Islands
+Radeon R5 210, Evergreen
+Radeon R5 220, Evergreen
+Radeon R5 230, Evergreen
+Radeon R5 235, Evergreen
+Radeon R5 235X, Evergreen
+Radeon R5 240, Southern Islands
+Radeon R5 330, Southern Islands
+Radeon R5 340, Southern Islands
+Radeon R5 430, Southern Islands
+Radeon R5 435, Southern Islands
+Radeon R7 240, Southern Islands
+Radeon R7 250, Southern Islands
+Radeon R7 250E, Southern Islands
+Radeon R7 250X, Southern Islands
+Radeon R7 260, Sea Islands
+Radeon R7 260X, Sea Islands
+Radeon R7 265, Southern Islands
+Radeon R7 340, Southern Islands
+Radeon R7 350, Southern Islands
+Radeon R7 360, Sea Islands
+Radeon R7 370, Southern Islands
+Radeon R7 430, Southern Islands
+Radeon R7 435, Southern Islands
+Radeon R7 450, Southern Islands
+Radeon R9 200, Sea Islands
+Radeon R9 270, Southern Islands
+Radeon R9 270X, Southern Islands
+Radeon R9 280, Southern Islan
+Radeon R9 280X, Southern Islands
+Radeon R9 285, Volcanic Islands
+Radeon R9 290, Sea Islands
+Radeon R9 290X, Sea Islands
+Radeon R9 295X2, Sea Islands
+Radeon R9 360, Sea Islands
+Radeon R9 370, Southern Islands
+Radeon R9 370X, Southern Islands
+Radeon R9 380, Volcanic Islands
+Radeon R9 380X, Volcanic Islands
+Radeon R9 390, Sea Islands
+Radeon R9 390X, Sea Islands
+Radeon R9 Fury, Volcanic Islands
+Radeon R9 Fury X, Volcanic Islands
+Radeon R9 Nano, Volcanic Islands
+Radeon Pro Duo, Volcanic Islands
+Radeon 520, Southern Islands
+Radeon 530, Southern Islands
+Radeon RX 455, Sea Islands
+Radeon RX 460, Arctic Islands
+Radeon RX 470, Arctic Islands
+Radeon RX 480, Arctic Islands
+Radeon RX 540, Arctic Islands
+Radeon RX 550, Arctic Islands
+Radeon RX 560, Arctic Islands
+Radeon RX 560D, Arctic Islands
+Radeon RX 570, Arctic Islands
+Radeon RX 580, Arctic Islands
+Radeon RX Vega 56, Vega
+Radeon RX Vega 64, Vega
