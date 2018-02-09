@@ -1,12 +1,12 @@
 # Master List of All AMD/ATI GPUS
 # TODO: Do all of HD 5000 Series and previous
 
-Radeon 3000,
-Radeon 3100,
+Radeon 3000, R100
+Radeon 3100, R100
 Radeon 8500, R200
 Radeon 9500, R300
-Radeon X700, R420
-Radeon X1300, R520
+Radeon X700, R400
+Radeon X1300, R500
 Radeon HD 2350, R600
 Radeon HD 2400 Pro, R600
 Radeon HD 2400 XT, R600
@@ -15,41 +15,41 @@ Radeon HD 2600 XT, R600
 Radeon HD 2900 GT, R600
 Radeon HD 2900 Pro, R600
 Radeon HD 2900 XT, R600
-Radeon HD 3200, RV670
-Radeon HD 3300, RV670
+Radeon HD 3200, R600
+Radeon HD 3300, R600
 Radeon HD 3410, R600
-Radeon HD 3450, RV670
-Radeon HD 3470, RV670
-Radeon HD 3550, RV670
-Radeon HD 3570, RV670
-Radeon HD 3610, RV670
-Radeon HD 3650, RV670
-Radeon HD 3730, RV670
-Radeon HD 3750, RV670
-Radeon HD 3830, RV670
-Radeon HD 3850, RV670
-Radeon HD 3850 X2, RV670
-Radeon HD 3870, RV670
-Radeon HD 3870 X2, RV670
-Radeon HD 4200, RV620
-Radeon HD 4250, RV620
-Radeon HD 4290, RV620
-Radeon HD 4350, RV770
-Radeon HD 4550, RV770
-Radeon HD 4570, RV770
-Radeon HD 4580, RV770
-Radeon HD 4650, RV770
-Radeon HD 4670, RV770
-Radeon HD 4730, RV770
-Radeon HD 4750, RV770
-Radeon HD 4770, RV770
-Radeon HD 4810, RV770
-Radeon HD 4830, RV770
-Radeon HD 4850, RV770 
-Radeon HD 4850 X2, RV770
-Radeon HD 4870, RV770
-Radeon HD 4870 X2, RV770
-Radeon HD 4890, RV770
+Radeon HD 3450, R600
+Radeon HD 3470, R600
+Radeon HD 3550, R600
+Radeon HD 3570, R600
+Radeon HD 3610, R600
+Radeon HD 3650, R600
+Radeon HD 3730, R600
+Radeon HD 3750, R600
+Radeon HD 3830, R600
+Radeon HD 3850, R600
+Radeon HD 3850 X2, R600
+Radeon HD 3870, R600
+Radeon HD 3870 X2, R600
+Radeon HD 4200, R600
+Radeon HD 4250, R600
+Radeon HD 4290, R600
+Radeon HD 4350, R700
+Radeon HD 4550, R700
+Radeon HD 4570, R700
+Radeon HD 4580, R700
+Radeon HD 4650, R700
+Radeon HD 4670, R700
+Radeon HD 4730, R700
+Radeon HD 4750, R700
+Radeon HD 4770, R700
+Radeon HD 4810, R700
+Radeon HD 4830, R700
+Radeon HD 4850, R700 
+Radeon HD 4850 X2, R700
+Radeon HD 4870, R700
+Radeon HD 4870 X2, R700
+Radeon HD 4890, R700
 Radeon HD 5450, Evergreen
 Radeon HD 5550, Evergreen
 Radeon HD 5570, Evergreen
