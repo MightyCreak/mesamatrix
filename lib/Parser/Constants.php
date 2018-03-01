@@ -37,15 +37,20 @@ abstract class Constants
         "r600",
         "radeonsi",
         "swr",
-        "freedreno"
+        "freedreno",
+        "vc4",
+        "vc5",
+        "etnaviv"
     ];
 
     const ALL_DRIVERS_VENDORS = [
         "Software"  => [ "softpipe", "llvmpipe", "swr" ],
+        "AMD"       => [ "r600", "radeonsi" ],
+        "Broadcom"  => [ "vc4", "vc5" ],
         "Intel"     => [ "i965" ],
         "Nvidia"    => [ "nv50", "nvc0" ],
-        "AMD"       => [ "r600", "radeonsi" ],
-        "Qualcomm"  => [ "freedreno" ],
+        "Vivante"   => [ "etnaviv" ],
+        "Qualcomm"  => [ "freedreno" ]
     ];
 
     // Hints enabling for all drivers.
