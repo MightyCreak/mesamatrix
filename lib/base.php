@@ -76,6 +76,12 @@ class Mesamatrix
             ini_set('display_errors', 1);
         }
 
+        // Check extensions dependencies
+        if (!extension_loaded('xml')) {
+            self::$logger->error('Could not find XML extension');
+            exit(1);
+        }
+
         // initialise request
         self::$request = HTTPRequest::createFromGlobals();
 
