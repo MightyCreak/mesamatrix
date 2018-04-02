@@ -18,7 +18,7 @@ use \Monolog\Logger as Log;
 $CONFIG = array(
     "info" => array(
         "log_level" => Log::WARNING,
-        "version" => "1.0",
+        "version" => "2.0",
         "title" => "The OpenGL vs Mesa matrix",
         "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",
         "xml_file" => "http/gl3.xml",
