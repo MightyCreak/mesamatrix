@@ -45,8 +45,7 @@ $channel
     ->url($baseUrl)
     ->appendTo($rss);
 
-$commitWeb = \Mesamatrix::$config->getValue("git", "mesa_web") . "/commit/" 
-    . \Mesamatrix::$config->getValue("git", "gl3") . "?id=";
+$commitWeb = \Mesamatrix::$config->getValue("git", "mesa_web") . "/commit/?id=";
 
 foreach ($xml->commits->commit as $commit) {
     $item = new RSSItem();

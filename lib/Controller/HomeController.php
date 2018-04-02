@@ -66,7 +66,7 @@ class HomeController extends BaseController
         for ($i = 0; $i < $numCommits; ++$i) {
             $xmlCommit = $xml->commits->commit[$i];
             $this->commits[] = array(
-                'url' => \Mesamatrix::$config->getValue('git', 'mesa_web').'/commit/'.\Mesamatrix::$config->getValue('git', 'gl3').'?id='.$xmlCommit['hash'],
+                'url' => \Mesamatrix::$config->getValue('git', 'mesa_web').'/commit/?id='.$xmlCommit['hash'],
                 'timestamp' => (int) $xmlCommit['timestamp'],
                 'subject' => $xmlCommit['subject']
             );
