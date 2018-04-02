@@ -43,7 +43,7 @@ class OglParser
     }
 
     /**
-     * Parse a stream of GL3.txt.
+     * Parse a stream of features.txt.
      *
      * @param $handle The stream handle.
      * @param \Mesamatrix\Git\Commit $commit The commit for the stream.

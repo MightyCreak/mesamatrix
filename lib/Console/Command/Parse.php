@@ -35,7 +35,7 @@ use \Mesamatrix\Parser\Hints;
 /**
  * Class that handles the 'parse' command.
  *
- * It reads all the commits of the file GL3.txt and transform it to an XML
+ * It reads all the commits of the file features.txt and transform it to an XML
  * file. The entry point for this class is the `execute()` method.
  */
 class Parse extends \Symfony\Component\Console\Command\Command
