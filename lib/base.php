@@ -86,6 +86,10 @@ class Mesamatrix
         self::$request = HTTPRequest::createFromGlobals();
 
         self::$logger->debug('Base initialisation complete');
+
+        self::$logger->debug('Log level: '.self::$logger->getLevelName($logLevel));
+        self::$logger->debug('PHP error_reporting: 0x'.dechex(ini_get('error_reporting')));
+        self::$logger->debug('PHP display_errors: '.ini_get('display_errors'));
     }
 
     public static function path($path) {
