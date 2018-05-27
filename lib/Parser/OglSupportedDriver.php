@@ -23,25 +23,13 @@ namespace Mesamatrix\Parser;
 class OglSupportedDriver
 {
     public function __construct($name, $hints) {
-        $this->name = null;
+        $this->name = $name;
         $this->hints = $hints;
         $this->hintIdx = -1;
         $this->setModifiedAt(null);
-
-        foreach (Constants::ALL_DRIVERS as $driver) {
-            $driverLen = strlen($driver);
-            if (strncmp($name, $driver, $driverLen) === 0) {
-                $this->name = $driver;
-                $this->setHint(substr($name, $driverLen + 1));
-            }
-        }
-
-        if (!$this->name) {
-            \Mesamatrix::$logger->error('Unrecognized driver: '.$name);
-        }
     }
 
-    // hints
+    // name
     public function setName($name) {
         $this->name = $name;
     }

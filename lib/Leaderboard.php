@@ -32,9 +32,42 @@ class Leaderboard {
      * Load leaderboard from data.
      *
      * @param SimpleXMLElement $xml Root of the XML data.
+     * @param string[] $apis APIs to show (order is important).
      */
-    public function load(\SimpleXMLElement $xml) {
-        foreach($xml->gl as $glVersion) {
+    public function load(\SimpleXMLElement $xml, array $apis) {
+        foreach ($apis as $api) {
+            foreach ($xml->apis->api as $xmlApi) {
+                if ((string) $xmlApi['name'] === $api)
+                    $this->loadApi($xmlApi);
+            }
+        }
+
+        // Sort by OpenGL versions descending.
+        usort($this->glVersions, function($a, $b) {
+            // Sort OpenGL before OpenGLES and higher versions before lower ones.
+            if ($a->getGlName() === $b->getGlName()) {
+                $diff = (float) $b->getGlVersion() - (float) $a->getGlVersion();
+                if ($diff === 0)
+                    return 0;
+                else
+                    return $diff < 0 ? -1 : 1;
+            }
+            elseif ($a->getGlName() === "OpenGL" || $a->getGlName() === "Vulkan") {
+                return -1;
+            }
+            else {
+                return 1;
+            }
+        });
+    }
+
+    /**
+     * Load all the versions from a given API.
+     *
+     * @param SimpleXMLElement $api The XML tag for the wanted API.
+     */
+    private function loadApi(\SimpleXMLElement $api) {
+        foreach($api->version as $glVersion) {
             $lbGlVersion = $this->createGlVersion((string) $glVersion["name"],
                                                   (string) $glVersion["version"]);
 
@@ -65,7 +98,7 @@ class Leaderboard {
             $lbGlVersion->addDriver("mesa", $numDoneExts);
 
             // Count done extensions and sub-extensions for each drivers.
-            foreach ($xml->drivers->vendor as $vendor) {
+            foreach ($api->drivers->vendor as $vendor) {
                 foreach ($vendor->driver as $driver) {
                     $driverName = (string) $driver["name"];
 
@@ -89,24 +122,6 @@ class Leaderboard {
                 }
             }
         }
-
-        // Sort by OpenGL versions descending.
-        usort($this->glVersions, function($a, $b) {
-            // Sort OpenGL before OpenGLES and higher versions before lower ones.
-            if ($a->getGlName() === $b->getGlName()) {
-                $diff = (float) $b->getGlVersion() - (float) $a->getGlVersion();
-                if ($diff === 0)
-                    return 0;
-                else
-                    return $diff < 0 ? -1 : 1;
-            }
-            elseif ($a->getGlName() === "OpenGL") {
-                return -1;
-            }
-            else {
-                return 1;
-            }
-        });
     }
 
     /**

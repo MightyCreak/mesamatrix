@@ -43,7 +43,7 @@ class OglParser
     }
 
     /**
-     * Parse a stream of GL3.txt.
+     * Parse a stream of features.txt.
      *
      * @param $handle The stream handle.
      * @param \Mesamatrix\Git\Commit $commit The commit for the stream.
@@ -54,7 +54,8 @@ class OglParser
 
         // Regexp patterns.
         $reTableHeader = "/^(Feature[ ]+)Status/";
-        $reVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
+        $reGlVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
+        $reVkVersion = "/^Vulkan ([[:digit:]]+\.[[:digit:]]+)/";
 
         // Skip header lines.
         $line = fgets($handle);
@@ -72,15 +73,49 @@ class OglParser
             $line = fgets($handle);
             while ($line !== FALSE) {
                 // Find version line (i.e. "GL 3.0, GLSL 1.30 ...").
-                if (preg_match($reVersion, $line, $matches) === 1) {
+                $glVersion = NULL;
+                if (preg_match($reGlVersion, $line, $matches) === 1) {
                     // Get or create new OpenGL version.
                     $glName = $matches[1] === 'GL' ? 'OpenGL' : 'OpenGL ES';
                     $glVersion = $matrix->getGlVersionByName($glName, $matches[3]);
                     if (!$glVersion) {
-                        $glVersion = new OglVersion($glName, $matches[3], $matches[4],
-                            $matches[6], $matrix->getHints());
+                        $glVersion = new OglVersion($glName, $matches[3], $matches[4], $matches[6], $matrix->getHints());
                         $matrix->addGlVersion($glVersion);
                     }
+                }
+                else if($line === self::OTHER_OFFICIAL_GL_EXTENSIONS) {
+                    $glName = Constants::GL_OR_ES_EXTRA_NAME;
+                    $glVersion = $matrix->getGlVersionByName($glName, NULL);
+                    if (!$glVersion) {
+                        $glVersion = new OglVersion($glName, NULL, NULL, NULL, $matrix->getHints());
+                        $matrix->addGlVersion($glVersion);
+                    }
+                }
+                else if (preg_match($reVkVersion, $line, $matches) === 1) {
+                    $vkName = "Vulkan";
+                    $glVersion = $matrix->getGlVersionByName($vkName, $matches[1]);
+                    if (!$glVersion) {
+                        $glVersion = new OglVersion($vkName, $matches[1], NULL, NULL, $matrix->getHints());
+                        $matrix->addGlVersion($glVersion);
+                    }
+                }
+                else if ($line === self::OTHER_OFFICIAL_VK_EXTENSIONS) {
+                    $vkName = Constants::VK_EXTRA_NAME;
+                    $glVersion = $matrix->getGlVersionByName($vkName, NULL);
+                    if (!$glVersion) {
+                        $glVersion = new OglVersion($vkName, NULL, NULL, NULL, $matrix->getHints());
+                        $matrix->addGlVersion($glVersion);
+                    }
+                }
+                else {
+                    //print("Unrecognized line: ".$line);
+                    $line = fgets($handle);
+                    continue;
+                }
+
+                if ($glVersion) {
+                    // Get all the drivers for this API.
+                    $this->apiDrivers = $glVersion->getAllApiDrivers();
 
                     // Set "all DONE" drivers.
                     $allSupportedDrivers = array();
@@ -88,22 +123,8 @@ class OglParser
                         $this->mergeDrivers($allSupportedDrivers, explode(", ", $matches[1]));
                     }
 
+                    // Parse section.
                     $line = $this->parseSection($glVersion, $matrix, $commit, $handle, $allSupportedDrivers);
-                }
-                else if($line === self::OTHER_OFFICIAL_EXTENSIONS) {
-                    $glName = "Extensions that are not part of any OpenGL or OpenGL ES version";
-                    $glVersion = $matrix->getGlVersionByName($glName, NULL);
-                    if (!$glVersion) {
-                        $glVersion = new OglVersion($glName, NULL, NULL,
-                            NULL, $matrix->getHints());
-                        $matrix->addGlVersion($glVersion);
-                    }
-
-                    $line = $this->parseSection($glVersion, $matrix, $commit, $handle);
-                }
-                else {
-                    //print("Unrecognized line: ".$line);
-                    $line = fgets($handle);
                 }
             }
         }
@@ -131,6 +152,11 @@ class OglParser
                                   $handle,
                                   $allSupportedDrivers = array()) {
         $line = $this->skipEmptyLines(fgets($handle), $handle);
+
+        // Verify the line is indented.
+        if (preg_match("/^  [^ ]/", $line) === 0) {
+            return $line;
+        }
 
         // Parse OpenGL version extensions.
         $lastExt = null;
@@ -174,7 +200,7 @@ class OglParser
                 if ($status === Constants::STATUS_DONE) {
                     if (!isset($matches[3])) {
                         // Done and nothing else precised, it's done for all drivers.
-                        $this->mergeDrivers($supportedDrivers, Constants::ALL_DRIVERS);
+                        $this->mergeDrivers($supportedDrivers, $this->apiDrivers);
                     }
                     elseif (isset($matches[4])) {
                         // Done but there are parenthesis after.
@@ -218,12 +244,12 @@ class OglParser
                     $parentDrivers = $supportedDrivers;
 
                     // Add the extension.
-                    $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
+                    $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
                     $lastExt = $glVersion->addExtension($newExtension, $commit);
                 }
                 else {
                     // Add the sub-extension.
-                    $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
+                    $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
                     $lastExt->addSubExtension($newSubExtension, $commit);
                 }
             }
@@ -257,7 +283,7 @@ class OglParser
     }
 
     private function isInDriversArray($name) {
-        foreach (Constants::ALL_DRIVERS as $driverName) {
+        foreach ($this->apiDrivers as $driverName) {
             if (strncmp($name, $driverName, strlen($driverName)) === 0) {
                 return TRUE;
             }
@@ -267,7 +293,7 @@ class OglParser
     }
 
     private function getDriverName($name) {
-        foreach (Constants::ALL_DRIVERS as $driver) {
+        foreach ($this->apiDrivers as $driver) {
             $driverLen = strlen($driver);
             if (strncmp($name, $driver, $driverLen) === 0) {
                 return $driver;
@@ -331,7 +357,7 @@ class OglParser
         foreach (Constants::RE_ALL_DRIVERS_HINTS as $reAllDriversHint) {
             if (preg_match($reAllDriversHint[0], $hint) === 1) {
                 $useHint = $reAllDriversHint[1];
-                return Constants::ALL_DRIVERS;
+                return $this->apiDrivers;
             }
         }
 
@@ -347,9 +373,12 @@ class OglParser
     }
 
     private $reExtension = "";
+    private $apiDrivers = null;
 
-    const OTHER_OFFICIAL_EXTENSIONS =
+    const OTHER_OFFICIAL_GL_EXTENSIONS =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
+    const OTHER_OFFICIAL_VK_EXTENSIONS =
+        "Khronos extensions that are not part of any Vulkan version:\n";
 
     const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
     const RE_NOTE = "/^(\(.+\)) (.*)$/";
