@@ -28,10 +28,12 @@ class OglExtension
      * @param string $name The extension name.
      * @param string $status The extension status (@see Constants::STATUS_...).
      * @param string $hint The extension hint.
-     * @param \Mesamatrix\Parser\Hints[] $hints The hint manager.
+     * @param \Mesamatrix\Parser\Hints $hints The hint manager.
      * @param string[] $supportedDrivers The drivers supporting the extension.
+     * @param string[] $apiDrivers All the possible drivers for the API.
      */
-    public function __construct($name, $status, $hint, $hints, $supportedDrivers = array()) {
+    public function __construct($name, $status, $hint, \Mesamatrix\Parser\Hints $hints,
+            array $supportedDrivers = array(), array $apiDrivers = array()) {
         $this->hints = $hints;
         $this->subextensions = array();
         $this->setName($name);
@@ -40,10 +42,43 @@ class OglExtension
         $this->setModifiedAt(null);
 
         $this->supportedDrivers = array();
-        foreach ($supportedDrivers as $driverName) {
-            $driver = new OglSupportedDriver($driverName, $this->hints);
-            $this->addSupportedDriver($driver, null);
+        foreach ($supportedDrivers as $driverNameAndHint) {
+            list($driverName, $driverHint) = self::splitDriverNameAndHint($driverNameAndHint, $apiDrivers);
+            if ($driverName === null) {
+                \Mesamatrix::$logger->error('Unrecognized driver: '.$driverName);
+            }
+
+            $supportedDriver = new OglSupportedDriver($driverName, $this->hints);
+            $supportedDriver->setHint($driverHint);
+            $this->addSupportedDriver($supportedDriver, null);
         }
+    }
+
+    /**
+     * Split the given string between an official API driver and its hint.
+     *
+     * @param string $driverNameAndHint The whole string containing the driver and its hint.
+     * @param string[] $apiDrivers All the possible drivers for the API.
+     *
+     * @return string[] An array of two string; 0: the driver name, 1: its hint.
+     */
+    private static function splitDriverNameAndHint($driverNameAndHint, array $apiDrivers) {
+        $driverName = null;
+        $driverHint = "";
+        $i = 0;
+        $numApiDrivers = count($apiDrivers);
+        while ($i < $numApiDrivers && $driverName === null) {
+            $apiDriverName = $apiDrivers[$i];
+            $apiDriverLen = strlen($apiDriverName);
+            if (strncmp($driverNameAndHint, $apiDriverName, $apiDriverLen) === 0) {
+                $driverName = $apiDriverName;
+                $driverHint = substr($driverNameAndHint, $apiDriverLen + 1);
+            }
+
+            ++$i;
+        }
+
+        return array($driverName, $driverHint);
     }
 
     // name

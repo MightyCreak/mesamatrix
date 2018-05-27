@@ -114,6 +114,9 @@ class OglParser
                 }
 
                 if ($glVersion) {
+                    // Get all the drivers for this API.
+                    $this->apiDrivers = $glVersion->getAllApiDrivers();
+
                     // Set "all DONE" drivers.
                     $allSupportedDrivers = array();
                     if (preg_match(self::RE_ALL_DONE, $line, $matches) === 1) {
@@ -197,7 +200,7 @@ class OglParser
                 if ($status === Constants::STATUS_DONE) {
                     if (!isset($matches[3])) {
                         // Done and nothing else precised, it's done for all drivers.
-                        $this->mergeDrivers($supportedDrivers, Constants::GL_ALL_DRIVERS);
+                        $this->mergeDrivers($supportedDrivers, $this->apiDrivers);
                     }
                     elseif (isset($matches[4])) {
                         // Done but there are parenthesis after.
@@ -241,12 +244,12 @@ class OglParser
                     $parentDrivers = $supportedDrivers;
 
                     // Add the extension.
-                    $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
+                    $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
                     $lastExt = $glVersion->addExtension($newExtension, $commit);
                 }
                 else {
                     // Add the sub-extension.
-                    $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers);
+                    $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
                     $lastExt->addSubExtension($newSubExtension, $commit);
                 }
             }
@@ -280,7 +283,7 @@ class OglParser
     }
 
     private function isInDriversArray($name) {
-        foreach (Constants::GL_ALL_DRIVERS as $driverName) {
+        foreach ($this->apiDrivers as $driverName) {
             if (strncmp($name, $driverName, strlen($driverName)) === 0) {
                 return TRUE;
             }
@@ -290,7 +293,7 @@ class OglParser
     }
 
     private function getDriverName($name) {
-        foreach (Constants::GL_ALL_DRIVERS as $driver) {
+        foreach ($this->apiDrivers as $driver) {
             $driverLen = strlen($driver);
             if (strncmp($name, $driver, $driverLen) === 0) {
                 return $driver;
@@ -354,7 +357,7 @@ class OglParser
         foreach (Constants::RE_ALL_DRIVERS_HINTS as $reAllDriversHint) {
             if (preg_match($reAllDriversHint[0], $hint) === 1) {
                 $useHint = $reAllDriversHint[1];
-                return Constants::GL_ALL_DRIVERS;
+                return $this->apiDrivers;
             }
         }
 
@@ -370,6 +373,7 @@ class OglParser
     }
 
     private $reExtension = "";
+    private $apiDrivers = null;
 
     const OTHER_OFFICIAL_GL_EXTENSIONS =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";

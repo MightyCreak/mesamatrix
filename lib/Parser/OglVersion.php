@@ -100,6 +100,27 @@ class OglVersion
     }
 
     /**
+     * Get all the drivers for this API.
+     *
+     * @return string[] The list of supported drivers names; null if API not recognized.
+     */
+    public function getAllApiDrivers() {
+        $glVersionName = $this->getGlName();
+        switch ($glVersionName) {
+        case 'OpenGL':
+        case 'OpenGL ES':
+        case Constants::GL_OR_ES_EXTRA_NAME:
+            return Constants::GL_ALL_DRIVERS;
+
+        case 'Vulkan':
+        case Constants::VK_EXTRA_NAME:
+            return Constants::VK_ALL_DRIVERS;
+        }
+
+        return null;
+    }
+
+    /**
      * Get the drivers supporting this version.
      *
      * @return string[] The list of supported drivers names.
@@ -107,7 +128,8 @@ class OglVersion
     public function getSupportedDrivers() {
         $supportedDrivers = [];
 
-        foreach (Constants::GL_ALL_DRIVERS as $driverName) {
+        $apiDrivers = $this->getAllApiDrivers();
+        foreach ($apiDrivers as $driverName) {
             $driver = NULL;
             foreach ($this->getExtensions() as $glExt) {
                 $driver = $glExt->getSupportedDriverByName($driverName);
@@ -160,6 +182,7 @@ class OglVersion
         }
 
         // Add and merge new extensions.
+        $apiDrivers = $this->getAllApiDrivers();
         foreach ($xmlExts as $xmlExt) {
             $extName = (string) $xmlExt['name'];
             $extStatus = (string) $xmlExt->mesa['status'];
@@ -167,8 +190,14 @@ class OglVersion
 
             $newExtension = new OglExtension($extName, $extStatus, $extHint, $this->hints, array());
             foreach ($xmlExt->supported->children() as $driver) {
-                // Create new supported driver.
+                // Get driver name and verify it's valid.
                 $driverName = $driver->getName();
+                if (!in_array($driverName, $apiDrivers)) {
+                    \Mesamatrix::$logger->error('Unrecognized driver: '.$driverName);
+                    continue;
+                }
+
+                // Create new supported driver.
                 $driverHint = (string) $driver['hint'];
                 $driver = new OglSupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);

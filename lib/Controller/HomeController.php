@@ -23,13 +23,15 @@ namespace Mesamatrix\Controller;
 class HomeController extends BaseController
 {
     private $commits = array();
-    private $apiController = null;
+    private $openGLController = null;
+    private $vulkanController = null;
 
     public function __construct() {
         parent::__construct();
 
         $this->setPage('Home');
-        $this->apiController = new ApiSubController();
+        $this->openGLController = new ApiSubController();
+        $this->vulkanController = new ApiSubController();
 
         $this->addCssScript('css/tipsy.css');
 
@@ -43,8 +45,12 @@ class HomeController extends BaseController
         $this->createCommitsModel($xml);
 
         $apis = [ 'OpenGL', 'OpenGL ES', \Mesamatrix\Parser\Constants::GL_OR_ES_EXTRA_NAME ];
-        $this->apiController->setApis($apis);
-        $this->apiController->prepare();
+        $this->openGLController->setApis($apis);
+        $this->openGLController->prepare();
+
+        $apis = [ 'Vulkan', \Mesamatrix\Parser\Constants::VK_EXTRA_NAME ];
+        $this->vulkanController->setApis($apis);
+        $this->vulkanController->prepare();
     }
 
     private function loadMesamatrixXml() {
@@ -122,7 +128,7 @@ endforeach;
             <h1>Leaderboard</h1>
 <?php
 $leaderboards = array(
-    'OpenGL' => $this->apiController->getLeaderboard());
+    'OpenGL' => $this->openGLController->getLeaderboard());
 foreach ($leaderboards as $api => $leaderboard):
     $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
     $numTotalExts = $leaderboard->getNumTotalExts();
@@ -185,6 +191,7 @@ foreach ($leaderboards as $api => $leaderboard):
 <?php
 endforeach;
 
-$this->apiController->writeMatrix();
+$this->openGLController->writeMatrix();
+$this->vulkanController->writeMatrix();
     }
 };
