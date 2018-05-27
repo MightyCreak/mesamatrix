@@ -5,6 +5,7 @@
 
     "require": {
         "symfony/console": "^3.0",
+        "symfony/debug": "^3.0",
         "symfony/process": "^3.0",
         "symfony/monolog-bridge": "^3.0",
         "symfony/event-dispatcher": "^3.0",
