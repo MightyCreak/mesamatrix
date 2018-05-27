@@ -10,6 +10,7 @@
         "symfony/monolog-bridge": "^3.0",
         "symfony/event-dispatcher": "^3.0",
         "symfony/http-foundation": "^3.0",
+        "symfony/http-kernel": "^3.0",
         "psr/log": "1.0.0",
         "monolog/monolog": "~1.12",
         "suin/php-rss-writer": "~1.0"
