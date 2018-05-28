@@ -44,7 +44,7 @@ class AboutController extends BaseController
             <p>Here are few links to learn more about the Linux graphics drivers:</p>
             <ul>
                 <li>Freedesktop.org: <a href="https://secure.freedesktop.org/~imirkin/glxinfo/glxinfo.html">Ilia Mirkin's glxinfo matrix</a>
-                <li>Freedesktop.org: <a href="http://xorg.freedesktop.org/wiki/RadeonFeature/">Radeon Feature</a></li>
+                <li>Freedesktop.org: <a href="https://xorg.freedesktop.org/wiki/RadeonFeature/">Radeon Feature</a></li>
                 <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Mesa_%28computer_graphics%29" title="Mesa (computer graphics)">Mesa (computer graphics)</a></li>
                 <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Radeon" title="Radeon">Radeon</a></li>
                 <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
