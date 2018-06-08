@@ -78,6 +78,10 @@ class ApiSubController
         $this->matrix['last_updated'] = (int) $xml['updated'];
     }
 
+    public function getLastUpdatedTime() {
+        return $this->matrix['last_updated'];
+    }
+
     private function createColumns(array &$matrix, array $xmlApis) {
         $matrix['column_groups'] = array();
         $matrix['columns'] = array();
@@ -438,7 +442,6 @@ foreach($this->matrix['sections'] as $section):
 endforeach;
 ?>
             </table>
-            <p><b>Last time features.txt was parsed:</b> <span class="toLocalDate" data-timestamp="<?= date(DATE_RFC2822, $this->matrix['last_updated']) ?>"><?= date('Y-m-d H:i O', $this->matrix['last_updated']) ?></span>.</p>
 <?php
     }
 };

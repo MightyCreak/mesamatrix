@@ -25,6 +25,7 @@ class HomeController extends BaseController
     private $commits = array();
     private $openGLController = null;
     private $vulkanController = null;
+    private $lastUpdatedTime = 0;
 
     public function __construct() {
         parent::__construct();
@@ -51,6 +52,8 @@ class HomeController extends BaseController
         $apis = [ 'Vulkan', \Mesamatrix\Parser\Constants::VK_EXTRA_NAME ];
         $this->vulkanController->setApis($apis);
         $this->vulkanController->prepare();
+
+        $this->lastUpdatedTime = $this->openGLController->getLastUpdatedTime();
     }
 
     private function loadMesamatrixXml() {
@@ -193,5 +196,9 @@ endforeach;
 
 $this->openGLController->writeMatrix();
 $this->vulkanController->writeMatrix();
+
+?>
+    <p><b>Last time features.txt was parsed:</b> <span class="toLocalDate" data-timestamp="<?= date(DATE_RFC2822, $this->lastUpdatedTime) ?>"><?= date('Y-m-d H:i O', $this->lastUpdatedTime) ?></span>.</p>
+<?php
     }
 };
