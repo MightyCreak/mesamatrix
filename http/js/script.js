@@ -128,27 +128,31 @@ $(document).ready(function() {
     });
 
     $('.matrix').delegate('td', 'mouseover mouseleave', function(e) {
+        // Get cell, row and table elements
+        var cell = $(this);
+        var row = cell.closest('tr');
+
         // Should highlight row
-        var row = $(this).parent();
         var highlightRow = row.hasClass('extension');
 
         // Should highlight column
-        var columnIdx = $(this).index();
+        var columnIdx = cell.index();
         var highlightCol = $('.matrix colgroup').eq(columnIdx).hasClass('hl');
         if (highlightCol) {
-            highlightCol = $(this).hasClass('task');
+            highlightCol = cell.hasClass('task');
             if (!highlightCol)
-                highlightCol = $(this).hasClass('hCellHeader') && !$(this).attr('colspan');
+                highlightCol = cell.hasClass('hCellHeader') && !cell.attr('colspan');
         }
 
         if (e.type == 'mouseover') {
-            if (row.hasClass('extension')) {
+            if (highlightRow) {
                 row.find('td').each(function() {
                     $(this).addClass('hover');
                 });
             }
             if (highlightCol) {
-                $('.matrix .extension td:nth-child(' + (columnIdx + 1) + ')').each(function() {
+                var table = row.closest('table');
+                table.find('.extension td:nth-child(' + (columnIdx + 1) + ')').each(function() {
                     $(this).addClass('hover');
                 });
             }
@@ -160,7 +164,8 @@ $(document).ready(function() {
                 });
             }
             if (highlightCol) {
-                $('.matrix .extension td:nth-child(' + (columnIdx + 1) + ')').each(function() {
+                var table = row.closest('table');
+                table.find('.extension td:nth-child(' + (columnIdx + 1) + ')').each(function() {
                     $(this).removeClass("hover");
                 });
             }
