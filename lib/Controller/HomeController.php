@@ -151,10 +151,12 @@ class HomeController extends BaseController
     protected function writeHtmlPage() {
 ?>
     <p>
-        Mesamatrix is a mere graphical representation of a text file from the Mesa git repository
-        (<a href="https://cgit.freedesktop.org/mesa/mesa/tree/docs/features.txt">features.txt</a>).
-        Some subtleties may lie in the source code, so if you want the most accurate information, you can subscribe to the mailing-list.
+        This page is a graphical representation of the text file <a href="https://cgit.freedesktop.org/mesa/mesa/tree/docs/features.txt">docs/features.txt</a> from the Mesa repository.
     </p>
+    <p>
+        Although this text file is updated by the Mesa developers themselves, it might not contain an exhaustive list of all the drivers features and subtleties. So, for more information, it is advised to look at the source code, or ask the developers on the mailing-list.
+    </p>
+
     <div class="stats">
         <div class="stats-commits">
             <h1>Last commits</h1>
