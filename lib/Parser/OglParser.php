@@ -138,6 +138,10 @@ class OglParser
     /**
      * Parse an OpenGL section.
      *
+     * Special case for section without any extension: add a fake one called
+     * "All extensions". This is needed for Vulkan 1.0 (until there is a better
+     * parser).
+     *
      * @param \Mesamatrix\Parser\OglVersion $glVersion The version section to feed during parsing.
      * @param \Mesamatrix\Parser\OglMatrix $matrix The matrix to feed during parsing.
      * @param \Mesamatrix\Git\Commit $commit The commit of this file.
@@ -155,6 +159,12 @@ class OglParser
 
         // Verify the line is indented.
         if (preg_match("/^  [^ ]/", $line) === 0) {
+            // Special case: no indentation means no extension, add a fake one.
+            if ($glVersion->getNumExtensions() === 0) {
+                $fakeExtension = new OglExtension("All extensions", Constants::STATUS_DONE, "", $matrix->getHints(), $allSupportedDrivers, $this->apiDrivers);
+                $glVersion->addExtension($fakeExtension, $commit);
+            }
+
             return $line;
         }
 

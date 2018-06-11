@@ -221,6 +221,15 @@ class OglVersion
     }
 
     /**
+     * Get the number of extensions.
+     *
+     * @return int The number of extensions.
+     */
+    public function getNumExtensions() {
+        return count($this->extensions);
+    }
+
+    /**
      * Find the extensions with the given name.
      *
      * @param string $name The name of the extension to find.
