@@ -88,6 +88,66 @@ class HomeController extends BaseController
         return $leaderboard;
     }
 
+    private function writeLeaderboard($api, $leaderboard) {
+        $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
+        $numTotalExts = $leaderboard->getNumTotalExts();
+?>
+            <!--<h2><?= $api ?></h2>-->
+            <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
+            The ranking is based on the number of extensions done by driver. </p>
+            <table class="lb">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Driver</th>
+                        <th>Extensions</th>
+                        <th>OpenGL</th>
+                        <th>OpenGL ES</th>
+                    </tr>
+                </thead>
+                <tbody>
+<?php
+        $index = 1;
+        $rank = 1;
+        $prevNumExtsDone = -1;
+        foreach($driversExtsDone as $drivername => $numExtsDone) {
+            $sameRank = $prevNumExtsDone === $numExtsDone;
+            if (!$sameRank) {
+                $rank = $index;
+            }
+            switch ($rank) {
+            case 1: $rankClass = "lbCol-1st"; break;
+            case 2: $rankClass = "lbCol-2nd"; break;
+            case 3: $rankClass = "lbCol-3rd"; break;
+            default: $rankClass = "";
+            }
+            $pctScore = sprintf("%.1f%%", $numExtsDone / $numTotalExts * 100);
+            $openglVersion = $leaderboard->getDriverGlVersion($drivername);
+            if ($openglVersion === NULL) {
+                $openglVersion = "N/A";
+            }
+            $openglesVersion = $leaderboard->getDriverGlesVersion($drivername);
+            if ($openglesVersion === NULL) {
+                $openglesVersion = "N/A";
+            }
+?>
+                    <tr class="<?= $rankClass ?>">
+                        <th class="lbCol-rank"><?= !$sameRank ? $rank : "" ?></th>
+                        <td class="lbCol-driver"><?= $drivername ?></td>
+                        <td class="lbCol-score"><span class="lbCol-pctScore">(<?= $pctScore ?>)</span> <?= $numExtsDone ?></td>
+                        <td class="lbCol-version"><?= $openglVersion ?></td>
+                        <td class="lbCol-version"><?= $openglesVersion ?></td>
+                    </tr>
+<?php
+            $prevNumExtsDone = $numExtsDone;
+            $index++;
+        }
+?>
+                </tbody>
+            </table>
+<?php
+    }
+
     protected function writeHtmlPage() {
 ?>
     <p>
@@ -130,73 +190,15 @@ endforeach;
         <div class="stats-lb">
             <h1>Leaderboard</h1>
 <?php
-$leaderboards = array(
-    'OpenGL' => $this->openGLController->getLeaderboard());
-foreach ($leaderboards as $api => $leaderboard):
-    $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
-    $numTotalExts = $leaderboard->getNumTotalExts();
+$this->writeLeaderboard('OpenGL', $this->openGLController->getLeaderboard());
+//$this->writeLeaderboard('Vulkan', $this->vulkanController->getLeaderboard());
 ?>
-            <!--<h2><?= $api ?></h2>-->
-            <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
-            The ranking is based on the number of extensions done by driver. </p>
-            <table class="lb">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Driver</th>
-                        <th>Extensions</th>
-                        <th>OpenGL</th>
-                        <th>OpenGL ES</th>
-                    </tr>
-                </thead>
-                <tbody>
-<?php
-    $index = 1;
-    $rank = 1;
-    $prevNumExtsDone = -1;
-    foreach($driversExtsDone as $drivername => $numExtsDone) {
-        $sameRank = $prevNumExtsDone === $numExtsDone;
-        if (!$sameRank) {
-            $rank = $index;
-        }
-        switch ($rank) {
-        case 1: $rankClass = "lbCol-1st"; break;
-        case 2: $rankClass = "lbCol-2nd"; break;
-        case 3: $rankClass = "lbCol-3rd"; break;
-        default: $rankClass = "";
-        }
-        $pctScore = sprintf("%.1f%%", $numExtsDone / $numTotalExts * 100);
-        $openglVersion = $leaderboard->getDriverGlVersion($drivername);
-        if ($openglVersion === NULL) {
-            $openglVersion = "N/A";
-        }
-        $openglesVersion = $leaderboard->getDriverGlesVersion($drivername);
-        if ($openglesVersion === NULL) {
-            $openglesVersion = "N/A";
-        }
-?>
-                    <tr class="<?= $rankClass ?>">
-                        <th class="lbCol-rank"><?= !$sameRank ? $rank : "" ?></th>
-                        <td class="lbCol-driver"><?= $drivername ?></td>
-                        <td class="lbCol-score"><span class="lbCol-pctScore">(<?= $pctScore ?>)</span> <?= $numExtsDone ?></td>
-                        <td class="lbCol-version"><?= $openglVersion ?></td>
-                        <td class="lbCol-version"><?= $openglesVersion ?></td>
-                    </tr>
-<?php
-        $prevNumExtsDone = $numExtsDone;
-        $index++;
-    }
-?>
-                </tbody>
-            </table>
         </div>
+
     </div>
 <?php
-endforeach;
-
 $this->openGLController->writeMatrix();
 $this->vulkanController->writeMatrix();
-
 ?>
     <p><b>Last time features.txt was parsed:</b> <span class="toLocalDate" data-timestamp="<?= date(DATE_RFC2822, $this->lastUpdatedTime) ?>"><?= date('Y-m-d H:i O', $this->lastUpdatedTime) ?></span>.</p>
 <?php
