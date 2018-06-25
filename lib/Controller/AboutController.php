@@ -35,7 +35,7 @@ class AboutController extends BaseController
 ?>
             <h1>About Mesamatrix</h1>
             <h2>How it works</h2>
-            <p>Frequently, the Mesa git is fetched and, if there is a new commit for the text file, a PHP script will parse it and format it into <abbr title="Extensible Markup Language">XML</abbr>. Then another PHP script displays the data into the HTML you can see here.</p>
+            <p>Frequently, the Mesa git is fetched and, if there is a new commit for the text file, a PHP script will parse it and format it into <abbr title="Extensible Markup Language">XML</abbr>. Then another PHP script displays the data into the <abbr title="Hypertext Markup Language">HTML</abbr> you can see here.</p>
             <h2>Source code</h2>
             <p>The code is free and licenced under AGPLv3. If you want to report a bug, participate to the project or simply browse the code:</p>
             <p><a href="<?= \Mesamatrix::$config->getValue("info", "project_url") ?>"><?= \Mesamatrix::$config->getValue("info", "project_url") ?></a></p>
