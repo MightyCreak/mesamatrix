@@ -38,6 +38,13 @@ $baseUrl = \Mesamatrix::$request->getSchemeAndHttpHost()
 // prepare RSS
 $rss = new RSSFeed();
 
+// Get the time of the last commit and substract a year.
+$minTime = 0;
+foreach ($xml->commits->commit as $commit) {
+    $minTime = max($minTime, (int)$commit["timestamp"]);
+}
+$minTime = $minTime - (60 * 60 * 24 * 365);
+
 $channel = new RSSChannel();
 $channel
     ->title(\Mesamatrix::$config->getValue("info", "title"))
@@ -48,6 +55,9 @@ $channel
 $commitWeb = \Mesamatrix::$config->getValue("git", "mesa_web") . "/commit/?id=";
 
 foreach ($xml->commits->commit as $commit) {
+    if ((int)$commit["timestamp"] < $minTime)
+        continue;
+
     $item = new RSSItem();
     $item
         ->title((string)$commit["subject"])
