@@ -141,10 +141,10 @@ header .header-icons img.rss {
 
 .hCellSep       { width: 0px; }
 
-.permalink { margin-left: 0.3em; display: none; }
+.permalink { margin-left: 0.3em; visibility: hidden; }
 .permalink:link { text-decoration: none; color: #DDDDDD; }
 .permalink:visited { text-decoration: none; color: #DDDDDD; }
-:hover > .permalink { display: inline; }
+:hover > .permalink { visibility: visible; }
 
 .extension-child { padding-left: 1em; }
 
