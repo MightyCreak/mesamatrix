@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+"use strict";
+
 function fillZeros(number, size) {
     var absNum = String(Math.abs(number));
     var numZeros = size - absNum.length;
@@ -88,8 +90,9 @@ function getRelativeDate(text) {
     return year + "-" + month + "-" + day;
 }
 
-function gaussian(x, a, b, c) {
-    return a * Math.exp(- Math.pow(x - b, 2) / (2 * Math.pow(c, 2)));
+function parametricBlend(t) {
+    const sqt = Math.pow(t, 2);
+    return sqt / (2.0 * (sqt - t) + 1.0);
 }
 
 $(document).ready(function() {
@@ -107,10 +110,12 @@ $(document).ready(function() {
     $('.footnote').tipsy({gravity: 'w', fade: true});
 
     // adjust the opacity of the 'modified' text based on age
-    var timeConst = 1.2e7;
+    const timeNow = Date.now() / 1000;
+    const timeConst = 31536000; // A year in seconds
     $('.task span').each(function() {
-        var timeDiff = (Date.now()/1000) - $(this).data('timestamp');
-        $(this).css('opacity', gaussian(timeDiff, 1, 0, timeConst));
+        var timeDiff = timeNow - $(this).data('timestamp');
+        var opacity = 1.0 - parametricBlend(Math.min(timeDiff, timeConst) / timeConst);
+        $(this).css('opacity', opacity);
     });
 
     // Change mesa score color based on completion
