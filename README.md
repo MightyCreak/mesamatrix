@@ -11,15 +11,16 @@ Official website: http://mesamatrix.net/
 
 Mesamatrix requires the following software:
 
+  * Composer
   * Git
-  * PHP 5.6.0 or higher
+  * PHP 5.6 or higher
     * php-json
     * php-xml
 
-If you are installing from Git, you need to initialise third-party code
-libraries with [Composer](https://getcomposer.org/):
+If you are installing from Git, you need to install the dependencies with
+[Composer](https://getcomposer.org/):
 
-    $ php composer.phar install
+    $ composer install
 
 ## Configuration (optional)
 
