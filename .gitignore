@@ -3,9 +3,12 @@
 /private/mesa.git/
 /private/mesamatrix.log
 /private/urlcache.json
-/vendor/
 /http/features.xml
 /config/config.php
+
+# Composer files
+/vendor/
+composer.phar
 
 # Editors files
 *.swp
