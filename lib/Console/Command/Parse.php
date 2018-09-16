@@ -187,7 +187,13 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $proc = $gitCommitGet->getProcess();
         $proc->mustRun();
         $oldestCommit = strtok($proc->getOutput(), "\n");
-        \Mesamatrix::$logger->info('Oldest commit: '.$oldestCommit);
+
+        if (empty($oldestCommit)) {
+            \Mesamatrix::$logger->info('No oldest commit found for '.$filepath);
+            return NULL;
+        }
+
+        \Mesamatrix::$logger->info('Oldest commit for '.$filepath.': '.$oldestCommit);
 
         $logSeparator = uniqid('mesamatrix_separator_');
         $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
