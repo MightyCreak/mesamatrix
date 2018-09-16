@@ -199,7 +199,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
         $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
             'log', '--pretty=format:'.$logFormat, '--reverse', '-p',
-            $oldestCommit.'^..', '--', $filepath
+            $oldestCommit.'..', '--', $filepath
         ));
         $proc = $gitLog->getProcess();
         $this->getHelper('process')->mustRun($this->output, $proc);
