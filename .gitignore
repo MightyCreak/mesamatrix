@@ -1,10 +1,7 @@
-/private/commits/
-/private/last_commit_parsed
-/private/mesa.git/
-/private/mesamatrix.log
-/private/urlcache.json
-/http/features.xml
+# App files
 /config/config.php
+/http/features.xml
+/private/
 
 # Composer files
 /vendor/
