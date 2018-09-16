@@ -4,6 +4,7 @@
     "type": "project",
 
     "require": {
+        "php": ">= 5.6",
         "symfony/console": "^3.0",
         "symfony/debug": "^3.0",
         "symfony/process": "^3.0",
@@ -11,8 +12,9 @@
         "symfony/event-dispatcher": "^3.0",
         "symfony/http-foundation": "^3.0",
         "symfony/http-kernel": "^3.0",
-        "psr/log": "1.0.0",
-        "monolog/monolog": "~1.12",
+        "paragonie/random_compat": "~2.0",
+        "psr/log": "~1.0",
+        "monolog/monolog": "~1.0",
         "suin/php-rss-writer": "~1.0"
     },
 
