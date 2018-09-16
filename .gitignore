@@ -6,5 +6,8 @@
 /vendor/
 /http/features.xml
 /config/config.php
+
+# Editors files
 *.swp
 *~
+.vscode/
