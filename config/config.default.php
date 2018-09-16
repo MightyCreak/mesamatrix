@@ -43,6 +43,15 @@ $CONFIG = array(
         "mesa_web" => "https://cgit.freedesktop.org/mesa/mesa",
         "mesa_url" => "https://anongit.freedesktop.org/git/mesa/mesa.git",
         "mesa_dir" => "mesa.git",
-        "gl_filepaths" => ["docs/GL3.txt", "docs/features.txt"],
+        "gl_filepaths" => [
+            [
+                "name" => "docs/GL3.txt",
+                "excluded_commits" => [ "f926cf5bd0ade3273b320ca4483d826fcfe20bbb" ]    // Rename from GL3.txt to features.txt
+            ],
+            [
+                "name" => "docs/features.txt",
+                "excluded_commits" => []
+            ]
+        ],
     ),
 );

@@ -69,33 +69,21 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $commits = array();
         $glFilepaths = \Mesamatrix::$config->getValue('git', 'gl_filepaths', array());
         foreach ($glFilepaths as $filepath) {
-            $fileCommits = $this->fetchCommits($filepath);
+            $fileCommits = $this->fetchCommits($filepath['name'], $filepath['excluded_commits']);
             if ($fileCommits !== NULL) {
                 foreach ($fileCommits as $commit) {
                     $commits[] = $commit;
                 }
             }
         }
+        unset($glFilepaths);
 
         if (empty($commits)) {
             // No commit found, exit.
             return 1;
         }
 
-        // Remove first commit in successive duplicates
-        // (it means the file has been renamed).
-        $i = 1;
-        $num = count($commits);
-        while ($i < $num) {
-            if ($commits[$i - 1]->getHash() === $commits[$i]->getHash()) {
-                array_splice($commits, $i - 1, 1);
-                $num--;
-            }
-            else {
-                $i++;
-            }
-        }
-        unset($i, $num);
+        $numCommits = count($commits);
 
         $lastCommitFilename = \Mesamatrix::$config->getValue('info', 'private_dir', 'private')
                             . '/last_commit_parsed';
@@ -116,7 +104,6 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
 
         // Get last commit fetched.
-        $numCommits = count($commits);
         $lastCommitFetched = $commits[$numCommits - 1]->getHash();
 
         // Compare last parsed and fetched commits.
@@ -178,9 +165,10 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * Fetch commits from mesa's git.
      *
      * @param string $filepath GL text file path.
+     * @param string[] $excludedCommits The commits to exclude from the list.
      * @return \Mesamatrix\Git\Commit[]|null Array of commits.
      */
-    protected function fetchCommits($filepath) {
+    protected function fetchCommits($filepath, array $excludedCommits) {
         $gitCommitGet = new \Mesamatrix\Git\ProcessBuilder(array(
             'rev-list', 'master', '--reverse', '--', $filepath
         ));
@@ -215,10 +203,17 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $commits = array();
         foreach ($commitSections as $commitSection) {
             $commitData = explode(PHP_EOL, $commitSection, 7);
+
             if ($commitData !== FALSE && isset($commitData[1])) {
+                $commitHash = $commitData[0];
+
+                // Skip excluded commits.
+                if (in_array($commitHash, $excludedCommits))
+                    continue;
+
                 $commit = new \Mesamatrix\Git\Commit();
                 $commit->setFilepath($filepath)
-                       ->setHash($commitData[0])
+                       ->setHash($commitHash)
                        ->setDate($commitData[1])
                        ->setAuthor($commitData[2])
                        ->setCommitter($commitData[3])
