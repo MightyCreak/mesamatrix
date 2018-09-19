@@ -3,19 +3,20 @@
     "license": "AGPL-3.0",
     "type": "project",
 
+    "config": {
+        "platform": {
+            "php": "5.6.38"
+        }
+    },
+
     "require": {
-        "php": ">= 5.6",
-        "symfony/console": "^3.0",
-        "symfony/debug": "^3.0",
-        "symfony/process": "^3.0",
-        "symfony/monolog-bridge": "^3.0",
-        "symfony/event-dispatcher": "^3.0",
-        "symfony/http-foundation": "^3.0",
-        "symfony/http-kernel": "^3.0",
-        "paragonie/random_compat": "~2.0",
-        "psr/log": "~1.0",
-        "monolog/monolog": "~1.0",
-        "suin/php-rss-writer": "~1.0"
+        "symfony/console": "*",
+        "symfony/debug": "*",
+        "symfony/process": "*",
+        "symfony/monolog-bridge": "*",
+        "symfony/http-kernel": "*",
+        "monolog/monolog": "*",
+        "suin/php-rss-writer": "*"
     },
 
     "autoload": {
