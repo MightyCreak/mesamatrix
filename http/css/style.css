@@ -51,6 +51,10 @@ header {
     display: flex;
     justify-content: space-between;
 }
+header img.banner {
+    width: 663px;
+    height: 132px;
+}
 header .header-icons {
     display: flex;
     flex-direction: column;
