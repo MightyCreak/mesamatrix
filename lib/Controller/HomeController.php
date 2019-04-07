@@ -157,8 +157,8 @@ class HomeController extends BaseController
         Although this text file is updated by the Mesa developers themselves, it might not contain an exhaustive list of all the drivers features and subtleties. So, for more information, it is advised to look at the source code, or ask the developers on the mailing-list.
     </p>
 
-    <div class="stats">
-        <div class="stats-commits">
+    <div class="stats-container">
+        <div class="stats-item-commits">
             <h1>Last commits</h1>
             <table class="commits">
                 <thead>
@@ -189,7 +189,7 @@ endforeach;
             </table>
         </div>
 
-        <div class="stats-lb">
+        <div>
             <h1>Leaderboard</h1>
 <?php
 $this->writeLeaderboard('OpenGL', $this->openGLController->getLeaderboard());

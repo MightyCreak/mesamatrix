@@ -65,16 +65,16 @@ header .header-icons img.rss {
     margin: 3px;
 }
 
-.stats {
+.stats-container {
     display: flex;
+    margin: 0 -5px;
 }
-.stats-commits {
-    order: 0;
+.stats-container > div {
+    flex: 0 1 50%;
+    padding: 0 5px;
+}
+.stats-container > div.stats-item-commits {
     white-space: nowrap;
-}
-.stats-lb {
-    order: 1;
-    margin-left: 5px;
 }
 
 .commits th                         { text-align: left; }
