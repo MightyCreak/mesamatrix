@@ -24,8 +24,7 @@ html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}main{display:b
 html{box-sizing:border-box}*,*:after,*:before{box-sizing:inherit}
 
 body {
-    font-size: 85%;
-    font-family: sans-serif;
+    font-family: 'Liberation Sans', 'Arial', sans-serif;
     background-color: #ffffff;
 }
 
@@ -81,7 +80,7 @@ header .header-icons img.rss {
 .commits .commitsAge                { padding-right: 2em; }
 .commits .commitsAge::first-letter  { text-transform: uppercase; }
 
-.lb                             { border-collapse: collapse; border-spacing: 0; width: 100%; }
+.lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; width: 100%; }
 .lb th, .lb td                  { padding: 0.25em 0.5em; }
 .lb th                          { background-color: #d3d7cf; }
 .lb td                          { border: 1px solid #d3d7cf; }
@@ -98,6 +97,7 @@ header .header-icons img.rss {
  */
 
 .matrix {
+    font-size: 85%;
     border-spacing: 1px;
     border-collapse: separate;
     width: 100%;
