@@ -75,7 +75,7 @@ class HomeController extends BaseController
         for ($i = 0; $i < $numCommits; ++$i) {
             $xmlCommit = $xml->commits->commit[$i];
             $this->commits[] = array(
-                'url' => \Mesamatrix::$config->getValue('git', 'mesa_web').'/commit/?id='.$xmlCommit['hash'],
+                'url' => \Mesamatrix::$config->getValue('git', 'mesa_commit_url').$xmlCommit['hash'],
                 'timestamp' => (int) $xmlCommit['timestamp'],
                 'subject' => $xmlCommit['subject']
             );
@@ -151,7 +151,7 @@ class HomeController extends BaseController
     protected function writeHtmlPage() {
 ?>
     <p>
-        This page is a graphical representation of the text file <a href="https://cgit.freedesktop.org/mesa/mesa/tree/docs/features.txt">docs/features.txt</a> from the Mesa repository.
+        This page is a graphical representation of the text file <a href="<?= \Mesamatrix::$config->getValue('git', 'mesa_web') ?>/blob/master/docs/features.txt">docs/features.txt</a> from the Mesa repository.
     </p>
     <p>
         Although this text file is updated by the Mesa developers themselves, it might not contain an exhaustive list of all the drivers features and subtleties. So, for more information, it is advised to look at the source code, or ask the developers on the mailing-list.

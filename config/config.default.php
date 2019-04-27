@@ -40,8 +40,9 @@ $CONFIG = array(
     ),
 
     "git" => array(
-        "mesa_web" => "https://cgit.freedesktop.org/mesa/mesa",
-        "mesa_url" => "https://anongit.freedesktop.org/git/mesa/mesa.git",
+        "mesa_web" => "https://gitlab.freedesktop.org/mesa/mesa",
+        "mesa_url" => "https://gitlab.freedesktop.org/mesa/mesa.git",
+        "mesa_commit_url" => "https://gitlab.freedesktop.org/mesa/mesa/commit/",
         "mesa_dir" => "mesa.git",
         "gl_filepaths" => [
             [

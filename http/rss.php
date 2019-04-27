@@ -52,7 +52,7 @@ $channel
     ->url($baseUrl)
     ->appendTo($rss);
 
-$commitWeb = \Mesamatrix::$config->getValue("git", "mesa_web") . "/commit/?id=";
+//$commitWeb = \Mesamatrix::$config->getValue("git", "mesa_commit_url");
 
 foreach ($xml->commits->commit as $commit) {
     if ((int)$commit["timestamp"] < $minTime)
