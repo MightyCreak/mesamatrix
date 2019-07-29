@@ -38,7 +38,8 @@ abstract class Constants
         "radeonsi",
         "swr",
         "freedreno",
-        "virgl"
+        "virgl",
+        "etnaviv",
     ];
 
     const GL_ALL_DRIVERS_VENDORS = [
@@ -47,6 +48,7 @@ abstract class Constants
         "Nvidia"    => [ "nv50", "nvc0" ],
         "AMD"       => [ "r600", "radeonsi" ],
         "Qualcomm"  => [ "freedreno" ],
+        "Vivante"   => [ "etnaviv" ],
     ];
 
     const VK_ALL_DRIVERS = [
