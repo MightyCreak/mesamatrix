@@ -36,12 +36,11 @@ class Setup extends \Symfony\Component\Console\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $dateLastYear = date("Y-m-d", time() - 31536000);
-        $git = new \Mesamatrix\Git\ProcessBuilder(array(
-            'clone', '--bare', '--shallow-since='.$dateLastYear, '--branch', 'master',
+        $git = new \Mesamatrix\Git\Process(array(
+            'clone', '--bare', '--shallow-since='.$dateLastYear, '--branch=master',
             \Mesamatrix::$config->getValue('git', 'mesa_url'), '@gitDir@'
         ));
-        $process = $git->getProcess();
-        $process->setTimeout(null);
-        $this->getHelper('process')->mustRun($output, $process);
+        $git->setTimeout(null);
+        $this->getHelper('process')->mustRun($output, $git);
     }
 }

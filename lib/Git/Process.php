@@ -21,17 +21,26 @@
 
 namespace Mesamatrix\Git;
 
-class ProcessBuilder extends \Symfony\Component\Process\ProcessBuilder
+class Process extends \Symfony\Component\Process\Process
 {
     public function __construct(array $arguments = array())
     {
-        $this->setPrefix('git');
+        // Replace '@gitDir@' by Mesa Git directory.
         $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "private_dir"))."/";
         $gitDir .= \Mesamatrix::$config->getValue("git", "mesa_dir", "mesa.git");
         foreach ($arguments as &$arg) {
             $arg = str_replace('@gitDir@', $gitDir, $arg);
         }
-        parent::__construct($arguments);
-        $this->setWorkingDirectory($gitDir);
+
+        // Ensure existence of the Mesa Git directory.
+        if (!is_dir($gitDir)) {
+            if (!mkdir($gitDir)) {
+                \Mesamatrix::$logger->critical('Couldn\'t create directory `'.$gitDir.'`.');
+                return 1;
+            }
+        }
+
+        $command = array_merge([ 'git' ], $arguments);
+        parent::__construct($command, $gitDir);
     }
 }

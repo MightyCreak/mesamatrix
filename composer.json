@@ -1,11 +1,20 @@
 {
     "name": "mesamatrix/mesamatrix",
+    "description": "Mesamatrix website",
     "license": "AGPL-3.0",
     "type": "project",
+    "homepage": "https://mesamatrix.net",
+
+    "authors": [
+        {
+            "name": "Romain Failliot",
+            "email": "romain.failliot@foolstep.com"
+        }
+    ],
 
     "config": {
         "platform": {
-            "php": "5.6.38"
+            "php": "7.2"
         }
     },
 
