@@ -3,7 +3,7 @@
 Mesamatrix is a PHP application that parses information from the Mesa Git
 repository and formats it in HTML.
 
-Official website: http://mesamatrix.net/
+Official website: https://mesamatrix.net/
 
 # Installation
 

@@ -169,12 +169,11 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * @return \Mesamatrix\Git\Commit[]|null Array of commits.
      */
     protected function fetchCommits($filepath, array $excludedCommits) {
-        $gitCommitGet = new \Mesamatrix\Git\ProcessBuilder(array(
+        $gitCommitGet = new \Mesamatrix\Git\Process(array(
             'rev-list', 'master', '--reverse', '--', $filepath
         ));
-        $proc = $gitCommitGet->getProcess();
-        $proc->mustRun();
-        $oldestCommit = strtok($proc->getOutput(), "\n");
+        $gitCommitGet->mustRun();
+        $oldestCommit = strtok($gitCommitGet->getOutput(), "\n");
 
         if (empty($oldestCommit)) {
             \Mesamatrix::$logger->info('No oldest commit found for '.$filepath);
@@ -185,14 +184,13 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         $logSeparator = uniqid('mesamatrix_separator_');
         $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
-        $gitLog = new \Mesamatrix\Git\ProcessBuilder(array(
+        $gitLog = new \Mesamatrix\Git\Process(array(
             'log', '--pretty=format:'.$logFormat, '--reverse', '-p',
             $oldestCommit.'..', '--', $filepath
         ));
-        $proc = $gitLog->getProcess();
-        $this->getHelper('process')->mustRun($this->output, $proc);
+        $this->getHelper('process')->mustRun($this->output, $gitLog);
 
-        $commitSections = explode($logSeparator . PHP_EOL, $proc->getOutput());
+        $commitSections = explode($logSeparator . PHP_EOL, $gitLog->getOutput());
         if (empty($commitSections)) {
             // No commit? There must be a problem.
             \Mesamatrix::$logger->error("No commit found.");
@@ -236,14 +234,13 @@ class Parse extends \Symfony\Component\Console\Command\Command
         // Show content for this commit.
         $filepath = $commit->getFilepath();
         $hash = $commit->getHash();
-        $cat = new \Mesamatrix\Git\ProcessBuilder(array('show', $hash.':'.$filepath));
-        $proc = $cat->getProcess();
-        $this->getHelper('process')->mustRun($this->output, $proc);
+        $cat = new \Mesamatrix\Git\Process(array('show', $hash.':'.$filepath));
+        $this->getHelper('process')->mustRun($this->output, $cat);
 
         // Parse the content.
         \Mesamatrix::$logger->info('Parsing '.(basename($filepath)).' for commit '.$hash);
         $parser = new OglParser();
-        $matrix = $parser->parseContent($proc->getOutput(), $commit);
+        $matrix = $parser->parseContent($cat->getOutput(), $commit);
 
         // Create the XML.
         $xml = new \SimpleXMLElement("<mesa></mesa>");
