@@ -40,6 +40,7 @@ abstract class Constants
         "freedreno",
         "virgl",
         "etnaviv",
+        "v3d"
     ];
 
     const GL_ALL_DRIVERS_VENDORS = [
@@ -49,6 +50,7 @@ abstract class Constants
         "AMD"       => [ "r600", "radeonsi" ],
         "Qualcomm"  => [ "freedreno" ],
         "Vivante"   => [ "etnaviv" ],
+        "Broadcom"  => [ "v3d" ],
     ];
 
     const VK_ALL_DRIVERS = [
