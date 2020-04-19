@@ -75,7 +75,10 @@ header .header-icons img.rss {
 
 .commits th                         { text-align: left; }
 .commits td                         { vertical-align: top; }
-.commits .commitsAge                { padding-right: 2em; }
+.commits .commitsAge                {
+    white-space: nowrap;
+    padding-right: 1em;
+}
 .commits .commitsAge::first-letter  { text-transform: uppercase; }
 
 .lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; width: 100%; }
