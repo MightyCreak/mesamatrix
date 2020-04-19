@@ -182,7 +182,7 @@ endforeach;
                     <tr>
                         <td colspan="2">
                             <noscript>(Dates are UTC)<br/></noscript>
-                            <a href="<?= \Mesamatrix::$config->getValue("git", "mesa_web")."/log/docs/features.txt" ?>">More...</a>
+                            <a href="<?= \Mesamatrix::$config->getValue("git", "mesa_web")."/-/commits/master/docs/features.txt" ?>">More...</a>
                         </td>
                     </tr>
                 </tbody>
