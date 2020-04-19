@@ -72,11 +72,9 @@ header .header-icons img.rss {
     flex: 0 1 50%;
     padding: 0 5px;
 }
-.stats-container > div.stats-item-commits {
-    white-space: nowrap;
-}
 
 .commits th                         { text-align: left; }
+.commits td                         { vertical-align: top; }
 .commits .commitsAge                { padding-right: 2em; }
 .commits .commitsAge::first-letter  { text-transform: uppercase; }
 
