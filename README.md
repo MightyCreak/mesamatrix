@@ -1,5 +1,3 @@
-![Matrix](https://img.shields.io/matrix/mesamatrix:matrix.org)
-
 # About
 
 Mesamatrix is a PHP application that parses information from the Mesa Git
