@@ -119,6 +119,7 @@ header .header-icons img.rss {
 }
 
 .hCellHeader {
+    min-width: 4em;
     padding: 0.2em;
     font-weight: bold;
     text-align: center;
