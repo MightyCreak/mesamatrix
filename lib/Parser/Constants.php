@@ -45,7 +45,7 @@ abstract class Constants
     ];
 
     const GL_ALL_DRIVERS_VENDORS = [
-        "Software"  => [ "softpipe", "llvmpipe", "swr", "virgl", "zink" ],
+        "Software"  => [ "llvmpipe", "softpipe", "swr", "virgl", "zink" ],
         "Intel"     => [ "i965" ],
         "Nvidia"    => [ "nv50", "nvc0" ],
         "AMD"       => [ "r600", "radeonsi" ],
