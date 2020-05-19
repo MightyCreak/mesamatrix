@@ -122,12 +122,12 @@ abstract class BaseController
     </head>
     <body>
         <div id="main">
-            <header>
+            <div class="header">
                 <a href="."><img src="images/banner.svg" class="banner" alt="Mesamatrix banner" /></a>
                 <div class="header-icons">
                     <a href="rss.php"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a>
                 </div>
-            </header>
+            </div>
 
             <div class="menu">
                 <ul class="menu-list">

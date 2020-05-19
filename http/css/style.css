@@ -44,21 +44,21 @@ a:hover, a:active {
     margin: auto;
 }
 
-header {
+.header {
     display: flex;
     justify-content: space-between;
 }
-header img.banner {
+.header img.banner {
     width: 663px;
     height: 132px;
 }
-header .header-icons {
+.header .header-icons {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-end;
 }
-header .header-icons img.rss {
+.header .header-icons img.rss {
     width: 32px;
     height: 32px;
     margin: 3px;
