@@ -419,7 +419,7 @@ foreach($this->matrix['sections'] as $section):
                     endif;
                     if (isset($driverTask['timestamp'])):
 ?>
-                    <td class="task <?= join($cssClasses, ' ') ?>"<?= $title ?>>
+                    <td class="task <?= join(' ', $cssClasses) ?>"<?= $title ?>>
                         <span data-timestamp="<?= $driverTask['timestamp'] ?>"><?= date('Y-m-d', $driverTask['timestamp']) ?></span>
                     </td>
 <?php
