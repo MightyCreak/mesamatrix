@@ -101,7 +101,7 @@ class OglMatrix
     }
 
     private function mergeApi(\SimpleXMLElement $api, \Mesamatrix\Git\Commit $commit) {
-        $xmlSections = $api->version;
+        $xmlSections = $api->versions->version;
 
         // Remove old sections.
         $numXmlSections = count($xmlSections);
@@ -136,10 +136,11 @@ class OglMatrix
 
             $glSection = $this->getGlVersionByName($glName, $glVersion);
             if (!$glSection) {
-                $glslName = (string) $xmlSection->glsl['name'];
-                $glslVersion = (string) $xmlSection->glsl['version'];
+                $xmlShaderVersion = $xmlSection->{'shader-version'};
+                $shaderName = (string) $xmlShaderVersion['name'];
+                $shaderVersion = (string) $xmlShaderVersion['version'];
 
-                $glSection = new OglVersion($glName, $glVersion, $glslName, $glslVersion, $this->getHints());
+                $glSection = new OglVersion($glName, $glVersion, $shaderName, $shaderVersion, $this->getHints());
                 $this->addGlVersion($glSection);
             }
 

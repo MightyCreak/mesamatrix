@@ -158,7 +158,7 @@ class OglVersion
     }
 
     public function merge(\SimpleXMLElement $xmlSection, \Mesamatrix\Git\Commit $commit) {
-        $xmlExts = $xmlSection->xpath('./extension');
+        $xmlExts = $xmlSection->extensions->extension;
 
         // Remove old extensions.
         $glName = $this->getGlName();
@@ -189,16 +189,18 @@ class OglVersion
             $extHint = (string) $xmlExt->mesa['hint'];
 
             $newExtension = new OglExtension($extName, $extStatus, $extHint, $this->hints, array());
-            foreach ($xmlExt->supported->children() as $driver) {
+            $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver");
+            foreach ($xmlSupportedDrivers as $xmlSupportedDriver) {
                 // Get driver name and verify it's valid.
-                $driverName = $driver->getName();
+                $driverName = (string) $xmlSupportedDriver['name'];
                 if (!in_array($driverName, $apiDrivers)) {
                     \Mesamatrix::$logger->error('Unrecognized driver: '.$driverName);
                     continue;
                 }
 
                 // Create new supported driver.
-                $driverHint = (string) $driver['hint'];
+                $driverHint = (string) $xmlSupportedDriver['hint'];
+
                 $driver = new OglSupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);
                 $newExtension->addSupportedDriver($driver, $commit);

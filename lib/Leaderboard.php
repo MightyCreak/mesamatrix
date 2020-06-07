@@ -67,29 +67,31 @@ class Leaderboard {
      * @param SimpleXMLElement $api The XML tag for the wanted API.
      */
     private function loadApi(\SimpleXMLElement $api) {
-        foreach($api->version as $glVersion) {
-            $lbGlVersion = $this->createGlVersion((string) $glVersion["name"],
-                                                  (string) $glVersion["version"]);
+        foreach($api->versions->version as $xmlVersion) {
+            $lbGlVersion = $this->createGlVersion((string) $xmlVersion["name"],
+                                                  (string) $xmlVersion["version"]);
 
             // Count total extensions and sub-extensions.
-            $numTotalExts = count($glVersion->extension);
-            foreach ($glVersion->extension as $glExt) {
-                $numTotalExts += count($glExt->subextension);
+            $numTotalExts = count($xmlVersion->extensions->extension);
+            foreach ($xmlVersion->extensions->extension as $xmlExt) {
+                $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
+                $numTotalExts += count($xmlSubExts);
             }
 
             $lbGlVersion->setNumExts($numTotalExts);
 
             // Count done mesa extensions and sub-extensions.
             $numDoneExts = 0;
-            foreach ($glVersion->extension as $glExt) {
+            foreach ($xmlVersion->extensions->extension as $xmlExt) {
                 // Extension.
-                if ($glExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
+                if ($xmlExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
                     $numDoneExts += 1;
                 }
 
                 // Sub-extensions.
-                foreach ($glExt->subextension as $glSubExt) {
-                    if ($glSubExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
+                $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
+                foreach ($xmlSubExts as $xmlSubExt) {
+                    if ($xmlSubExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
                         $numDoneExts += 1;
                     }
                 }
@@ -98,21 +100,26 @@ class Leaderboard {
             $lbGlVersion->addDriver("mesa", $numDoneExts);
 
             // Count done extensions and sub-extensions for each drivers.
-            foreach ($api->drivers->vendor as $vendor) {
-                foreach ($vendor->driver as $driver) {
+            foreach ($api->vendors->vendor as $vendor) {
+                foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver["name"];
 
                     // Count done extensions and sub-extensions for $driverName.
                     $numDoneExts = 0;
-                    foreach ($glVersion->extension as $glExt) {
+                    foreach ($xmlVersion->extensions->extension as $xmlExt) {
                         // Extension.
-                        if ($glExt->supported->{$driverName}) {
+                        $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver[@name='${driverName}']");
+                        $xmlSupportedDriver = !empty($xmlSupportedDrivers) ? $xmlSupportedDrivers[0] : null;
+                        if ($xmlSupportedDriver) {
                             $numDoneExts += 1;
                         }
 
                         // Sub-extensions.
-                        foreach ($glExt->subextension as $glSubExt) {
-                            if ($glSubExt->supported->{$driverName}) {
+                        $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
+                        foreach ($xmlSubExts as $xmlSubExt) {
+                            $xmlSupportedDrivers = $xmlSubExt->xpath("./supported-drivers/driver[@name='${driverName}']");
+                            $xmlSupportedDriver = !empty($xmlSupportedDrivers) ? $xmlSupportedDrivers[0] : null;
+                            if ($xmlSupportedDriver) {
                                 $numDoneExts += 1;
                             }
                         }
