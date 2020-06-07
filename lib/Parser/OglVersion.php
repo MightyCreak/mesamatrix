@@ -158,7 +158,7 @@ class OglVersion
     }
 
     public function merge(\SimpleXMLElement $xmlSection, \Mesamatrix\Git\Commit $commit) {
-        $xmlExts = $xmlSection->xpath('./extension');
+        $xmlExts = $xmlSection->extensions->extension;
 
         // Remove old extensions.
         $glName = $this->getGlName();

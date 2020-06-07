@@ -427,8 +427,9 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $glsl->addAttribute("name", $glVersion->getGlslName());
         $glsl->addAttribute("version", $glVersion->getGlslVersion());
 
+        $extensions = $version->addChild("extensions");
         foreach ($glVersion->getExtensions() as $glExt) {
-            $ext = $version->addChild("extension");
+            $ext = $extensions->addChild("extension");
             $this->generateExtension($ext, $glExt, $hints);
         }
     }

@@ -165,16 +165,16 @@ class ApiSubController
     }
 
     private function addApiSection(array &$matrix, \SimpleXmlElement $xmlApi) {
-        $glVersions = array();
-        foreach ($xmlApi->versions->version as $glVersion) {
-            $glVersions[] = $glVersion;
+        $xmlVersions = array();
+        foreach ($xmlApi->versions->version as $xmlVersion) {
+            $xmlVersions[] = $xmlVersion;
         }
 
-        if (empty($glVersions))
+        if (empty($xmlVersions))
             return;
 
         // Sort the versions descending.
-        usort($glVersions, function($a, $b) {
+        usort($xmlVersions, function($a, $b) {
             $diff = (float) $b['version'] - (float) $a['version'];
             if ($diff === 0)
                 return 0;
@@ -188,22 +188,22 @@ class ApiSubController
             'subsections' => array()
         );
 
-        foreach ($glVersions as $glVersion) {
-            $this->addSection($api, $glVersion, $xmlApi->vendors);
+        foreach ($xmlVersions as $xmlVersion) {
+            $this->addSection($api, $xmlVersion, $xmlApi->vendors);
         }
 
         $matrix['sections'][] = $api;
     }
 
-    private function addSection(array &$section, \SimpleXMLElement $glSection, \SimpleXMLElement $vendors) {
+    private function addSection(array &$section, \SimpleXMLElement $xmlVersion, \SimpleXMLElement $vendors) {
         $text = "";
-        if (!empty($glSection['version'])) {
-            $text = $glSection['name'];
-            if (!empty((string) $glSection['version'])) {
-                $text .= ' '.$glSection['version'];
+        if (!empty($xmlVersion['version'])) {
+            $text = $xmlVersion['name'];
+            if (!empty((string) $xmlVersion['version'])) {
+                $text .= ' '.$xmlVersion['version'];
             }
-            if (!empty((string) $glSection->glsl['name'])) {
-                $text .= ' - '.$glSection->glsl['name'].' '.$glSection->glsl['version'];
+            if (!empty((string) $xmlVersion->glsl['name'])) {
+                $text .= ' - '.$xmlVersion->glsl['name'].' '.$xmlVersion->glsl['version'];
             }
         }
 
@@ -214,7 +214,7 @@ class ApiSubController
             'extensions' => array()
         );
 
-        $lbGlVersion = $this->leaderboard->findGlVersion($glSection['name'].$glSection['version']);
+        $lbGlVersion = $this->leaderboard->findGlVersion($xmlVersion['name'].$xmlVersion['version']);
         if ($lbGlVersion !== NULL) {
             $numGlVersionExts = $lbGlVersion->getNumExts();
 
@@ -229,42 +229,42 @@ class ApiSubController
 
             $subsection['scores'] = $driverScores;
 
-            foreach ($glSection->extension as $glExt) {
-                $this->addExtension($subsection, $glExt, false, $vendors);
-                foreach ($glExt->subextension as $glSubExt)
-                    $this->addExtension($subsection, $glSubExt, true, $vendors);
+            foreach ($xmlVersion->extensions->extension as $xmlExt) {
+                $this->addExtension($subsection, $xmlExt, false, $vendors);
+                foreach ($xmlExt->subextension as $xmlSubExt)
+                    $this->addExtension($subsection, $xmlSubExt, true, $vendors);
             }
         }
 
         $section['subsections'][] = $subsection;
     }
 
-    private function addExtension(array &$subsection, \SimpleXMLElement $glExt, $isSubExt, \SimpleXMLElement $vendors) {
+    private function addExtension(array &$subsection, \SimpleXMLElement $xmlExt, $isSubExt, \SimpleXMLElement $vendors) {
         $extension = array(
-            'name' => $glExt['name'],
+            'name' => $xmlExt['name'],
         );
 
-        $extUrlId = str_replace(' ', '_', $glExt['name']);
+        $extUrlId = str_replace(' ', '_', $xmlExt['name']);
         $extUrlId = preg_replace('/[^A-Za-z0-9_]/', '', $extUrlId);
         $extUrlId = $subsection['target'].'_Extension_'.$extUrlId;
         $extension['target'] = $extUrlId;
         $extension['is_subext'] = $isSubExt;
 
-        if (isset($glExt->link)) {
-            $extension['url_href'] = $glExt->link['href'];
-            $extension['url_text'] = $glExt->link;
+        if (isset($xmlExt->link)) {
+            $extension['url_href'] = $xmlExt->link['href'];
+            $extension['url_text'] = $xmlExt->link;
         }
 
         $extTask = array();
-        if ($glExt->mesa['status'] == \Mesamatrix\Parser\Constants::STATUS_DONE)
+        if ($xmlExt->mesa['status'] == \Mesamatrix\Parser\Constants::STATUS_DONE)
             $extTask['class'] = 'isDone';
-        elseif ($glExt->mesa['status'] == \Mesamatrix\Parser\Constants::STATUS_NOT_STARTED)
+        elseif ($xmlExt->mesa['status'] == \Mesamatrix\Parser\Constants::STATUS_NOT_STARTED)
             $extTask['class'] = 'isNotStarted';
         else
             $extTask['class'] = 'isInProgress';
-        if (!empty($glExt->mesa->modified))
-            $extTask['timestamp'] = (int) $glExt->mesa->modified->date;
-        $extTask['hint'] = $glExt->mesa['hint'];
+        if (!empty($xmlExt->mesa->modified))
+            $extTask['timestamp'] = (int) $xmlExt->mesa->modified->date;
+        $extTask['hint'] = $xmlExt->mesa['hint'];
         $extension['tasks']['mesa'] = $extTask;
 
         foreach ($vendors->vendor as $vendor) {
@@ -272,7 +272,7 @@ class ApiSubController
                 $driverName = (string) $driver['name'];
 
                 $extTask = array();
-                $driverNode = $glExt->supported->{$driverName};
+                $driverNode = $xmlExt->supported->{$driverName};
                 if ($driverNode) {
                     $extTask['class'] = 'isDone';
                     $extTask['timestamp'] = (int) $driverNode->modified->date;

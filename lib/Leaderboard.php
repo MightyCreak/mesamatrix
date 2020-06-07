@@ -72,8 +72,8 @@ class Leaderboard {
                                                   (string) $glVersion["version"]);
 
             // Count total extensions and sub-extensions.
-            $numTotalExts = count($glVersion->extension);
-            foreach ($glVersion->extension as $glExt) {
+            $numTotalExts = count($glVersion->extensions->extension);
+            foreach ($glVersion->extensions->extension as $glExt) {
                 $numTotalExts += count($glExt->subextension);
             }
 
@@ -81,7 +81,7 @@ class Leaderboard {
 
             // Count done mesa extensions and sub-extensions.
             $numDoneExts = 0;
-            foreach ($glVersion->extension as $glExt) {
+            foreach ($glVersion->extensions->extension as $glExt) {
                 // Extension.
                 if ($glExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
                     $numDoneExts += 1;
@@ -104,7 +104,7 @@ class Leaderboard {
 
                     // Count done extensions and sub-extensions for $driverName.
                     $numDoneExts = 0;
-                    foreach ($glVersion->extension as $glExt) {
+                    foreach ($glVersion->extensions->extension as $glExt) {
                         // Extension.
                         if ($glExt->supported->{$driverName}) {
                             $numDoneExts += 1;
