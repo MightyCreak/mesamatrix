@@ -267,10 +267,12 @@ class OglExtension
             $subExtHint = (string) $xmlSubExt->mesa['hint'];
 
             $newSubExtension = new OglExtension($subExtName, $subExtStatus, $subExtHint, $this->hints, array());
-            foreach ($xmlSubExt->{'supported-drivers'}->children() as $driver) {
+            $xmlSupportedDrivers = $xmlSubExt->xpath("./supported-drivers/driver");
+            foreach ($xmlSupportedDrivers as $xmlSupportedDriver) {
                 // Create new supported driver.
-                $driverName = $driver->getName();
-                $driverHint = (string) $driver['hint'];
+                $driverName = (string) $xmlSupportedDriver['name'];
+                $driverHint = (string) $xmlSupportedDriver['hint'];
+
                 $driver = new OglSupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);
                 $newSubExtension->addSupportedDriver($driver, $commit);

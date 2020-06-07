@@ -273,15 +273,16 @@ class ApiSubController
                 $driverName = (string) $driver['name'];
 
                 $extTask = array();
-                $driverNode = $xmlExt->{'supported-drivers'}->{$driverName};
-                if ($driverNode) {
+                $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver[@name='${driverName}']");
+                $xmlSupportedDriver = !empty($xmlSupportedDrivers) ? $xmlSupportedDrivers[0] : null;
+                if ($xmlSupportedDriver) {
                     $extTask['class'] = 'isDone';
-                    $extTask['timestamp'] = (int) $driverNode->modified->date;
+                    $extTask['timestamp'] = (int) $xmlSupportedDriver->modified->date;
+                    $extTask['hint'] = $xmlSupportedDriver['hint'];
                 }
                 else {
                     $extTask['class'] = 'isNotStarted';
                 }
-                $extTask['hint'] = $driverNode['hint'];
                 $extension['tasks'][$driverName] = $extTask;
             }
         }
