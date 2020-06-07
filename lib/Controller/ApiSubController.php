@@ -202,8 +202,9 @@ class ApiSubController
             if (!empty((string) $xmlVersion['version'])) {
                 $text .= ' '.$xmlVersion['version'];
             }
-            if (!empty((string) $xmlVersion->glsl['name'])) {
-                $text .= ' - '.$xmlVersion->glsl['name'].' '.$xmlVersion->glsl['version'];
+            $xmlShaderVersion = $xmlVersion->{'shader-version'};
+            if (!empty((string) $xmlShaderVersion['name'])) {
+                $text .= ' - '.$xmlShaderVersion['name'].' '.$xmlShaderVersion['version'];
             }
         }
 

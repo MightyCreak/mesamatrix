@@ -423,9 +423,10 @@ class Parse extends \Symfony\Component\Console\Command\Command
     protected function generateGlVersion(\SimpleXMLElement $version, OglVersion $glVersion, Hints $hints) {
         $version->addAttribute("name", $glVersion->getGlName());
         $version->addAttribute("version", $glVersion->getGlVersion());
-        $glsl = $version->addChild("glsl");
-        $glsl->addAttribute("name", $glVersion->getGlslName());
-        $glsl->addAttribute("version", $glVersion->getGlslVersion());
+
+        $shaderVersion = $version->addChild("shader-version");
+        $shaderVersion->addAttribute("name", $glVersion->getGlslName());
+        $shaderVersion->addAttribute("version", $glVersion->getGlslVersion());
 
         $extensions = $version->addChild("extensions");
         foreach ($glVersion->getExtensions() as $glExt) {
