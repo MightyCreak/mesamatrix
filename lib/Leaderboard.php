@@ -98,8 +98,8 @@ class Leaderboard {
             $lbGlVersion->addDriver("mesa", $numDoneExts);
 
             // Count done extensions and sub-extensions for each drivers.
-            foreach ($api->drivers->vendor as $vendor) {
-                foreach ($vendor->driver as $driver) {
+            foreach ($api->vendors->vendor as $vendor) {
+                foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver["name"];
 
                     // Count done extensions and sub-extensions for $driverName.

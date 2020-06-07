@@ -336,31 +336,31 @@ class Parse extends \Symfony\Component\Console\Command\Command
         // Generate for OpenGL.
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'OpenGL');
-        $this->populateGlDrivers($api);
+        $this->populateGlVendors($api);
         $this->generateApi($api, $matrix, 'OpenGL');
 
         // Generate for OpenGL ES.
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'OpenGL ES');
-        $this->populateGlDrivers($api); // Uses the same drivers as OpenGL.
+        $this->populateGlVendors($api); // Uses the same drivers as OpenGL.
         $this->generateApi($api, $matrix, 'OpenGL ES');
 
         // Generate for OpenGL(ES) extra.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::GL_OR_ES_EXTRA_NAME);
-        $this->populateGlDrivers($api); // Uses the same drivers as OpenGL.
+        $this->populateGlVendors($api); // Uses the same drivers as OpenGL.
         $this->generateApi($api, $matrix, Constants::GL_OR_ES_EXTRA_NAME);
 
         // Generate for Vulkan.
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'Vulkan');
-        $this->populateVulkanDrivers($api);
+        $this->populateVulkanVendors($api);
         $this->generateApi($api, $matrix, 'Vulkan');
 
         // Generate for Vulkan (extra).
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::VK_EXTRA_NAME);
-        $this->populateVulkanDrivers($api);
+        $this->populateVulkanVendors($api);
         $this->generateApi($api, $matrix, Constants::VK_EXTRA_NAME);
 
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
@@ -388,22 +388,23 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
     }
 
-    protected function populateGlDrivers(\SimpleXMLElement $xmlParent) {
-        $xmlDrivers = $xmlParent->addChild("drivers");
-        $this->populateDrivers($xmlDrivers, Constants::GL_ALL_DRIVERS_VENDORS);
+    protected function populateGlVendors(\SimpleXMLElement $xmlParent) {
+        $xmlVendors = $xmlParent->addChild("vendors");
+        $this->populateDrivers($xmlVendors, Constants::GL_ALL_DRIVERS_VENDORS);
     }
 
-    protected function populateVulkanDrivers(\SimpleXMLElement $xmlParent) {
-        $xmlDrivers = $xmlParent->addChild("drivers");
-        $this->populateDrivers($xmlDrivers, Constants::VK_ALL_DRIVERS_VENDORS);
+    protected function populateVulkanVendors(\SimpleXMLElement $xmlParent) {
+        $xmlVendors = $xmlParent->addChild("vendors");
+        $this->populateDrivers($xmlVendors, Constants::VK_ALL_DRIVERS_VENDORS);
     }
 
-    protected function populateDrivers(\SimpleXMLElement $xmlDrivers, array $vendors) {
+    protected function populateDrivers(\SimpleXMLElement $xmlVendors, array $vendors) {
         foreach ($vendors as $vendor => $drivers) {
-            $xmlVendor = $xmlDrivers->addChild("vendor");
+            $xmlVendor = $xmlVendors->addChild("vendor");
             $xmlVendor->addAttribute("name", $vendor);
+            $xmlDrivers = $xmlVendor->addChild("drivers");
             foreach ($drivers as $driver) {
-                $xmlDriver = $xmlVendor->addChild("driver");
+                $xmlDriver = $xmlDrivers->addChild("driver");
                 $xmlDriver->addAttribute("name", $driver);
             }
         }

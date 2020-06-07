@@ -116,14 +116,14 @@ class ApiSubController
         // Get all the vendors and all their drivers.
         $vendors = array();
         foreach ($xmlApis as $xmlApi) {
-            foreach ($xmlApi->drivers->vendor as $vendor) {
+            foreach ($xmlApi->vendors->vendor as $vendor) {
                 $vendorName = (string) $vendor['name'];
                 if (!array_key_exists($vendorName, $vendors)) {
                     $vendors[$vendorName] = array();
                 }
 
                 $driverNames = &$vendors[$vendorName];
-                foreach ($vendor->driver as $driver) {
+                foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver['name'];
                     if (!in_array($driverName, $driverNames)) {
                         $driverNames[] = $driverName;
@@ -189,13 +189,13 @@ class ApiSubController
         );
 
         foreach ($glVersions as $glVersion) {
-            $this->addSection($api, $glVersion, $xmlApi->drivers);
+            $this->addSection($api, $glVersion, $xmlApi->vendors);
         }
 
         $matrix['sections'][] = $api;
     }
 
-    private function addSection(array &$section, \SimpleXMLElement $glSection, \SimpleXMLElement $drivers) {
+    private function addSection(array &$section, \SimpleXMLElement $glSection, \SimpleXMLElement $vendors) {
         $text = "";
         if (!empty($glSection['version'])) {
             $text = $glSection['name'];
@@ -220,8 +220,8 @@ class ApiSubController
 
             $driverScores = array();
             $driverScores['mesa'] = $numGlVersionExts !== 0 ? $lbGlVersion->getNumDriverExtsDone('mesa') / $numGlVersionExts : 0;
-            foreach ($drivers->vendor as $vendor) {
-                foreach ($vendor->driver as $driver) {
+            foreach ($vendors->vendor as $vendor) {
+                foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver['name'];
                     $driverScores[$driverName] = $numGlVersionExts !== 0 ? $lbGlVersion->getNumDriverExtsDone($driverName) / $numGlVersionExts : 0;
                 }
@@ -230,16 +230,16 @@ class ApiSubController
             $subsection['scores'] = $driverScores;
 
             foreach ($glSection->extension as $glExt) {
-                $this->addExtension($subsection, $glExt, false, $drivers);
+                $this->addExtension($subsection, $glExt, false, $vendors);
                 foreach ($glExt->subextension as $glSubExt)
-                    $this->addExtension($subsection, $glSubExt, true, $drivers);
+                    $this->addExtension($subsection, $glSubExt, true, $vendors);
             }
         }
 
         $section['subsections'][] = $subsection;
     }
 
-    private function addExtension(array &$subsection, \SimpleXMLElement $glExt, $isSubExt, \SimpleXMLElement $drivers) {
+    private function addExtension(array &$subsection, \SimpleXMLElement $glExt, $isSubExt, \SimpleXMLElement $vendors) {
         $extension = array(
             'name' => $glExt['name'],
         );
@@ -267,8 +267,8 @@ class ApiSubController
         $extTask['hint'] = $glExt->mesa['hint'];
         $extension['tasks']['mesa'] = $extTask;
 
-        foreach ($drivers->vendor as $vendor) {
-            foreach ($vendor->driver as $driver) {
+        foreach ($vendors->vendor as $vendor) {
+            foreach ($vendor->drivers->driver as $driver) {
                 $driverName = (string) $driver['name'];
 
                 $extTask = array();
