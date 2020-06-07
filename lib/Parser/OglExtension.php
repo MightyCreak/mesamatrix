@@ -238,7 +238,7 @@ class OglExtension
     }
 
     public function merge(OglVersion $glSection, \SimpleXMLElement $xmlExt, \Mesamatrix\Git\Commit $commit) {
-        $xmlSubExts = $xmlExt->xpath('./subextension');
+        $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
 
         // Remove old sub-extensions.
         $numXmlSubExts = count($xmlSubExts);

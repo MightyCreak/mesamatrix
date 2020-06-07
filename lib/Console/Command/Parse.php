@@ -482,9 +482,13 @@ class Parse extends \Symfony\Component\Console\Command\Command
             }
         }
 
-        foreach ($glExt->getSubExtensions() as $glSubExt) {
-            $xmlSubExt = $xmlExt->addChild("subextension");
-            $this->generateExtension($xmlSubExt, $glSubExt, $hints);
+        $glSubExts = $glExt->getSubExtensions();
+        if (!empty($glSubExts)) {
+            $xmlSubExts = $xmlExt->addChild("subextensions");
+            foreach ($glSubExts as $glSubExt) {
+                $xmlSubExt = $xmlSubExts->addChild("subextension");
+                $this->generateExtension($xmlSubExt, $glSubExt, $hints);
+            }
         }
     }
 

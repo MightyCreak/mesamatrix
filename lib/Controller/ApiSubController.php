@@ -231,7 +231,8 @@ class ApiSubController
 
             foreach ($xmlVersion->extensions->extension as $xmlExt) {
                 $this->addExtension($subsection, $xmlExt, false, $vendors);
-                foreach ($xmlExt->subextension as $xmlSubExt)
+                $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
+                foreach ($xmlSubExts as $xmlSubExt)
                     $this->addExtension($subsection, $xmlSubExt, true, $vendors);
             }
         }
