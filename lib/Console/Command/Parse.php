@@ -467,9 +467,9 @@ class Parse extends \Symfony\Component\Console\Command\Command
             $modified->addChild("author", $commit->getAuthor());
         }
 
-        $supported = $xmlExt->addChild("supported");
+        $supportedDrivers = $xmlExt->addChild("supported-drivers");
         foreach ($glExt->getSupportedDrivers() as $glDriver) {
-            $driver = $supported->addChild($glDriver->getName());
+            $driver = $supportedDrivers->addChild($glDriver->getName());
             $hintId = $glDriver->getHintIdx();
             if ($hintId !== -1) {
                 $driver->addAttribute("hint", $hints->allHints[$hintId]);

@@ -189,7 +189,7 @@ class OglVersion
             $extHint = (string) $xmlExt->mesa['hint'];
 
             $newExtension = new OglExtension($extName, $extStatus, $extHint, $this->hints, array());
-            foreach ($xmlExt->supported->children() as $driver) {
+            foreach ($xmlExt->{'supported-drivers'}->children() as $driver) {
                 // Get driver name and verify it's valid.
                 $driverName = $driver->getName();
                 if (!in_array($driverName, $apiDrivers)) {

@@ -108,14 +108,14 @@ class Leaderboard {
                     $numDoneExts = 0;
                     foreach ($xmlVersion->extensions->extension as $xmlExt) {
                         // Extension.
-                        if ($xmlExt->supported->{$driverName}) {
+                        if ($xmlExt->{'supported-drivers'}->{$driverName}) {
                             $numDoneExts += 1;
                         }
 
                         // Sub-extensions.
                         $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
                         foreach ($xmlSubExts as $xmlSubExt) {
-                            if ($xmlSubExt->supported->{$driverName}) {
+                            if ($xmlSubExt->{'supported-drivers'}->{$driverName}) {
                                 $numDoneExts += 1;
                             }
                         }
