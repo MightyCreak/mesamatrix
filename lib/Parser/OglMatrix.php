@@ -101,7 +101,7 @@ class OglMatrix
     }
 
     private function mergeApi(\SimpleXMLElement $api, \Mesamatrix\Git\Commit $commit) {
-        $xmlSections = $api->version;
+        $xmlSections = $api->versions->version;
 
         // Remove old sections.
         $numXmlSections = count($xmlSections);

@@ -67,7 +67,7 @@ class Leaderboard {
      * @param SimpleXMLElement $api The XML tag for the wanted API.
      */
     private function loadApi(\SimpleXMLElement $api) {
-        foreach($api->version as $glVersion) {
+        foreach($api->versions->version as $glVersion) {
             $lbGlVersion = $this->createGlVersion((string) $glVersion["name"],
                                                   (string) $glVersion["version"]);
 

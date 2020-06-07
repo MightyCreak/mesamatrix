@@ -260,27 +260,27 @@ class Parse extends \Symfony\Component\Console\Command\Command
         // Write OpenGL API.
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'OpenGL');
-        $this->generateApi($api, $matrix, 'OpenGL');
+        $this->generateApiVersions($api, $matrix, 'OpenGL');
 
         // Write OpenGL ES API.
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'OpenGL ES');
-        $this->generateApi($api, $matrix, 'OpenGL ES');
+        $this->generateApiVersions($api, $matrix, 'OpenGL ES');
 
         // Write OpenGL(ES) extra API.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::GL_OR_ES_EXTRA_NAME);
-        $this->generateApi($api, $matrix, Constants::GL_OR_ES_EXTRA_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::GL_OR_ES_EXTRA_NAME);
 
         // Write Vulkan API.
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'Vulkan');
-        $this->generateApi($api, $matrix, 'Vulkan');
+        $this->generateApiVersions($api, $matrix, 'Vulkan');
 
         // Write Vulkan extra API.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::VK_EXTRA_NAME);
-        $this->generateApi($api, $matrix, Constants::VK_EXTRA_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::VK_EXTRA_NAME);
 
         // Write file.
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
@@ -337,31 +337,31 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'OpenGL');
         $this->populateGlVendors($api);
-        $this->generateApi($api, $matrix, 'OpenGL');
+        $this->generateApiVersions($api, $matrix, 'OpenGL');
 
         // Generate for OpenGL ES.
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'OpenGL ES');
         $this->populateGlVendors($api); // Uses the same drivers as OpenGL.
-        $this->generateApi($api, $matrix, 'OpenGL ES');
+        $this->generateApiVersions($api, $matrix, 'OpenGL ES');
 
         // Generate for OpenGL(ES) extra.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::GL_OR_ES_EXTRA_NAME);
         $this->populateGlVendors($api); // Uses the same drivers as OpenGL.
-        $this->generateApi($api, $matrix, Constants::GL_OR_ES_EXTRA_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::GL_OR_ES_EXTRA_NAME);
 
         // Generate for Vulkan.
         $api = $apis->addChild('api');
         $api->addAttribute('name', 'Vulkan');
         $this->populateVulkanVendors($api);
-        $this->generateApi($api, $matrix, 'Vulkan');
+        $this->generateApiVersions($api, $matrix, 'Vulkan');
 
         // Generate for Vulkan (extra).
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::VK_EXTRA_NAME);
         $this->populateVulkanVendors($api);
-        $this->generateApi($api, $matrix, Constants::VK_EXTRA_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::VK_EXTRA_NAME);
 
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
 
@@ -410,10 +410,11 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
     }
 
-    protected function generateApi(\SimpleXMLElement $api, OglMatrix $matrix, $name) {
+    protected function generateApiVersions(\SimpleXMLElement $api, OglMatrix $matrix, $name) {
+        $xmlVersions = $api->addChild("versions");
         foreach ($matrix->getGlVersions() as $glVersion) {
             if ($glVersion->getGlName() === $name) {
-                $version = $api->addChild('version');
+                $version = $xmlVersions->addChild('version');
                 $this->generateGlVersion($version, $glVersion, $matrix->getHints());
             }
         }

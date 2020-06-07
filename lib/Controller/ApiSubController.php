@@ -166,7 +166,7 @@ class ApiSubController
 
     private function addApiSection(array &$matrix, \SimpleXmlElement $xmlApi) {
         $glVersions = array();
-        foreach ($xmlApi->version as $glVersion) {
+        foreach ($xmlApi->versions->version as $glVersion) {
             $glVersions[] = $glVersion;
         }
 
