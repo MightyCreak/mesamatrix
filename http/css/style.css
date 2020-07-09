@@ -144,6 +144,7 @@ a:hover, a:active {
 .hCellVendor-qualcomm   { background-color: #c7dce8; }
 .hCellVendor-vivante    { background-color: #a6d87a; }
 .hCellVendor-broadcom   { background-color: #ff8e8e; }
+.hCellVendor-arm        { background-color: #7acde8; }
 
 .hCellSep       { width: 0px; }
 
