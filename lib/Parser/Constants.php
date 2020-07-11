@@ -42,6 +42,7 @@ abstract class Constants
         "etnaviv",
         "v3d",
         "zink",
+        "panfrost",
     ];
 
     const GL_ALL_DRIVERS_VENDORS = [
@@ -52,6 +53,7 @@ abstract class Constants
         "Qualcomm"  => [ "freedreno" ],
         "Vivante"   => [ "etnaviv" ],
         "Broadcom"  => [ "v3d" ],
+        "ARM"       => [ "panfrost" ],
     ];
 
     const VK_ALL_DRIVERS = [
