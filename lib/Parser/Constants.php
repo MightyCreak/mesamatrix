@@ -53,7 +53,7 @@ abstract class Constants
         "Qualcomm"  => [ "freedreno" ],
         "Vivante"   => [ "etnaviv" ],
         "Broadcom"  => [ "v3d" ],
-        "ARM"       => [ "panfrost" ],
+        "Arm"       => [ "panfrost" ],
     ];
 
     const VK_ALL_DRIVERS = [
