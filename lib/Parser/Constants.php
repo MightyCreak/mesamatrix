@@ -59,11 +59,13 @@ abstract class Constants
     const VK_ALL_DRIVERS = [
         "anv",
         "radv",
+        "v3dv"
     ];
 
     const VK_ALL_DRIVERS_VENDORS = [
         "Intel"     => [ "anv" ],
         "AMD"       => [ "radv" ],
+        "Broadcom"  => [ "v3dv" ],
     ];
 
     // Hints enabling for all drivers.
