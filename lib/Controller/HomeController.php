@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014-2017 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2020 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,16 +23,16 @@ namespace Mesamatrix\Controller;
 class HomeController extends BaseController
 {
     private $commits = array();
-    private $openGLController = null;
-    private $vulkanController = null;
+    private $openGLController;
+    private $vulkanController;
     private $lastUpdatedTime = 0;
 
     public function __construct() {
         parent::__construct();
 
         $this->setPage('Home');
-        $this->openGLController = new ApiSubController();
-        $this->vulkanController = new ApiSubController();
+        $this->openGLController = new OpenGlController();
+        $this->vulkanController = new VulkanController();
 
         $this->addCssScript('css/tipsy.css');
 
@@ -88,66 +88,6 @@ class HomeController extends BaseController
         return $leaderboard;
     }
 
-    private function writeLeaderboard($api, $leaderboard) {
-        $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
-        $numTotalExts = $leaderboard->getNumTotalExts();
-?>
-            <!--<h2><?= $api ?></h2>-->
-            <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
-            The ranking is based on the number of extensions done by driver. </p>
-            <table class="lb">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Driver</th>
-                        <th>Extensions</th>
-                        <th>OpenGL</th>
-                        <th>OpenGL ES</th>
-                    </tr>
-                </thead>
-                <tbody>
-<?php
-        $index = 1;
-        $rank = 1;
-        $prevNumExtsDone = -1;
-        foreach($driversExtsDone as $drivername => $numExtsDone) {
-            $sameRank = $prevNumExtsDone === $numExtsDone;
-            if (!$sameRank) {
-                $rank = $index;
-            }
-            switch ($rank) {
-            case 1: $rankClass = "lbCol-1st"; break;
-            case 2: $rankClass = "lbCol-2nd"; break;
-            case 3: $rankClass = "lbCol-3rd"; break;
-            default: $rankClass = "";
-            }
-            $pctScore = sprintf("%.1f%%", $numExtsDone / $numTotalExts * 100);
-            $openglVersion = $leaderboard->getDriverGlVersion($drivername);
-            if ($openglVersion === NULL) {
-                $openglVersion = "N/A";
-            }
-            $openglesVersion = $leaderboard->getDriverGlesVersion($drivername);
-            if ($openglesVersion === NULL) {
-                $openglesVersion = "N/A";
-            }
-?>
-                    <tr class="<?= $rankClass ?>">
-                        <th class="lbCol-rank"><?= !$sameRank ? $rank : "" ?></th>
-                        <td class="lbCol-driver"><?= $drivername ?></td>
-                        <td class="lbCol-score"><span class="lbCol-pctScore">(<?= $pctScore ?>)</span> <?= $numExtsDone ?></td>
-                        <td class="lbCol-version"><?= $openglVersion ?></td>
-                        <td class="lbCol-version"><?= $openglesVersion ?></td>
-                    </tr>
-<?php
-            $prevNumExtsDone = $numExtsDone;
-            $index++;
-        }
-?>
-                </tbody>
-            </table>
-<?php
-    }
-
     protected function writeHtmlPage() {
 ?>
     <p>
@@ -160,47 +100,34 @@ class HomeController extends BaseController
         Feel free to open an issue or create a PR on <a href="<?= \Mesamatrix::$config->getValue('info', 'project_url') ?>" target="_blank">GitHub</a>, or join the Matrix room <a href="https://matrix.to/#/#mesamatrix:matrix.org" target="_blank">#mesamatrix:matrix.org</a>.
     </p>
 
-    <div class="stats-container">
-        <div class="stats-item-commits">
-            <h1>Last commits</h1>
-            <table class="commits">
-                <thead>
-                    <tr>
-                        <th>Age</th>
-                        <th>Commit message</th>
-                    </tr>
-                </thead>
-                <tbody>
+    <h1>Last commits</h1>
+    <table class="commits">
+        <thead>
+            <tr>
+                <th>Age</th>
+                <th>Commit message</th>
+            </tr>
+        </thead>
+        <tbody>
 <?php
 // Commit list.
 foreach ($this->commits as $commit):
 ?>
-                    <tr>
-                        <td class="commitsAge toRelativeDate" data-timestamp="<?= date(DATE_RFC2822, $commit['timestamp']) ?>"><?= date('Y-m-d H:i', $commit['timestamp']) ?></td>
-                        <td><a href="<?= $commit['url'] ?>"><?= $commit['subject'] ?></a></td>
-                    </tr>
+            <tr>
+                <td class="commitsAge toRelativeDate" data-timestamp="<?= date(DATE_RFC2822, $commit['timestamp']) ?>"><?= date('Y-m-d H:i', $commit['timestamp']) ?></td>
+                <td><a href="<?= $commit['url'] ?>"><?= $commit['subject'] ?></a></td>
+            </tr>
 <?php
 endforeach;
 ?>
-                    <tr>
-                        <td colspan="2">
-                            <noscript>(Dates are UTC)<br/></noscript>
-                            <a href="<?= \Mesamatrix::$config->getValue("git", "mesa_web")."/-/commits/master/docs/features.txt" ?>">More...</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div>
-            <h1>Leaderboard</h1>
-<?php
-$this->writeLeaderboard('OpenGL', $this->openGLController->getLeaderboard());
-//$this->writeLeaderboard('Vulkan', $this->vulkanController->getLeaderboard());
-?>
-        </div>
-
-    </div>
+            <tr>
+                <td colspan="2">
+                    <noscript>(Dates are UTC)<br/></noscript>
+                    <a href="<?= \Mesamatrix::$config->getValue("git", "mesa_web")."/-/commits/master/docs/features.txt" ?>">More...</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 <?php
 $this->openGLController->writeMatrix();
 $this->vulkanController->writeMatrix();

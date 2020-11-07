@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2020 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -199,57 +199,31 @@ class Leaderboard {
     }
 
     /**
-     * Get latest valid OpenGL version for a driver.
+     * Get latest valid API version for a driver.
      *
-     * @param string $drivername Nome of the driver (mesa, r600, ...).
+     * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan).
+     * @param string $drivername Name of the driver (mesa, r600, ...).
      * @return string The OpenGL version string; NULL otherwise.
      */
-    public function getDriverGlVersion($drivername) {
-        $openglVersion = NULL;
+    public function getDriverApiVersion(string $api, string $drivername) {
+        $apiVersion = NULL;
 
-        // Parse from first to latest OpenGL version.
+        // Parse from first to latest API version.
         // Continue as long as all the extensions are done for this driver in
         // this version, and remember the version.
         $i = count($this->glVersions);
         while ($i > 0) {
             $glVersion = $this->glVersions[--$i];
-            if ($glVersion->getGlName() === "OpenGL") {
+            if ($glVersion->getGlName() === $api) {
                 if ($glVersion->getNumDriverExtsDone($drivername) !== $glVersion->getNumExts()) {
                     break;
                 }
 
-                $openglVersion = $glVersion->getGlVersion();
+                $apiVersion = $glVersion->getGlVersion();
             }
         }
 
-        return $openglVersion;
-    }
-
-    /**
-     * Get latest valid OpenGL ES version for a driver.
-     *
-     * @param string $drivername Nome of the driver (mesa, r600, ...).
-     * @return string The OpenGL version string; NULL otherwise.
-     */
-    public function getDriverGlesVersion($drivername) {
-        $openglVersion = NULL;
-
-        // Parse from first to latest OpenGL ES version.
-        // Continue as long as all the extensions are done for this driver in
-        // this version, and remember the version.
-        $i = count($this->glVersions);
-        while ($i > 0) {
-            $glVersion = $this->glVersions[--$i];
-            if ($glVersion->getGlName() === "OpenGL ES") {
-                if ($glVersion->getNumDriverExtsDone($drivername) !== $glVersion->getNumExts()) {
-                    break;
-                }
-
-                $openglVersion = $glVersion->getGlVersion();
-            }
-        }
-
-        return $openglVersion;
+        return $apiVersion;
     }
 
     /**
