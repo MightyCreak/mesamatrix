@@ -89,13 +89,13 @@ a:hover, a:active {
  */
 
 .matrix {
-    font-size: 85%;
     border-spacing: 1px;
     border-collapse: separate;
     width: 100%;
 }
 
 .hCellHeader {
+    font-size: 85%;
     min-width: 4em;
     padding: 0.2em;
     font-weight: bold;
@@ -104,6 +104,7 @@ a:hover, a:active {
 }
 
 .hCellDriverScore {
+    font-size: 85%;
     font-weight: bold;
     color: #DDDDDD;
     cursor: default;
@@ -131,6 +132,10 @@ a:hover, a:active {
 :hover > .permalink { visibility: visible; }
 
 .extension-child { padding-left: 1em; }
+
+.extension {
+    font-size: 85%;
+}
 
 .extension > td.hover {
     opacity: 0.75;
