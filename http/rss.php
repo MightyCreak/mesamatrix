@@ -2,6 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
+ * Copyright (C) 2020 Romain "Creak" Failliot.
  * Copyright (C) 2015 Robin McCorkell <rmccorkell@karoshi.org.uk>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,18 +33,18 @@ if (!$xml) {
     exit();
 }
 
-$baseUrl = \Mesamatrix::$request->getSchemeAndHttpHost()
-    . \Mesamatrix::$request->getBasePath();
-
-// prepare RSS
-$rss = new RSSFeed();
-
 // Get the time of the last commit and substract a year.
 $minTime = 0;
 foreach ($xml->commits->commit as $commit) {
     $minTime = max($minTime, (int)$commit["timestamp"]);
 }
 $minTime = $minTime - (60 * 60 * 24 * 365);
+
+// prepare RSS
+$rss = new RSSFeed();
+
+$baseUrl = \Mesamatrix::$request->getSchemeAndHttpHost()
+    . \Mesamatrix::$request->getBasePath();
 
 $channel = new RSSChannel();
 $channel
@@ -58,10 +59,18 @@ foreach ($xml->commits->commit as $commit) {
     if ((int)$commit["timestamp"] < $minTime)
         continue;
 
+    $description = (string)$commit;
+    $description = str_replace('<pre>', '<pre style="white-space: pre-wrap;">', $description);
+    $lines = explode("\n", $description);
+    $lines = preg_replace('/^\+.*$/', '<span style="color: green">$0</span>', $lines);
+    $lines = preg_replace('/^-.*$/', '<span style="color: red">$0</span>', $lines);
+    $description = implode("\n", $lines);
+
     $item = new RSSItem();
     $item
+        ->preferCdata(true)
         ->title((string)$commit["subject"])
-        ->description((string)$commit)
+        ->description($description)
         //->url($commitWeb . $commit["hash"])
         ->url($baseUrl . '?commit=' . $commit["hash"])
         ->pubDate((int)$commit["timestamp"])
