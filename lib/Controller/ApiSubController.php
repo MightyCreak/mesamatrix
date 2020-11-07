@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014-2017 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2020 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,7 +20,7 @@
 
 namespace Mesamatrix\Controller;
 
-class ApiSubController
+abstract class ApiSubController
 {
     private $apis = array();
     private $xml = null;
@@ -291,6 +291,8 @@ class ApiSubController
         $subsection['extensions'][] = $extension;
     }
 
+    abstract protected function writeLeaderboard();
+
     public function writeMatrix() {
 ?>
             <table class="matrix">
@@ -313,22 +315,35 @@ endforeach;
 
 // Sections.
 foreach($this->matrix['sections'] as $section):
+    $sectionName = (string)$section['name'];
+    $sectionId = (string)$section['target'];
 ?>
                 <tr>
-                    <td id="<?= $section['target'] ?>" colspan="<?= count($this->matrix['columns']) ?>" class="hCellGl">
-                        <?= $section['name'] ?><a href="#<?= $section['target'] ?>" class="permalink">&para;</a>
+                    <td colspan="<?= count($this->matrix['columns']) ?>">
+                        <h1 id="<?= $sectionId ?>"><?= $sectionName ?><a href="#<?= $sectionId ?>" class="permalink">&para;</a></h1>
+<?php
+    if ($sectionName === 'OpenGL' || $sectionName === 'Vulkan'):
+        $leaderboardId = $sectionId."_Leaderboard";
+?>
+                        <h2 id="<?= $leaderboardId ?>">Leaderboard<a href="#<?= $leaderboardId ?>" class="permalink">&para;</a></h2>
+<?php
+        $this->writeLeaderboard();
+    endif;
+?>
                     </td>
                 </tr>
 <?php
     // Sub-sections.
     foreach($section['subsections'] as $subsection):
+        $subsectionName = (string)$subsection['name'];
+        $subsectionId = (string)$subsection['target'];
 ?>
                 <tr>
-                    <td id="<?= $subsection['target'] ?>" colspan="<?= count($this->matrix['columns']) ?>" class="hCellGlVersion">
+                    <td colspan="<?= count($this->matrix['columns']) ?>">
 <?php
-        if (!empty($subsection['name'])):
+        if (!empty($subsectionName)):
 ?>
-                        <?= $subsection['name'] ?><a href="#<?= $subsection['target'] ?>" class="permalink">&para;</a>
+                        <h2 id="<?= $subsectionId ?>"><?= $subsectionName ?><a href="#<?= $subsectionId ?>" class="permalink">&para;</a></h2>
 <?php
         endif;
 ?>

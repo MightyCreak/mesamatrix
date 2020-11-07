@@ -1,7 +1,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2020 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -64,15 +64,6 @@ a:hover, a:active {
     margin: 3px;
 }
 
-.stats-container {
-    display: flex;
-    margin: 0 -5px;
-}
-.stats-container > div {
-    flex: 0 1 50%;
-    padding: 0 5px;
-}
-
 .commits th                         { text-align: left; }
 .commits td                         { vertical-align: top; }
 .commits .commitsAge                {
@@ -81,7 +72,7 @@ a:hover, a:active {
 }
 .commits .commitsAge::first-letter  { text-transform: uppercase; }
 
-.lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; width: 100%; }
+.lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; min-width: 50%; }
 .lb th, .lb td                  { padding: 0.25em 0.5em; }
 .lb th                          { background-color: #d3d7cf; }
 .lb td                          { border: 1px solid #d3d7cf; }
@@ -102,20 +93,6 @@ a:hover, a:active {
     border-spacing: 1px;
     border-collapse: separate;
     width: 100%;
-}
-
-.hCellGl {
-    padding: 0.8em 0 0 0;
-    font-weight: bold;
-    font-size: 2em;
-    text-align: left;
-}
-
-.hCellGlVersion {
-    padding: 0.8em 0 0.8em 0;
-    font-weight: bold;
-    font-size: 1.5em;
-    text-align: left;
 }
 
 .hCellHeader {
