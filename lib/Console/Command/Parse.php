@@ -85,7 +85,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         $numCommits = count($commits);
 
-        $lastCommitFilename = \Mesamatrix::$config->getValue('info', 'private_dir', 'private')
+        $lastCommitFilename = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
                             . '/last_commit_parsed';
 
         // Get last commit parsed.
