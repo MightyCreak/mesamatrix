@@ -26,64 +26,110 @@ use \Suin\RSSWriter\Feed as RSSFeed;
 use \Suin\RSSWriter\Channel as RSSChannel;
 use \Suin\RSSWriter\Item as RSSItem;
 
-$gl3Path = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
-$xml = simplexml_load_file($gl3Path);
-if (!$xml) {
-    \Mesamatrix::$logger->critical("Can't read ".$gl3Path);
-    exit();
+function rssGenerationNeeded(string $featuresXmlFilepath, string $rssFilepath)
+{
+    if (file_exists($featuresXmlFilepath) && file_exists($rssFilepath))
+    {
+        $lastCommitFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
+            . '/last_commit_parsed';
+        if (file_exists($lastCommitFilepath))
+        {
+            // Generate RSS if file is older than last_commit_parsed modification time.
+            return filemtime($rssFilepath) < filemtime($lastCommitFilepath);
+        }
+    }
+
+    return true;
 }
 
-// Get the time of the last commit and substract a year.
-$minTime = 0;
-foreach ($xml->commits->commit as $commit) {
-    $minTime = max($minTime, (int)$commit["timestamp"]);
+function generateRss(string $featuresXmlFilepath)
+{
+    $xml = simplexml_load_file($featuresXmlFilepath);
+    if (!$xml) {
+        \Mesamatrix::$logger->critical("Can't read ".$featuresXmlFilepath);
+        exit();
+    }
+
+    // Get the time of the last commit and substract a year.
+    $minTime = 0;
+    foreach ($xml->commits->commit as $commit) {
+        $minTime = max($minTime, (int)$commit["timestamp"]);
+    }
+    $minTime = $minTime - (60 * 60 * 24 * 365);
+
+    // prepare RSS
+    $rss = new RSSFeed();
+
+    $baseUrl = \Mesamatrix::$request->getSchemeAndHttpHost()
+        . \Mesamatrix::$request->getBasePath();
+
+    $channel = new RSSChannel();
+    $channel
+        ->title(\Mesamatrix::$config->getValue("info", "title"))
+        ->description(\Mesamatrix::$config->getValue("info", "description"))
+        ->url($baseUrl)
+        ->appendTo($rss);
+
+    //$commitWeb = \Mesamatrix::$config->getValue("git", "mesa_commit_url");
+
+    foreach ($xml->commits->commit as $commit) {
+        if ((int)$commit["timestamp"] < $minTime)
+            continue;
+
+        $description = (string)$commit;
+        $description = str_replace('<pre>', '<pre style="white-space: pre-wrap;">', $description);
+        $lines = explode("\n", $description);
+        $lines = preg_replace('/^\+.*$/', '<span style="color: green">$0</span>', $lines);
+        $lines = preg_replace('/^-.*$/', '<span style="color: red">$0</span>', $lines);
+        $description = implode("\n", $lines);
+
+        $item = new RSSItem();
+        $item
+            ->preferCdata(true)
+            ->title((string)$commit["subject"])
+            ->description($description)
+            //->url($commitWeb . $commit["hash"])
+            ->url($baseUrl . '?commit=' . $commit["hash"])
+            ->pubDate((int)$commit["timestamp"])
+            ->appendTo($channel);
+    }
+
+    return $rss->render();
 }
-$minTime = $minTime - (60 * 60 * 24 * 365);
 
-// prepare RSS
-$rss = new RSSFeed();
+$featuresXmlFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
+$rssFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
+    . '/rss.xml';
 
-$baseUrl = \Mesamatrix::$request->getSchemeAndHttpHost()
-    . \Mesamatrix::$request->getBasePath();
+$mustGenerateRss = rssGenerationNeeded($featuresXmlFilepath, $rssFilepath);
 
-$channel = new RSSChannel();
-$channel
-    ->title(\Mesamatrix::$config->getValue("info", "title"))
-    ->description(\Mesamatrix::$config->getValue("info", "description"))
-    ->url($baseUrl)
-    ->appendTo($rss);
+$rssContents = null;
+if ($mustGenerateRss)
+{
+    // Generate RSS.
+    $rssContents = generateRss($featuresXmlFilepath);
 
-//$commitWeb = \Mesamatrix::$config->getValue("git", "mesa_commit_url");
+    // Write to file.
+    $h = fopen($rssFilepath, "w");
+    if ($h !== false) {
+        fwrite($h, $rssContents);
+        fclose($h);
+    }
 
-foreach ($xml->commits->commit as $commit) {
-    if ((int)$commit["timestamp"] < $minTime)
-        continue;
-
-    $description = (string)$commit;
-    $description = str_replace('<pre>', '<pre style="white-space: pre-wrap;">', $description);
-    $lines = explode("\n", $description);
-    $lines = preg_replace('/^\+.*$/', '<span style="color: green">$0</span>', $lines);
-    $lines = preg_replace('/^-.*$/', '<span style="color: red">$0</span>', $lines);
-    $description = implode("\n", $lines);
-
-    $item = new RSSItem();
-    $item
-        ->preferCdata(true)
-        ->title((string)$commit["subject"])
-        ->description($description)
-        //->url($commitWeb . $commit["hash"])
-        ->url($baseUrl . '?commit=' . $commit["hash"])
-        ->pubDate((int)$commit["timestamp"])
-        ->appendTo($channel);
+    \Mesamatrix::$logger->info('RSS file generated.');
+}
+else
+{
+    // Read from file.
+    $rssContents = file_get_contents($rssFilepath);
 }
 
-// send response
+// Send response.
 $response = new HTTPResponse(
-    $rss,
+    $rssContents,
     HTTPResponse::HTTP_OK,
     ['Content-Type' => 'text/xml']
 );
 
 $response->prepare(\Mesamatrix::$request);
 $response->send();
-
