@@ -46,7 +46,7 @@ abstract class Constants
     ];
 
     const GL_ALL_DRIVERS_VENDORS = [
-        "Software"  => [ "llvmpipe", "softpipe", "swr", "virgl", "zink" ],
+        "Software"  => [ "llvmpipe", "softpipe", "swr" ],
         "Intel"     => [ "i965" ],
         "Nvidia"    => [ "nv50", "nvc0" ],
         "AMD"       => [ "r600", "radeonsi" ],
@@ -54,6 +54,7 @@ abstract class Constants
         "Vivante"   => [ "etnaviv" ],
         "Broadcom"  => [ "v3d" ],
         "Arm"       => [ "panfrost" ],
+        "Emulation" => [ "virgl", "zink" ],
     ];
 
     const VK_ALL_DRIVERS = [
