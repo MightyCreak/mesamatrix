@@ -123,6 +123,7 @@ a:hover, a:active {
 .hCellVendor-vivante    { background-color: #a6d87a; }
 .hCellVendor-broadcom   { background-color: #ff8e8e; }
 .hCellVendor-arm        { background-color: #7acde8; }
+.hCellVendor-emulation  { background-color: #ffd6fc; }
 
 .hCellSep       { width: 0px; }
 
