@@ -43,6 +43,7 @@ abstract class Constants
         "v3d",
         "zink",
         "panfrost",
+        "d3d12",
     ];
 
     const GL_ALL_DRIVERS_VENDORS = [
@@ -54,7 +55,7 @@ abstract class Constants
         "Vivante"   => [ "etnaviv" ],
         "Broadcom"  => [ "v3d" ],
         "Arm"       => [ "panfrost" ],
-        "Emulation" => [ "virgl", "zink" ],
+        "Emulation" => [ "d3d12", "virgl", "zink" ],
     ];
 
     const VK_ALL_DRIVERS = [
