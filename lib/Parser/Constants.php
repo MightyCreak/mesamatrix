@@ -41,6 +41,7 @@ abstract class Constants
         "virgl",
         "etnaviv",
         "v3d",
+        "vc4",
         "zink",
         "panfrost",
         "d3d12",
@@ -53,7 +54,7 @@ abstract class Constants
         "AMD"       => [ "r600", "radeonsi" ],
         "Qualcomm"  => [ "freedreno" ],
         "Vivante"   => [ "etnaviv" ],
-        "Broadcom"  => [ "v3d" ],
+        "Broadcom"  => [ "v3d", "vc4" ],
         "Arm"       => [ "panfrost" ],
         "Emulation" => [ "d3d12", "virgl", "zink" ],
     ];
