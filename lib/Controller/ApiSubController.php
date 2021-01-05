@@ -220,11 +220,11 @@ abstract class ApiSubController
             $numGlVersionExts = $lbGlVersion->getNumExts();
 
             $driverScores = array();
-            $driverScores['mesa'] = $numGlVersionExts !== 0 ? $lbGlVersion->getNumDriverExtsDone('mesa') / $numGlVersionExts : 0;
+            $driverScores['mesa'] = $lbGlVersion->getDriverScore('mesa')->getScore();
             foreach ($vendors->vendor as $vendor) {
                 foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver['name'];
-                    $driverScores[$driverName] = $numGlVersionExts !== 0 ? $lbGlVersion->getNumDriverExtsDone($driverName) / $numGlVersionExts : 0;
+                    $driverScores[$driverName] = $lbGlVersion->getDriverScore($driverName)->getScore();
                 }
             }
 

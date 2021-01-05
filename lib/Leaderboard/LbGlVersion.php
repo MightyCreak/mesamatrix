@@ -26,15 +26,16 @@ class LbGlVersion {
      *
      * @param string $glname OpenGL name (e.g. OpenGL, OpenGL ES).
      * @param string $glversion OpenGL version (e.g. 3.1, 4.0).
+     * @param integer $numExts Total number of extensions.
      * @remark Versions are identified by `glid` which is the concatenation of
      *         the name and the version (examples: OpenGL4.5, OpenGL ES3.1, ...).
      */
-    public function __construct($glname, $glversion) {
+    public function __construct(string $glname, string $glversion, int $numExts) {
         $this->glid = $glname.$glversion;
         $this->glName = $glname;
         $this->glVersion = $glversion;
-        $this->numExts = 0;
-        $this->driversExtsDone = array();
+        $this->numExts = $numExts;
+        $this->drivers = array();
     }
 
     /**
@@ -64,8 +65,8 @@ class LbGlVersion {
      * @param string $drivername Name of the driver.
      * @param integer $numExtsDone Number of extensions done.
      */
-    public function addDriver($drivername, $numExtsDone) {
-        $this->driversExtsDone[$drivername] = $numExtsDone;
+    public function addDriver(string $drivername, int $numExtsDone) {
+        $this->driverScores[$drivername] = new LbDriverScore($numExtsDone, $this->getNumExts());
     }
 
     /**
@@ -88,26 +89,25 @@ class LbGlVersion {
      * Get the number of extension done for a given driver.
      *
      * @param string $drivername Name of the driver.
-     * @return integer The number of extensions done for the given driver.
+     * @return LbDriverScore The driver score.
      */
-    public function getNumDriverExtsDone($drivername) {
-        return $this->driversExtsDone[$drivername];
+    public function getDriverScore($drivername) {
+        return $this->driverScores[$drivername];
     }
 
     /**
-     * Get all the drivers results for this OpenGL verison.
+     * Get all the drivers scores for this OpenGL version.
      *
      * @return mixed[] An associative array: the key is the driver name, the
-     *                 value is the number of extensions done.
+     *                 value is an LbDriverScore.
      */
-    public function getAllDrivers() {
-        return $this->driversExtsDone;
+    public function getDriverScores() {
+        return $this->driverScores;
     }
 
     private $glid;
     private $glName;
     private $glVersion;
     private $numExts;
-    private $driversExtsDone;
+    private $driverScores;
 }
-

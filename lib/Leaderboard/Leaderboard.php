@@ -68,9 +68,6 @@ class Leaderboard {
      */
     private function loadApi(\SimpleXMLElement $api) {
         foreach($api->versions->version as $xmlVersion) {
-            $lbGlVersion = $this->createGlVersion((string) $xmlVersion["name"],
-                                                  (string) $xmlVersion["version"]);
-
             // Count total extensions and sub-extensions.
             $numTotalExts = count($xmlVersion->extensions->extension);
             foreach ($xmlVersion->extensions->extension as $xmlExt) {
@@ -78,7 +75,10 @@ class Leaderboard {
                 $numTotalExts += count($xmlSubExts);
             }
 
-            $lbGlVersion->setNumExts($numTotalExts);
+            $lbGlVersion = $this->createGlVersion(
+                (string) $xmlVersion["name"],
+                (string) $xmlVersion["version"],
+                $numTotalExts);
 
             // Count done mesa extensions and sub-extensions.
             $numDoneExts = 0;
@@ -148,21 +148,6 @@ class Leaderboard {
      }
 
     /**
-     * Get the number of extensions done by a specific driver.
-     *
-     * @param string $drivername Name of the driver.
-     * @return integer Number of extensions done for the given driver.
-     */
-    public function getNumDriverExtsDone($drivername) {
-        $numExtsDone = 0;
-        foreach ($this->glVersions as &$glVersion) {
-            $numExtsDone += $glVersion->getNumDriverExtsDone($drivername);
-        }
-
-        return $numExtsDone;
-    }
-
-    /**
      * Get the total number of extensions.
      */
     public function getNumTotalExts() {
@@ -184,13 +169,13 @@ class Leaderboard {
     public function getDriversSortedByExtsDone() {
         $driversTotalExtsDone = array();
         foreach ($this->glVersions as &$glVersion) {
-            $glVersionDrivers = $glVersion->getAllDrivers();
-            foreach ($glVersionDrivers as $drivername => $numExtsDone) {
+            $glVersionDrivers = $glVersion->getDriverScores();
+            foreach ($glVersionDrivers as $drivername => $driverScore) {
                 if (!array_key_exists($drivername, $driversTotalExtsDone)) {
                     $driversTotalExtsDone[$drivername] = 0;
                 }
 
-                $driversTotalExtsDone[$drivername] += $numExtsDone;
+                $driversTotalExtsDone[$drivername] += $driverScore->getNumExtensionsDone();
             }
         }
 
@@ -215,7 +200,7 @@ class Leaderboard {
         while ($i > 0) {
             $glVersion = $this->glVersions[--$i];
             if ($glVersion->getGlName() === $api) {
-                if ($glVersion->getNumDriverExtsDone($drivername) !== $glVersion->getNumExts()) {
+                if ($glVersion->getDriverScore($drivername)->getNumExtensionsDone() !== $glVersion->getNumExts()) {
                     break;
                 }
 
@@ -231,10 +216,11 @@ class Leaderboard {
      *
      * @param string $glname OpenGL name.
      * @param string $glversion OpenGL version.
+     * @param integer $numExts Total number of extensions.
      * @return LbGlVersion The new item.
      */
-    private function createGlVersion($glname, $glversion) {
-        $glVersion = new LbGlVersion($glname, $glversion);
+    private function createGlVersion(string $glname, string $glversion, int $numExts) {
+        $glVersion = new LbGlVersion($glname, $glversion, $numExts);
         $this->glVersions[] = $glVersion;
         return $glVersion;
     }
