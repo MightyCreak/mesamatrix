@@ -66,7 +66,10 @@ class LbGlVersion {
      * @param integer $numExtsDone Number of extensions done.
      */
     public function addDriver(string $drivername, int $numExtsDone) {
-        $this->driverScores[$drivername] = new LbDriverScore($numExtsDone, $this->getNumExts());
+        $this->driverScores[$drivername] = new LbDriverScore(
+            $numExtsDone,
+            $this->getNumExts(),
+            (float) $this->getGlVersion());
     }
 
     /**

@@ -42,6 +42,10 @@ class Leaderboard {
             }
         }
 
+        // foreach ($this->glVersions as $glVersion) {
+        //     print($glVersion->getGlId() . "\n");
+        // }
+
         // Sort by OpenGL versions descending.
         usort($this->glVersions, function($a, $b) {
             // Sort OpenGL before OpenGLES and higher versions before lower ones.
@@ -59,6 +63,11 @@ class Leaderboard {
                 return 1;
             }
         });
+
+        // print("\n");
+        // foreach ($this->glVersions as $glVersion) {
+        //     print($glVersion->getGlId() . "\n");
+        // }
     }
 
     /**
@@ -163,24 +172,47 @@ class Leaderboard {
      * Get an array of driver with their number of extensions done for all the
      * OpenGL versions. The array is sorted by the drivers score (descending).
      *
-     * @return mixed[] An associative array: the key is the driver name, the
-     *                 value is the number of extensions done.
+     * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan).
+     * @return LbDriverScore[] An associative array: the key is the driver name, the
+     *                         value is an LbDriverScore.
      */
-    public function getDriversSortedByExtsDone() {
-        $driversTotalExtsDone = array();
+    public function getDriversSortedByExtsDone(string $api) {
+        $sortedDriversScores = array();
+        $numTotalExts = $this->getNumTotalExts();
         foreach ($this->glVersions as &$glVersion) {
             $glVersionDrivers = $glVersion->getDriverScores();
             foreach ($glVersionDrivers as $drivername => $driverScore) {
-                if (!array_key_exists($drivername, $driversTotalExtsDone)) {
-                    $driversTotalExtsDone[$drivername] = 0;
+                if (!array_key_exists($drivername, $sortedDriversScores)) {
+                    // Add new driver.
+                    $sortedDriversScores[$drivername] = new LbDriverScore(0, $numTotalExts, 0);
                 }
 
-                $driversTotalExtsDone[$drivername] += $driverScore->getNumExtensionsDone();
+                // Add up the number of extensions done for this driver.
+                $numExtsDone = $sortedDriversScores[$drivername]->getNumExtensionsDone() +
+                    $driverScore->getNumExtensionsDone();
+                $sortedDriversScores[$drivername]->setNumExtensionsDone($numExtsDone);
             }
         }
 
-        arsort($driversTotalExtsDone);
-        return $driversTotalExtsDone;
+        // Keep last max API version fully implemented.
+        foreach (array_keys($sortedDriversScores) as $drivername) {
+            $sortedDriversScores[$drivername]->setApiVersion($this->getDriverApiVersion($api, $drivername));
+        }
+
+        // Sort by number of extensions and then by API version.
+        uasort($sortedDriversScores, function($a, $b) {
+            $diff = $b->getNumExtensionsDone() - $a->getNumExtensionsDone();
+            if ($diff === 0) {
+                $versionDiff = $b->getApiVersion() - $a->getApiVersion();
+                if ($versionDiff !== 0) {
+                    $diff = $versionDiff < 0 ? -1 : 1;
+                }
+            }
+
+            return $diff;
+        });
+
+        return $sortedDriversScores;
     }
 
     /**

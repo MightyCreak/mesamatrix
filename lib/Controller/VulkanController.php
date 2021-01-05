@@ -25,7 +25,7 @@ class VulkanController extends ApiSubController
     protected function writeLeaderboard()
     {
         $leaderboard = $this->getLeaderboard();
-        $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
+        $driversExtsDone = $leaderboard->getDriversSortedByExtsDone("Vulkan");
         $numTotalExts = $leaderboard->getNumTotalExts();
 ?>
             <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
@@ -44,7 +44,8 @@ class VulkanController extends ApiSubController
         $index = 1;
         $rank = 1;
         $prevNumExtsDone = -1;
-        foreach($driversExtsDone as $drivername => $numExtsDone) {
+        foreach($driversExtsDone as $drivername => $driverScore) {
+            $numExtsDone = $driverScore->getNumExtensionsDone();
             $sameRank = $prevNumExtsDone === $numExtsDone;
             if (!$sameRank) {
                 $rank = $index;
@@ -55,8 +56,8 @@ class VulkanController extends ApiSubController
             case 3: $rankClass = "lbCol-3rd"; break;
             default: $rankClass = "";
             }
-            $pctScore = sprintf("%.1f%%", $numExtsDone / $numTotalExts * 100);
-            $vulkanVersion = $leaderboard->getDriverApiVersion("Vulkan", $drivername);
+            $pctScore = sprintf("%.1f%%", $driverScore->getScore() * 100);
+            $vulkanVersion = $driverScore->getApiVersion();
             if ($vulkanVersion === NULL) {
                 $vulkanVersion = "N/A";
             }

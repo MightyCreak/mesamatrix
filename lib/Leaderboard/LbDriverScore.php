@@ -22,17 +22,27 @@ namespace Mesamatrix\Leaderboard;
 
 class LbDriverScore {
     private $numExtsDone;
-    private $score;
+    private $numExts;
+    private $apiVersion;
 
     /**
      * LbDriver constructor.
      *
      * @param int $numExtsDone Number of extensions done.
      * @param int $numExts Total number of extensions.
+     * @param float $apiVersion API version (e.g. 3.1, 4.0).
      */
-    public function __construct(int $numExtsDone, int $numExts) {
-        $this->numExtsDone = $numExtsDone;
-        $this->score = $numExts !== 0 ? $this->numExtsDone / $numExts : 0;
+    public function __construct(int $numExtsDone, int $numExts, float $apiVersion) {
+        $this->setNumExtensionsDone($numExtsDone);
+        $this->setNumExtensions($numExts);
+        $this->setApiVersion($apiVersion);
+    }
+
+    /**
+     * Set the number of extensions done.
+     */
+    function setNumExtensionsDone($num) {
+        $this->numExtsDone = $num;
     }
 
     /**
@@ -43,9 +53,37 @@ class LbDriverScore {
     }
 
     /**
+     * Set the total number of extensions.
+     */
+    function setNumExtensions($num) {
+        $this->numExts = $num;
+    }
+
+    /**
+     * Get the total number of extensions.
+     */
+    function getNumExtensions() {
+        return $this->numExts;
+    }
+
+    /**
      * Get the score.
      */
     function getScore() {
-        return $this->score;
+        return $this->numExts !== 0 ? $this->numExtsDone / $this->numExts : 0;
+    }
+
+    /**
+     * Set the API version.
+     */
+    function setApiVersion($apiVersion) {
+        $this->apiVersion = $apiVersion;
+    }
+
+    /**
+     * Get the API version.
+     */
+    function getApiVersion() {
+        return $this->apiVersion;
     }
 }
