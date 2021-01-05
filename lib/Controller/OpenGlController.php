@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014-2020 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2021 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -25,7 +25,7 @@ class OpenGlController extends ApiSubController
     protected function writeLeaderboard()
     {
         $leaderboard = $this->getLeaderboard();
-        $driversExtsDone = $leaderboard->getDriversSortedByExtsDone();
+        $sortedDrivers = $leaderboard->getDriversSortedByExtsDone("OpenGL");
         $numTotalExts = $leaderboard->getNumTotalExts();
 ?>
             <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
@@ -45,7 +45,8 @@ class OpenGlController extends ApiSubController
         $index = 1;
         $rank = 1;
         $prevNumExtsDone = -1;
-        foreach($driversExtsDone as $drivername => $numExtsDone) {
+        foreach($sortedDrivers as $drivername => $driverScore) {
+            $numExtsDone = $driverScore->getNumExtensionsDone();
             $sameRank = $prevNumExtsDone === $numExtsDone;
             if (!$sameRank) {
                 $rank = $index;
@@ -56,8 +57,8 @@ class OpenGlController extends ApiSubController
             case 3: $rankClass = "lbCol-3rd"; break;
             default: $rankClass = "";
             }
-            $pctScore = sprintf("%.1f%%", $numExtsDone / $numTotalExts * 100);
-            $openglVersion = $leaderboard->getDriverApiVersion("OpenGL", $drivername);
+            $pctScore = sprintf("%.1f%%", $driverScore->getScore() * 100);
+            $openglVersion = $driverScore->getApiVersion();
             if ($openglVersion === NULL) {
                 $openglVersion = "N/A";
             }

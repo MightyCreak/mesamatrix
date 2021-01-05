@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014-2020 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2021 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -54,7 +54,7 @@ abstract class ApiSubController
     }
 
     private function createLeaderboard(\SimpleXMLElement $xml) {
-        $this->leaderboard = new \Mesamatrix\Leaderboard();
+        $this->leaderboard = new \Mesamatrix\Leaderboard\Leaderboard();
         $this->leaderboard->load($xml, $this->apis);
     }
 
@@ -220,11 +220,11 @@ abstract class ApiSubController
             $numGlVersionExts = $lbGlVersion->getNumExts();
 
             $driverScores = array();
-            $driverScores['mesa'] = $numGlVersionExts !== 0 ? $lbGlVersion->getNumDriverExtsDone('mesa') / $numGlVersionExts : 0;
+            $driverScores['mesa'] = $lbGlVersion->getDriverScore('mesa')->getScore();
             foreach ($vendors->vendor as $vendor) {
                 foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver['name'];
-                    $driverScores[$driverName] = $numGlVersionExts !== 0 ? $lbGlVersion->getNumDriverExtsDone($driverName) / $numGlVersionExts : 0;
+                    $driverScores[$driverName] = $lbGlVersion->getDriverScore($driverName)->getScore();
                 }
             }
 

@@ -2,7 +2,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014-2020 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2021 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Mesamatrix;
+namespace Mesamatrix\Leaderboard;
 
 class Leaderboard {
     /**
@@ -42,6 +42,10 @@ class Leaderboard {
             }
         }
 
+        // foreach ($this->glVersions as $glVersion) {
+        //     print($glVersion->getGlId() . "\n");
+        // }
+
         // Sort by OpenGL versions descending.
         usort($this->glVersions, function($a, $b) {
             // Sort OpenGL before OpenGLES and higher versions before lower ones.
@@ -59,6 +63,11 @@ class Leaderboard {
                 return 1;
             }
         });
+
+        // print("\n");
+        // foreach ($this->glVersions as $glVersion) {
+        //     print($glVersion->getGlId() . "\n");
+        // }
     }
 
     /**
@@ -68,9 +77,6 @@ class Leaderboard {
      */
     private function loadApi(\SimpleXMLElement $api) {
         foreach($api->versions->version as $xmlVersion) {
-            $lbGlVersion = $this->createGlVersion((string) $xmlVersion["name"],
-                                                  (string) $xmlVersion["version"]);
-
             // Count total extensions and sub-extensions.
             $numTotalExts = count($xmlVersion->extensions->extension);
             foreach ($xmlVersion->extensions->extension as $xmlExt) {
@@ -78,20 +84,23 @@ class Leaderboard {
                 $numTotalExts += count($xmlSubExts);
             }
 
-            $lbGlVersion->setNumExts($numTotalExts);
+            $lbGlVersion = $this->createGlVersion(
+                (string) $xmlVersion["name"],
+                (string) $xmlVersion["version"],
+                $numTotalExts);
 
             // Count done mesa extensions and sub-extensions.
             $numDoneExts = 0;
             foreach ($xmlVersion->extensions->extension as $xmlExt) {
                 // Extension.
-                if ($xmlExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
+                if ($xmlExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_DONE) {
                     $numDoneExts += 1;
                 }
 
                 // Sub-extensions.
                 $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
                 foreach ($xmlSubExts as $xmlSubExt) {
-                    if ($xmlSubExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
+                    if ($xmlSubExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_DONE) {
                         $numDoneExts += 1;
                     }
                 }
@@ -148,21 +157,6 @@ class Leaderboard {
      }
 
     /**
-     * Get the number of extensions done by a specific driver.
-     *
-     * @param string $drivername Name of the driver.
-     * @return integer Number of extensions done for the given driver.
-     */
-    public function getNumDriverExtsDone($drivername) {
-        $numExtsDone = 0;
-        foreach ($this->glVersions as &$glVersion) {
-            $numExtsDone += $glVersion->getNumDriverExtsDone($drivername);
-        }
-
-        return $numExtsDone;
-    }
-
-    /**
      * Get the total number of extensions.
      */
     public function getNumTotalExts() {
@@ -178,24 +172,47 @@ class Leaderboard {
      * Get an array of driver with their number of extensions done for all the
      * OpenGL versions. The array is sorted by the drivers score (descending).
      *
-     * @return mixed[] An associative array: the key is the driver name, the
-     *                 value is the number of extensions done.
+     * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan).
+     * @return LbDriverScore[] An associative array: the key is the driver name, the
+     *                         value is an LbDriverScore.
      */
-    public function getDriversSortedByExtsDone() {
-        $driversTotalExtsDone = array();
+    public function getDriversSortedByExtsDone(string $api) {
+        $sortedDriversScores = array();
+        $numTotalExts = $this->getNumTotalExts();
         foreach ($this->glVersions as &$glVersion) {
-            $glVersionDrivers = $glVersion->getAllDrivers();
-            foreach ($glVersionDrivers as $drivername => $numExtsDone) {
-                if (!array_key_exists($drivername, $driversTotalExtsDone)) {
-                    $driversTotalExtsDone[$drivername] = 0;
+            $glVersionDrivers = $glVersion->getDriverScores();
+            foreach ($glVersionDrivers as $drivername => $driverScore) {
+                if (!array_key_exists($drivername, $sortedDriversScores)) {
+                    // Add new driver.
+                    $sortedDriversScores[$drivername] = new LbDriverScore(0, $numTotalExts, 0);
                 }
 
-                $driversTotalExtsDone[$drivername] += $numExtsDone;
+                // Add up the number of extensions done for this driver.
+                $numExtsDone = $sortedDriversScores[$drivername]->getNumExtensionsDone() +
+                    $driverScore->getNumExtensionsDone();
+                $sortedDriversScores[$drivername]->setNumExtensionsDone($numExtsDone);
             }
         }
 
-        arsort($driversTotalExtsDone);
-        return $driversTotalExtsDone;
+        // Keep last max API version fully implemented.
+        foreach (array_keys($sortedDriversScores) as $drivername) {
+            $sortedDriversScores[$drivername]->setApiVersion($this->getDriverApiVersion($api, $drivername));
+        }
+
+        // Sort by number of extensions and then by API version.
+        uasort($sortedDriversScores, function($a, $b) {
+            $diff = $b->getNumExtensionsDone() - $a->getNumExtensionsDone();
+            if ($diff === 0) {
+                $versionDiff = $b->getApiVersion() - $a->getApiVersion();
+                if ($versionDiff !== 0) {
+                    $diff = $versionDiff < 0 ? -1 : 1;
+                }
+            }
+
+            return $diff;
+        });
+
+        return $sortedDriversScores;
     }
 
     /**
@@ -215,7 +232,7 @@ class Leaderboard {
         while ($i > 0) {
             $glVersion = $this->glVersions[--$i];
             if ($glVersion->getGlName() === $api) {
-                if ($glVersion->getNumDriverExtsDone($drivername) !== $glVersion->getNumExts()) {
+                if ($glVersion->getDriverScore($drivername)->getNumExtensionsDone() !== $glVersion->getNumExts()) {
                     break;
                 }
 
@@ -231,13 +248,14 @@ class Leaderboard {
      *
      * @param string $glname OpenGL name.
      * @param string $glversion OpenGL version.
+     * @param integer $numExts Total number of extensions.
      * @return LbGlVersion The new item.
      */
-    private function createGlVersion($glname, $glversion) {
-        $glVersion = new Leaderboard\LbGlVersion($glname, $glversion);
+    private function createGlVersion(string $glname, string $glversion, int $numExts) {
+        $glVersion = new LbGlVersion($glname, $glversion, $numExts);
         $this->glVersions[] = $glVersion;
         return $glVersion;
     }
 
-    private $glVersions;    ///< Leaderboard\LbGlVersion[].
+    private $glVersions;    ///< LbGlVersion[].
 }
