@@ -54,7 +54,7 @@ abstract class ApiSubController
     }
 
     private function createLeaderboard(\SimpleXMLElement $xml) {
-        $this->leaderboard = new \Mesamatrix\Leaderboard();
+        $this->leaderboard = new \Mesamatrix\Leaderboard\Leaderboard();
         $this->leaderboard->load($xml, $this->apis);
     }
 

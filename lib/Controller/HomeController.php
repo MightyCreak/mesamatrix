@@ -83,7 +83,7 @@ class HomeController extends BaseController
     }
 
     private function createLeaderboard(\SimpleXMLElement $xml, array $apis) {
-        $leaderboard = new \Mesamatrix\Leaderboard();
+        $leaderboard = new \Mesamatrix\Leaderboard\Leaderboard();
         $leaderboard->load($xml, $apis);
         return $leaderboard;
     }

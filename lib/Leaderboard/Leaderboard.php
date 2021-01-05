@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Mesamatrix;
+namespace Mesamatrix\Leaderboard;
 
 class Leaderboard {
     /**
@@ -84,14 +84,14 @@ class Leaderboard {
             $numDoneExts = 0;
             foreach ($xmlVersion->extensions->extension as $xmlExt) {
                 // Extension.
-                if ($xmlExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
+                if ($xmlExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_DONE) {
                     $numDoneExts += 1;
                 }
 
                 // Sub-extensions.
                 $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
                 foreach ($xmlSubExts as $xmlSubExt) {
-                    if ($xmlSubExt->mesa["status"] == Parser\Constants::STATUS_DONE) {
+                    if ($xmlSubExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_DONE) {
                         $numDoneExts += 1;
                     }
                 }
@@ -234,10 +234,10 @@ class Leaderboard {
      * @return LbGlVersion The new item.
      */
     private function createGlVersion($glname, $glversion) {
-        $glVersion = new Leaderboard\LbGlVersion($glname, $glversion);
+        $glVersion = new LbGlVersion($glname, $glversion);
         $this->glVersions[] = $glVersion;
         return $glVersion;
     }
 
-    private $glVersions;    ///< Leaderboard\LbGlVersion[].
+    private $glVersions;    ///< LbGlVersion[].
 }
