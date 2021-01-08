@@ -31,20 +31,10 @@ class Leaderboard {
     /**
      * Load leaderboard from data.
      *
-     * @param SimpleXMLElement $xml Root of the XML data.
-     * @param string[] $apis APIs to show (order is important).
+     * @param SimpleXMLElement $xmlApi The XML element of the API.
      */
-    public function load(\SimpleXMLElement $xml, array $apis) {
-        foreach ($apis as $api) {
-            foreach ($xml->apis->api as $xmlApi) {
-                if ((string) $xmlApi['name'] === $api)
-                    $this->loadApi($xmlApi);
-            }
-        }
-
-        // foreach ($this->glVersions as $glVersion) {
-        //     print($glVersion->getGlId() . "\n");
-        // }
+    public function load(\SimpleXMLElement $xmlApi) {
+        $this->loadApi($xmlApi);
 
         // Sort by OpenGL versions descending.
         usort($this->glVersions, function($a, $b) {
@@ -63,20 +53,15 @@ class Leaderboard {
                 return 1;
             }
         });
-
-        // print("\n");
-        // foreach ($this->glVersions as $glVersion) {
-        //     print($glVersion->getGlId() . "\n");
-        // }
     }
 
     /**
      * Load all the versions from a given API.
      *
-     * @param SimpleXMLElement $api The XML tag for the wanted API.
+     * @param SimpleXMLElement $xmlApi The XML tag for the wanted API.
      */
-    private function loadApi(\SimpleXMLElement $api) {
-        foreach($api->versions->version as $xmlVersion) {
+    private function loadApi(\SimpleXMLElement $xmlApi) {
+        foreach($xmlApi->versions->version as $xmlVersion) {
             // Count total extensions and sub-extensions.
             $numTotalExts = count($xmlVersion->extensions->extension);
             foreach ($xmlVersion->extensions->extension as $xmlExt) {
@@ -109,7 +94,7 @@ class Leaderboard {
             $lbGlVersion->addDriver("mesa", $numDoneExts);
 
             // Count done extensions and sub-extensions for each drivers.
-            foreach ($api->vendors->vendor as $vendor) {
+            foreach ($xmlApi->vendors->vendor as $vendor) {
                 foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver["name"];
 
