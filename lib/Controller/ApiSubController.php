@@ -20,12 +20,18 @@
 
 namespace Mesamatrix\Controller;
 
-abstract class ApiSubController
+class ApiSubController
 {
     private $apis = array();
     private $xml = null;
     private $leaderboard = null;
+    private $showLbVersion = true;
     private $matrix = array();
+
+    public function __construct(string $api, bool $showLbVersion) {
+        $this->apis = [ $api ];
+        $this->showLbVersion = $showLbVersion;
+    }
 
     public function setApis(array $apis) {
         $this->apis = $apis;
@@ -184,7 +190,7 @@ abstract class ApiSubController
 
         $api = array(
             'name' => $xmlApi['name'],
-            'target' => 'Version_'.urlencode(str_replace(' ', '', $xmlApi['name'])),
+            'target' => urlencode(str_replace(' ', '', $xmlApi['name'])),
             'subsections' => array()
         );
 
@@ -196,21 +202,28 @@ abstract class ApiSubController
     }
 
     private function addSection(array &$section, \SimpleXMLElement $xmlVersion, \SimpleXMLElement $vendors) {
-        $text = "";
+        $name = "";
         if (!empty($xmlVersion['version'])) {
-            $text = $xmlVersion['name'];
+            $name = $xmlVersion['name'];
             if (!empty((string) $xmlVersion['version'])) {
-                $text .= ' '.$xmlVersion['version'];
+                $name .= ' '.$xmlVersion['version'];
             }
             $xmlShaderVersion = $xmlVersion->{'shader-version'};
             if (!empty((string) $xmlShaderVersion['name'])) {
-                $text .= ' - '.$xmlShaderVersion['name'].' '.$xmlShaderVersion['version'];
+                $name .= ' - '.$xmlShaderVersion['name'].' '.$xmlShaderVersion['version'];
             }
         }
+        else {
+            $name = "Extensions";
+        }
+
+        $target = $xmlVersion['name'];
+        $target .= !empty($xmlVersion['version']) ? $xmlVersion['version'] : '_Extensions';
+        $target = urlencode(str_replace(' ', '', $target));
 
         $subsection = array(
-            'name' => $text,
-            'target' => !empty($text) ? 'Version_'.urlencode(str_replace(' ', '', $text)) : '',
+            'name' => $name,
+            'target' => $target,
             'scores' => array(),
             'extensions' => array()
         );
@@ -291,8 +304,6 @@ abstract class ApiSubController
         $subsection['extensions'][] = $extension;
     }
 
-    abstract protected function writeLeaderboard();
-
     public function writeMatrix() {
 ?>
             <table class="matrix">
@@ -322,13 +333,11 @@ foreach($this->matrix['sections'] as $section):
                     <td colspan="<?= count($this->matrix['columns']) ?>">
                         <h1 id="<?= $sectionId ?>"><?= $sectionName ?><a href="#<?= $sectionId ?>" class="permalink">&para;</a></h1>
 <?php
-    if ($sectionName === 'OpenGL' || $sectionName === 'Vulkan'):
-        $leaderboardId = $sectionId."_Leaderboard";
+    $leaderboardId = $sectionId."_Leaderboard";
 ?>
                         <h2 id="<?= $leaderboardId ?>">Leaderboard<a href="#<?= $leaderboardId ?>" class="permalink">&para;</a></h2>
 <?php
-        $this->writeLeaderboard();
-    endif;
+    $this->writeLeaderboard();
 ?>
                     </td>
                 </tr>
@@ -340,13 +349,7 @@ foreach($this->matrix['sections'] as $section):
 ?>
                 <tr>
                     <td colspan="<?= count($this->matrix['columns']) ?>">
-<?php
-        if (!empty($subsectionName)):
-?>
                         <h2 id="<?= $subsectionId ?>"><?= $subsectionName ?><a href="#<?= $subsectionId ?>" class="permalink">&para;</a></h2>
-<?php
-        endif;
-?>
                     </td>
                 </tr>
                 <tr>
@@ -459,6 +462,78 @@ foreach($this->matrix['sections'] as $section):
     endforeach;
 endforeach;
 ?>
+            </table>
+<?php
+    }
+
+    private function writeLeaderboard() {
+        $api = $this->apis[0];
+        $leaderboard = $this->getLeaderboard();
+        $sortedDrivers = $leaderboard->getDriversSortedByExtsDone($api);
+        $numTotalExts = $leaderboard->getNumTotalExts();
+        $colNames = [ '#', 'Driver', 'Extensions' ];
+        if ($this->showLbVersion) {
+            $colNames[] = $api;
+        }
+?>
+            <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
+            The ranking is based on the number of extensions done by driver. </p>
+            <table class="lb">
+                <thead>
+                    <tr>
+<?php
+        foreach ($colNames as $name):
+?>
+                        <th><?= $name ?></th>
+<?php
+        endforeach;
+?>
+                    </tr>
+                </thead>
+                <tbody>
+<?php
+        $index = 1;
+        $rank = 1;
+        $prevNumExtsDone = -1;
+        foreach($sortedDrivers as $drivername => $driverScore) {
+            $numExtsDone = $driverScore->getNumExtensionsDone();
+            $sameRank = $prevNumExtsDone === $numExtsDone;
+            if (!$sameRank) {
+                $rank = $index;
+            }
+            switch ($rank) {
+            case 1: $rankClass = "lbCol-1st"; break;
+            case 2: $rankClass = "lbCol-2nd"; break;
+            case 3: $rankClass = "lbCol-3rd"; break;
+            default: $rankClass = "";
+            }
+            $pctScore = sprintf("%.1f%%", $driverScore->getScore() * 100);
+            $apiVersion = null;
+            if ($this->showLbVersion) {
+                $apiVersion = $driverScore->getApiVersion();
+                if ($apiVersion === NULL) {
+                    $apiVersion = "N/A";
+                }
+            }
+?>
+                    <tr class="<?= $rankClass ?>">
+                        <th class="lbCol-rank"><?= !$sameRank ? $rank : "" ?></th>
+                        <td class="lbCol-driver"><?= $drivername ?></td>
+                        <td class="lbCol-score"><span class="lbCol-pctScore">(<?= $pctScore ?>)</span> <?= $numExtsDone ?></td>
+<?php
+                        if ($this->showLbVersion):
+?>
+                        <td class="lbCol-version"><?= $apiVersion ?></td>
+<?php
+                        endif;
+?>
+                    </tr>
+<?php
+            $prevNumExtsDone = $numExtsDone;
+            $index++;
+        }
+?>
+                </tbody>
             </table>
 <?php
     }
