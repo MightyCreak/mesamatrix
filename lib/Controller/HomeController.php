@@ -95,7 +95,7 @@ class HomeController extends BaseController
         Although this text file is updated by the Mesa developers themselves, it might not contain an exhaustive list of all the drivers features and subtleties. So, for more information, it is advised to look at the <a href="<?= \Mesamatrix::$config->getValue('git', 'mesa_web') ?>" target="_blank">source code</a>, or ask the developers on their <a href="https://mesa3d.org/lists.html" target="_blank">mailing-list</a>.
     </p>
     <p>
-        Feel free to open an issue or create a PR on <a href="<?= \Mesamatrix::$config->getValue('info', 'project_url') ?>" target="_blank">GitHub</a>, or join the Matrix room <a href="https://matrix.to/#/#mesamatrix:matrix.org" target="_blank">#mesamatrix:matrix.org</a>.
+        Feel free to open an issue or create a PR on <a href="<?= \Mesamatrix::$config->getValue('info', 'project_url') ?>" target="_blank">GitHub</a>, or join the Matrix room <a href="https://matrix.to/#/%23mesamatrix:matrix.org" target="_blank">#mesamatrix:matrix.org</a>.
     </p>
 
     <h1>Last commits</h1>
