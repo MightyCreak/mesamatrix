@@ -22,19 +22,15 @@ namespace Mesamatrix\Controller;
 
 class ApiSubController
 {
-    private $apis = array();
+    private $api = "";
     private $xml = null;
     private $leaderboard = null;
     private $showLbVersion = true;
     private $matrix = array();
 
     public function __construct(string $api, bool $showLbVersion) {
-        $this->apis = [ $api ];
+        $this->api = $api;
         $this->showLbVersion = $showLbVersion;
-    }
-
-    public function setApis(array $apis) {
-        $this->apis = $apis;
     }
 
     public function getLeaderboard() {
@@ -44,8 +40,16 @@ class ApiSubController
     public function prepare() {
         $this->xml = $this->loadMesamatrixXml();
 
-        $this->createLeaderboard($this->xml);
-        $this->createMatrixModel($this->xml);
+        $xmlApi = null;
+        foreach ($this->xml->apis->api as $it) {
+            if ((string) $it['name'] === $this->api) {
+                $xmlApi = $it;
+                break;
+            }
+        }
+
+        $this->createLeaderboard($xmlApi);
+        $this->createMatrixModel($xmlApi);
     }
 
     private function loadMesamatrixXml() {
@@ -59,36 +63,26 @@ class ApiSubController
         return $xml;
     }
 
-    private function createLeaderboard(\SimpleXMLElement $xml) {
+    private function createLeaderboard(\SimpleXMLElement $xmlApi) {
         $this->leaderboard = new \Mesamatrix\Leaderboard\Leaderboard();
-        $this->leaderboard->load($xml, $this->apis);
+        $this->leaderboard->load($xmlApi);
     }
 
-    public function createMatrixModel(\SimpleXMLElement $xml) {
-        $xmlApis = array();
-        foreach ($this->apis as $api) {
-            foreach ($xml->apis->api as $xmlApi) {
-                if ((string) $xmlApi['name'] === $api)
-                    $xmlApis[] = $xmlApi;
-            }
-        }
-
+    public function createMatrixModel(\SimpleXMLElement $xmlApi) {
         $this->matrix = array();
-        $this->createColumns($this->matrix, $xmlApis);
+        $this->createColumns($this->matrix, $xmlApi);
 
         $this->matrix['sections'] = array();
-        foreach ($xmlApis as $xmlApi) {
-            $this->addApiSection($this->matrix, $xmlApi);
-        }
+        $this->addApiSection($this->matrix, $xmlApi);
 
-        $this->matrix['last_updated'] = (int) $xml['updated'];
+        $this->matrix['last_updated'] = (int) $this->xml['updated'];
     }
 
     public function getLastUpdatedTime() {
         return $this->matrix['last_updated'];
     }
 
-    private function createColumns(array &$matrix, array $xmlApis) {
+    private function createColumns(array &$matrix, \SimpleXMLElement $xmlApi) {
         $matrix['column_groups'] = array();
         $matrix['columns'] = array();
 
@@ -121,19 +115,17 @@ class ApiSubController
 
         // Get all the vendors and all their drivers.
         $vendors = array();
-        foreach ($xmlApis as $xmlApi) {
-            foreach ($xmlApi->vendors->vendor as $vendor) {
-                $vendorName = (string) $vendor['name'];
-                if (!array_key_exists($vendorName, $vendors)) {
-                    $vendors[$vendorName] = array();
-                }
+        foreach ($xmlApi->vendors->vendor as $vendor) {
+            $vendorName = (string) $vendor['name'];
+            if (!array_key_exists($vendorName, $vendors)) {
+                $vendors[$vendorName] = array();
+            }
 
-                $driverNames = &$vendors[$vendorName];
-                foreach ($vendor->drivers->driver as $driver) {
-                    $driverName = (string) $driver['name'];
-                    if (!in_array($driverName, $driverNames)) {
-                        $driverNames[] = $driverName;
-                    }
+            $driverNames = &$vendors[$vendorName];
+            foreach ($vendor->drivers->driver as $driver) {
+                $driverName = (string) $driver['name'];
+                if (!in_array($driverName, $driverNames)) {
+                    $driverNames[] = $driverName;
                 }
             }
         }
@@ -461,13 +453,12 @@ endforeach;
     }
 
     private function writeLeaderboard() {
-        $api = $this->apis[0];
         $leaderboard = $this->getLeaderboard();
-        $sortedDrivers = $leaderboard->getDriversSortedByExtsDone($api);
+        $sortedDrivers = $leaderboard->getDriversSortedByExtsDone($this->api);
         $numTotalExts = $leaderboard->getNumTotalExts();
         $colNames = [ '#', 'Driver', 'Extensions' ];
         if ($this->showLbVersion) {
-            $colNames[] = $api;
+            $colNames[] = $this->api;
         }
 ?>
     <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
