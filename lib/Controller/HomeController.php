@@ -23,16 +23,18 @@ namespace Mesamatrix\Controller;
 class HomeController extends BaseController
 {
     private $commits = array();
-    private $openGLController;
-    private $vulkanController;
+    private $apiControllers = array();
     private $lastUpdatedTime = 0;
 
     public function __construct() {
         parent::__construct();
 
         $this->setPage('Home');
-        $this->openGLController = new OpenGlController();
-        $this->vulkanController = new VulkanController();
+        $this->apiControllers[] = new ApiSubController('OpenGL', true);
+        $this->apiControllers[] = new ApiSubController('OpenGL ES', true);
+        $this->apiControllers[] = new ApiSubController(\Mesamatrix\Parser\Constants::GL_OR_ES_EXTRA_NAME, false);
+        $this->apiControllers[] = new ApiSubController('Vulkan', true);
+        $this->apiControllers[] = new ApiSubController(\Mesamatrix\Parser\Constants::VK_EXTRA_NAME, false);
 
         $this->addCssScript('css/tipsy.css');
 
@@ -45,15 +47,11 @@ class HomeController extends BaseController
 
         $this->createCommitsModel($xml);
 
-        $apis = [ 'OpenGL', 'OpenGL ES', \Mesamatrix\Parser\Constants::GL_OR_ES_EXTRA_NAME ];
-        $this->openGLController->setApis($apis);
-        $this->openGLController->prepare();
+        foreach ($this->apiControllers as $apiController) {
+            $apiController->prepare();
+        }
 
-        $apis = [ 'Vulkan', \Mesamatrix\Parser\Constants::VK_EXTRA_NAME ];
-        $this->vulkanController->setApis($apis);
-        $this->vulkanController->prepare();
-
-        $this->lastUpdatedTime = $this->openGLController->getLastUpdatedTime();
+        $this->lastUpdatedTime = $this->apiControllers[0]->getLastUpdatedTime();
     }
 
     private function loadMesamatrixXml() {
@@ -110,15 +108,15 @@ class HomeController extends BaseController
         </thead>
         <tbody>
 <?php
-// Commit list.
-foreach ($this->commits as $commit):
+        // Commit list.
+        foreach ($this->commits as $commit):
 ?>
             <tr>
                 <td class="commitsAge toRelativeDate" data-timestamp="<?= date(DATE_RFC2822, $commit['timestamp']) ?>"><?= date('Y-m-d H:i', $commit['timestamp']) ?></td>
                 <td><a href="<?= $commit['url'] ?>"><?= $commit['subject'] ?></a></td>
             </tr>
 <?php
-endforeach;
+        endforeach;
 ?>
             <tr>
                 <td colspan="2">
@@ -129,8 +127,10 @@ endforeach;
         </tbody>
     </table>
 <?php
-$this->openGLController->writeMatrix();
-$this->vulkanController->writeMatrix();
+        // APIs matrices.
+        foreach ($this->apiControllers as $apiController) {
+            $apiController->writeMatrix();
+        }
 ?>
     <p>Last time changes were detected in <a href="<?= \Mesamatrix::$config->getValue('git', 'mesa_web') ?>/blob/master/docs/features.txt" target="_blank">features.txt</a>: <span class="toLocalDate" data-timestamp="<?= date(DATE_RFC2822, $this->lastUpdatedTime) ?>"><?= date('Y-m-d H:i O', $this->lastUpdatedTime) ?></span>.</p>
 <?php
