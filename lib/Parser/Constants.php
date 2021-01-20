@@ -69,6 +69,7 @@ abstract class Constants
         "Intel"     => [ "anv" ],
         "AMD"       => [ "radv" ],
         "Broadcom"  => [ "v3dv" ],
+        "Lavapipe"  => [ "lvp" ],
     ];
 
     // Hints enabling for all drivers.
