@@ -61,7 +61,9 @@ abstract class Constants
 
     const VK_ALL_DRIVERS = [
         "anv",
+        "lvp",
         "radv",
+        "tu",
         "v3dv"
     ];
 
@@ -70,6 +72,7 @@ abstract class Constants
         "AMD"       => [ "radv" ],
         "Broadcom"  => [ "v3dv" ],
         "Lavapipe"  => [ "lvp" ],
+        "Turnip"  => [ "tu" ],
     ];
 
     // Hints enabling for all drivers.
