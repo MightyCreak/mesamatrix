@@ -43,6 +43,7 @@ abstract class Constants
         "vc4",
         "v3d",
         "zink",
+        "lima",
         "panfrost",
         "d3d12",
     ];
@@ -55,7 +56,7 @@ abstract class Constants
         "Qualcomm"  => [ "freedreno" ],
         "Vivante"   => [ "etnaviv" ],
         "Broadcom"  => [ "vc4", "v3d" ],
-        "Arm"       => [ "panfrost" ],
+        "Arm"       => [ "lima", "panfrost" ],
         "Emulation" => [ "d3d12", "virgl", "zink" ],
     ];
 
