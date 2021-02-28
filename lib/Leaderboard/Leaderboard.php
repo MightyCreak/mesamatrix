@@ -49,7 +49,8 @@ class Leaderboard {
                     return $diff < 0 ? -1 : 1;
             }
             elseif ($a->getGlName() === Constants::GL_NAME ||
-                $a->getGlName() === Constants::VK_NAME) {
+                $a->getGlName() === Constants::VK_NAME ||
+                $a->getGlName() === Constants::OPENCL_NAME) {
                 return -1;
             }
             else {

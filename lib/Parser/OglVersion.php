@@ -115,6 +115,10 @@ class OglVersion
         case Constants::VK_NAME:
         case Constants::VK_EXTRA_NAME:
             return Constants::VK_ALL_DRIVERS;
+
+        case Constants::OPENCL_NAME:
+        case Constants::OPENCL_EXTRA_NAME:
+            return Constants::OPENCL_ALL_DRIVERS;
         }
 
         return null;

@@ -56,6 +56,7 @@ class OglParser
         $reTableHeader = "/^(Feature[ ]+)Status/";
         $reGlVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
         $reVkVersion = "/^Vulkan ([[:digit:]]+\.[[:digit:]]+)/";
+        $reOpenClVersion = "/^OpenCL ([[:digit:]]+\.[[:digit:]]+)/";
 
         // Skip header lines.
         $line = fgets($handle);
@@ -104,6 +105,22 @@ class OglParser
                     $glVersion = $matrix->getGlVersionByName($vkName, NULL);
                     if (!$glVersion) {
                         $glVersion = new OglVersion($vkName, NULL, NULL, NULL, $matrix->getHints());
+                        $matrix->addGlVersion($glVersion);
+                    }
+                }
+                else if (preg_match($reOpenClVersion, $line, $matches) === 1) {
+                    $openClName = Constants::OPENCL_NAME;
+                    $glVersion = $matrix->getGlVersionByName($openClName, $matches[1]);
+                    if (!$glVersion) {
+                        $glVersion = new OglVersion($openClName, $matches[1], NULL, NULL, $matrix->getHints());
+                        $matrix->addGlVersion($glVersion);
+                    }
+                }
+                else if ($line === self::OTHER_OFFICIAL_OPENCL_EXTENSIONS) {
+                    $openClName = Constants::OPENCL_EXTRA_NAME;
+                    $glVersion = $matrix->getGlVersionByName($openClName, NULL);
+                    if (!$glVersion) {
+                        $glVersion = new OglVersion($openClName, NULL, NULL, NULL, $matrix->getHints());
                         $matrix->addGlVersion($glVersion);
                     }
                 }
@@ -389,6 +406,8 @@ class OglParser
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
     const OTHER_OFFICIAL_VK_EXTENSIONS =
         "Khronos extensions that are not part of any Vulkan version:\n";
+    const OTHER_OFFICIAL_OPENCL_EXTENSIONS =
+        "Khronos, and EXT extensions that are not part of any OpenCL version:\n";
 
     const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
     const RE_NOTE = "/^(\(.+\)) (.*)$/";

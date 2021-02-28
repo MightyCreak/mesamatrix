@@ -80,6 +80,21 @@ abstract class Constants
         "Broadcom"  => [ "v3dv" ],
     ];
 
+    // OpenCL.
+    const OPENCL_NAME = "OpenCL";
+    const OPENCL_EXTRA_NAME = "Extensions that are not part of any OpenCL version";
+
+    const OPENCL_ALL_DRIVERS = [
+        "nvc0",
+        "r600",
+        "radeonsi",
+    ];
+
+    const OPENCL_ALL_DRIVERS_VENDORS = [
+        "Nvidia"    => [ "nvc0" ],
+        "AMD"       => [ "r600", "radeonsi" ],
+    ];
+
     // Hints enabling for all drivers.
     // 0: regexp
     // 1: use hint?

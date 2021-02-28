@@ -282,6 +282,16 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $api->addAttribute('name', Constants::VK_EXTRA_NAME);
         $this->generateApiVersions($api, $matrix, Constants::VK_EXTRA_NAME);
 
+        // Write OpenCL API.
+        $api = $apis->addChild('api');
+        $api->addAttribute('name', Constants::OPENCL_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::OPENCL_NAME);
+
+        // Write OpenCL extra API.
+        $api = $apis->addChild('api');
+        $api->addAttribute('name', Constants::OPENCL_EXTRA_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::OPENCL_EXTRA_NAME);
+
         // Write file.
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
                    . '/commits/commit_'.$hash.'.xml';
@@ -363,6 +373,18 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $this->populateVulkanVendors($api);
         $this->generateApiVersions($api, $matrix, Constants::VK_EXTRA_NAME);
 
+        // Generate for OpenCL.
+        $api = $apis->addChild('api');
+        $api->addAttribute('name', Constants::OPENCL_NAME);
+        $this->populateOpenClVendors($api);
+        $this->generateApiVersions($api, $matrix, Constants::OPENCL_NAME);
+
+        // Generate for OpenCL (extra).
+        $api = $apis->addChild('api');
+        $api->addAttribute('name', Constants::OPENCL_EXTRA_NAME);
+        $this->populateOpenClVendors($api);
+        $this->generateApiVersions($api, $matrix, Constants::OPENCL_EXTRA_NAME);
+
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
 
         $dom = dom_import_simplexml($xml)->ownerDocument;
@@ -396,6 +418,11 @@ class Parse extends \Symfony\Component\Console\Command\Command
     protected function populateVulkanVendors(\SimpleXMLElement $xmlParent) {
         $xmlVendors = $xmlParent->addChild("vendors");
         $this->populateDrivers($xmlVendors, Constants::VK_ALL_DRIVERS_VENDORS);
+    }
+
+    protected function populateOpenClVendors(\SimpleXMLElement $xmlParent) {
+        $xmlVendors = $xmlParent->addChild("vendors");
+        $this->populateDrivers($xmlVendors, Constants::OPENCL_ALL_DRIVERS_VENDORS);
     }
 
     protected function populateDrivers(\SimpleXMLElement $xmlVendors, array $vendors) {
