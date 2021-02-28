@@ -26,8 +26,9 @@ class Leaderboard {
     /**
      * Leaderboard default constructor.
      */
-    public function __construct() {
+    public function __construct(bool $useVersions) {
         $this->glVersions = array();
+        $this->useVersions = $useVersions;
     }
 
     /**
@@ -191,7 +192,7 @@ class Leaderboard {
         // Sort by number of extensions and then by API version.
         uasort($sortedDriversScores, function($a, $b) {
             $diff = $b->getNumExtensionsDone() - $a->getNumExtensionsDone();
-            if ($diff === 0) {
+            if ($diff === 0 && $this->useVersions) {
                 $versionDiff = $b->getApiVersion() - $a->getApiVersion();
                 if ($versionDiff !== 0) {
                     $diff = $versionDiff < 0 ? -1 : 1;
@@ -247,4 +248,5 @@ class Leaderboard {
     }
 
     private $glVersions;    ///< LbGlVersion[].
+    private $useVersions;   ///< bool.
 }

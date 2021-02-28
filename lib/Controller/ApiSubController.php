@@ -64,7 +64,7 @@ class ApiSubController
     }
 
     private function createLeaderboard(\SimpleXMLElement $xmlApi) {
-        $this->leaderboard = new \Mesamatrix\Leaderboard\Leaderboard();
+        $this->leaderboard = new \Mesamatrix\Leaderboard\Leaderboard($this->showLbVersion);
         $this->leaderboard->load($xmlApi);
     }
 
