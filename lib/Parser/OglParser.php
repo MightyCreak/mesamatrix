@@ -124,6 +124,14 @@ class OglParser
                         $matrix->addGlVersion($glVersion);
                     }
                 }
+                else if ($line === self::OTHER_VENDOR_SPECIFIC_OPENCL_EXTENSIONS) {
+                    $openClName = Constants::OPENCL_VENDOR_SPECIFIC_NAME;
+                    $glVersion = $matrix->getGlVersionByName($openClName, NULL);
+                    if (!$glVersion) {
+                        $glVersion = new OglVersion($openClName, NULL, NULL, NULL, $matrix->getHints());
+                        $matrix->addGlVersion($glVersion);
+                    }
+                }
                 else {
                     //print("Unrecognized line: ".$line);
                     $line = fgets($handle);
@@ -408,6 +416,8 @@ class OglParser
         "Khronos extensions that are not part of any Vulkan version:\n";
     const OTHER_OFFICIAL_OPENCL_EXTENSIONS =
         "Khronos, and EXT extensions that are not part of any OpenCL version:\n";
+    const OTHER_VENDOR_SPECIFIC_OPENCL_EXTENSIONS =
+        "Vendor specific extensions that are not part of any OpenCL version:\n";
 
     const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
     const RE_NOTE = "/^(\(.+\)) (.*)$/";

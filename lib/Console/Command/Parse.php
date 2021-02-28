@@ -292,6 +292,11 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $api->addAttribute('name', Constants::OPENCL_EXTRA_NAME);
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_EXTRA_NAME);
 
+        // Write OpenCL vendor specific API.
+        $api = $apis->addChild('api');
+        $api->addAttribute('name', Constants::OPENCL_VENDOR_SPECIFIC_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
+
         // Write file.
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
                    . '/commits/commit_'.$hash.'.xml';
@@ -384,6 +389,12 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $api->addAttribute('name', Constants::OPENCL_EXTRA_NAME);
         $this->populateOpenClVendors($api);
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_EXTRA_NAME);
+
+        // Generate for OpenCL (vendor specific).
+        $api = $apis->addChild('api');
+        $api->addAttribute('name', Constants::OPENCL_VENDOR_SPECIFIC_NAME);
+        $this->populateOpenClVendors($api);
+        $this->generateApiVersions($api, $matrix, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
 
         $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
 

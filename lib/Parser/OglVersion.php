@@ -118,6 +118,7 @@ class OglVersion
 
         case Constants::OPENCL_NAME:
         case Constants::OPENCL_EXTRA_NAME:
+        case Constants::OPENCL_VENDOR_SPECIFIC_NAME:
             return Constants::OPENCL_ALL_DRIVERS;
         }
 
