@@ -107,14 +107,18 @@ class OglVersion
     public function getAllApiDrivers() {
         $glVersionName = $this->getGlName();
         switch ($glVersionName) {
-        case 'OpenGL':
-        case 'OpenGL ES':
+        case Constants::GL_NAME:
+        case Constants::GLES_NAME:
         case Constants::GL_OR_ES_EXTRA_NAME:
             return Constants::GL_ALL_DRIVERS;
 
-        case 'Vulkan':
+        case Constants::VK_NAME:
         case Constants::VK_EXTRA_NAME:
             return Constants::VK_ALL_DRIVERS;
+
+        case Constants::OPENCL_NAME:
+        case Constants::OPENCL_EXTRA_NAME:
+            return Constants::OPENCL_ALL_DRIVERS;
         }
 
         return null;

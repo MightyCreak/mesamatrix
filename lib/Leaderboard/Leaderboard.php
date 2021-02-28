@@ -20,6 +20,8 @@
 
 namespace Mesamatrix\Leaderboard;
 
+use \Mesamatrix\Parser\Constants;
+
 class Leaderboard {
     /**
      * Leaderboard default constructor.
@@ -46,7 +48,9 @@ class Leaderboard {
                 else
                     return $diff < 0 ? -1 : 1;
             }
-            elseif ($a->getGlName() === "OpenGL" || $a->getGlName() === "Vulkan") {
+            elseif ($a->getGlName() === Constants::GL_NAME ||
+                $a->getGlName() === Constants::VK_NAME ||
+                $a->getGlName() === Constants::OPENCL_NAME) {
                 return -1;
             }
             else {
@@ -78,14 +82,14 @@ class Leaderboard {
             $numDoneExts = 0;
             foreach ($xmlVersion->extensions->extension as $xmlExt) {
                 // Extension.
-                if ($xmlExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_DONE) {
+                if ($xmlExt->mesa["status"] == Constants::STATUS_DONE) {
                     $numDoneExts += 1;
                 }
 
                 // Sub-extensions.
                 $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
                 foreach ($xmlSubExts as $xmlSubExt) {
-                    if ($xmlSubExt->mesa["status"] == \Mesamatrix\Parser\Constants::STATUS_DONE) {
+                    if ($xmlSubExt->mesa["status"] == Constants::STATUS_DONE) {
                         $numDoneExts += 1;
                     }
                 }
@@ -157,7 +161,7 @@ class Leaderboard {
      * Get an array of driver with their number of extensions done for all the
      * OpenGL versions. The array is sorted by the drivers score (descending).
      *
-     * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan).
+     * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan, ...).
      * @return LbDriverScore[] An associative array: the key is the driver name, the
      *                         value is an LbDriverScore.
      */
@@ -203,7 +207,7 @@ class Leaderboard {
     /**
      * Get latest valid API version for a driver.
      *
-     * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan).
+     * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan, ...).
      * @param string $drivername Name of the driver (mesa, r600, ...).
      * @return string The OpenGL version string; NULL otherwise.
      */

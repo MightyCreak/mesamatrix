@@ -20,6 +20,8 @@
 
 namespace Mesamatrix\Controller;
 
+use \Mesamatrix\Parser\Constants;
+
 class HomeController extends BaseController
 {
     private $commits = array();
@@ -30,11 +32,13 @@ class HomeController extends BaseController
         parent::__construct();
 
         $this->setPage('Home');
-        $this->apiControllers[] = new ApiSubController('OpenGL', true);
-        $this->apiControllers[] = new ApiSubController('OpenGL ES', true);
-        $this->apiControllers[] = new ApiSubController(\Mesamatrix\Parser\Constants::GL_OR_ES_EXTRA_NAME, false);
-        $this->apiControllers[] = new ApiSubController('Vulkan', true);
-        $this->apiControllers[] = new ApiSubController(\Mesamatrix\Parser\Constants::VK_EXTRA_NAME, false);
+        $this->apiControllers[] = new ApiSubController(Constants::GL_NAME, true);
+        $this->apiControllers[] = new ApiSubController(Constants::GLES_NAME, true);
+        $this->apiControllers[] = new ApiSubController(Constants::GL_OR_ES_EXTRA_NAME, false);
+        $this->apiControllers[] = new ApiSubController(Constants::VK_NAME, true);
+        $this->apiControllers[] = new ApiSubController(Constants::VK_EXTRA_NAME, false);
+        $this->apiControllers[] = new ApiSubController(Constants::OPENCL_NAME, true);
+        $this->apiControllers[] = new ApiSubController(Constants::OPENCL_EXTRA_NAME, false);
 
         $this->addCssScript('css/tipsy.css');
 

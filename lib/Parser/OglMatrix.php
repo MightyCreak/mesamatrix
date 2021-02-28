@@ -69,7 +69,7 @@ class OglMatrix
      */
     public function getDriversSupportingGlesVersion($version) {
         foreach ($this->getGlVersions() as $glVersion) {
-            if ($glVersion->getGlName() === 'OpenGL ES' && $glVersion->getGlVersion() === $version) {
+            if ($glVersion->getGlName() === Constants::GLES_NAME && $glVersion->getGlVersion() === $version) {
                 return $glVersion->getSupportedDrivers();
             }
         }
