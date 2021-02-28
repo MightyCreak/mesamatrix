@@ -259,13 +259,13 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Write OpenGL API.
         $api = $apis->addChild('api');
-        $api->addAttribute('name', 'OpenGL');
-        $this->generateApiVersions($api, $matrix, 'OpenGL');
+        $api->addAttribute('name', Constants::GL_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::GL_NAME);
 
         // Write OpenGL ES API.
         $api = $apis->addChild('api');
-        $api->addAttribute('name', 'OpenGL ES');
-        $this->generateApiVersions($api, $matrix, 'OpenGL ES');
+        $api->addAttribute('name', Constants::GLES_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::GLES_NAME);
 
         // Write OpenGL(ES) extra API.
         $api = $apis->addChild('api');
@@ -274,8 +274,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Write Vulkan API.
         $api = $apis->addChild('api');
-        $api->addAttribute('name', 'Vulkan');
-        $this->generateApiVersions($api, $matrix, 'Vulkan');
+        $api->addAttribute('name', Constants::VK_NAME);
+        $this->generateApiVersions($api, $matrix, Constants::VK_NAME);
 
         // Write Vulkan extra API.
         $api = $apis->addChild('api');
@@ -335,17 +335,17 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Generate for OpenGL.
         $api = $apis->addChild('api');
-        $api->addAttribute('name', 'OpenGL');
+        $api->addAttribute('name', Constants::GL_NAME);
         $this->populateGlVendors($api);
-        $this->generateApiVersions($api, $matrix, 'OpenGL');
+        $this->generateApiVersions($api, $matrix, Constants::GL_NAME);
 
         // Generate for OpenGL ES.
         $api = $apis->addChild('api');
-        $api->addAttribute('name', 'OpenGL ES');
+        $api->addAttribute('name', Constants::GLES_NAME);
         $this->populateGlVendors($api); // Uses the same drivers as OpenGL.
-        $this->generateApiVersions($api, $matrix, 'OpenGL ES');
+        $this->generateApiVersions($api, $matrix, Constants::GLES_NAME);
 
-        // Generate for OpenGL(ES) extra.
+        // Generate for OpenGL/ES (extra).
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::GL_OR_ES_EXTRA_NAME);
         $this->populateGlVendors($api); // Uses the same drivers as OpenGL.
@@ -353,9 +353,9 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Generate for Vulkan.
         $api = $apis->addChild('api');
-        $api->addAttribute('name', 'Vulkan');
+        $api->addAttribute('name', Constants::VK_NAME);
         $this->populateVulkanVendors($api);
-        $this->generateApiVersions($api, $matrix, 'Vulkan');
+        $this->generateApiVersions($api, $matrix, Constants::VK_NAME);
 
         // Generate for Vulkan (extra).
         $api = $apis->addChild('api');

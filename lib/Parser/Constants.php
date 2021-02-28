@@ -27,7 +27,11 @@ abstract class Constants
     const STATUS_IN_PROGRESS = "started";
     const STATUS_DONE = "complete";
 
-    // List of all the drivers.
+    // OpenGL and OpenGL ES.
+    const GL_NAME = "OpenGL";
+    const GLES_NAME = "OpenGL ES";
+    const GL_OR_ES_EXTRA_NAME = "Extensions that are not part of any OpenGL or OpenGL ES version";
+
     const GL_ALL_DRIVERS = [
         "softpipe",
         "llvmpipe",
@@ -60,10 +64,14 @@ abstract class Constants
         "Emulation" => [ "d3d12", "virgl", "zink" ],
     ];
 
+    // Vulkan.
+    const VK_NAME = "Vulkan";
+    const VK_EXTRA_NAME = "Extensions that are not part of any Vulkan version";
+
     const VK_ALL_DRIVERS = [
         "anv",
         "radv",
-        "v3dv"
+        "v3dv",
     ];
 
     const VK_ALL_DRIVERS_VENDORS = [
@@ -91,7 +99,4 @@ abstract class Constants
         [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", TRUE, DependsOn::Extension, 1 ],
         [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", TRUE, DependsOn::GlesVersion, 1 ],
     ];
-
-    const GL_OR_ES_EXTRA_NAME = "Extensions that are not part of any OpenGL or OpenGL ES version";
-    const VK_EXTRA_NAME = "Extensions that are not part of any Vulkan version";
 }

@@ -76,7 +76,7 @@ class OglParser
                 $glVersion = NULL;
                 if (preg_match($reGlVersion, $line, $matches) === 1) {
                     // Get or create new OpenGL version.
-                    $glName = $matches[1] === 'GL' ? 'OpenGL' : 'OpenGL ES';
+                    $glName = $matches[1] === 'GL' ? Constants::GL_NAME : Constants::GLES_NAME;
                     $glVersion = $matrix->getGlVersionByName($glName, $matches[3]);
                     if (!$glVersion) {
                         $glVersion = new OglVersion($glName, $matches[3], $matches[4], $matches[6], $matrix->getHints());
@@ -92,7 +92,7 @@ class OglParser
                     }
                 }
                 else if (preg_match($reVkVersion, $line, $matches) === 1) {
-                    $vkName = "Vulkan";
+                    $vkName = Constants::VK_NAME;
                     $glVersion = $matrix->getGlVersionByName($vkName, $matches[1]);
                     if (!$glVersion) {
                         $glVersion = new OglVersion($vkName, $matches[1], NULL, NULL, $matrix->getHints());
