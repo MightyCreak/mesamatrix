@@ -78,7 +78,7 @@ abstract class Constants
 
     const VK_ALL_DRIVERS_VENDORS = [
         "Intel"     => [ "anv" ],
-        "Lavapipe"  => [ "lvp" ],
+        "Software"  => [ "lvp" ],
         "AMD"       => [ "radv" ],
         "Turnip"    => [ "tu" ],
         "Broadcom"  => [ "v3dv" ],
