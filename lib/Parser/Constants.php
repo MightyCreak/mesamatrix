@@ -80,7 +80,7 @@ abstract class Constants
         "Intel"     => [ "anv" ],
         "Software"  => [ "lvp" ],
         "AMD"       => [ "radv" ],
-        "Qualcomm"    => [ "tu" ],
+        "Qualcomm"  => [ "tu" ],
         "Broadcom"  => [ "v3dv" ],
     ];
 
