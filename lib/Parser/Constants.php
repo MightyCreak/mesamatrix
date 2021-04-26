@@ -83,7 +83,7 @@ abstract class Constants
         "AMD"       => [ "radv" ],
         "Qualcomm"  => [ "tu" ],
         "Broadcom"  => [ "v3dv" ],
-        "Google"  => [ "vn" ],
+        "Emulation" => [ "vn" ],
     ];
 
     // OpenCL.
