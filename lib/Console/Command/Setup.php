@@ -36,8 +36,9 @@ class Setup extends \Symfony\Component\Console\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $dateLastYear = date("Y-m-d", time() - 31536000);
+        $branch = \Mesamatrix::$config->getValue("git", "branch");
         $git = new \Mesamatrix\Git\Process(array(
-            'clone', '--bare', '--shallow-since='.$dateLastYear, '--branch=master',
+            'clone', '--bare', "--shallow-since=$dateLastYear", "--branch=$branch",
             \Mesamatrix::$config->getValue('git', 'mesa_url'), '@gitDir@'
         ));
         $git->setTimeout(null);

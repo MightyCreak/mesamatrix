@@ -26,6 +26,7 @@ html{box-sizing:border-box}*,*:after,*:before{box-sizing:inherit}
 body {
     font-family: 'Liberation Sans', 'Arial', sans-serif;
     background-color: #ffffff;
+    margin-bottom: 2em;
 }
 
 a:link {
