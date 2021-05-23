@@ -74,6 +74,7 @@ abstract class Constants
         "radv",
         "tu",
         "v3dv",
+        "vn",
     ];
 
     const VK_ALL_DRIVERS_VENDORS = [
@@ -82,6 +83,7 @@ abstract class Constants
         "AMD"       => [ "radv" ],
         "Qualcomm"  => [ "tu" ],
         "Broadcom"  => [ "v3dv" ],
+        "Emulation" => [ "vn" ],
     ];
 
     // OpenCL.
