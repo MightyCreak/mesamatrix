@@ -169,8 +169,9 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * @return \Mesamatrix\Git\Commit[]|null Array of commits.
      */
     protected function fetchCommits($filepath, array $excludedCommits) {
+        $branch = \Mesamatrix::$config->getValue("git", "branch");
         $gitCommitGet = new \Mesamatrix\Git\Process(array(
-            'rev-list', 'master', '--reverse', '--', $filepath
+            'rev-list', $branch, '--reverse', '--', $filepath
         ));
         $gitCommitGet->mustRun();
         $oldestCommit = strtok($gitCommitGet->getOutput(), "\n");

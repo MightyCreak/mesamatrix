@@ -18,7 +18,7 @@ use \Monolog\Logger as Log;
 $CONFIG = array(
     "info" => array(
         "log_level" => Log::WARNING,
-        "version" => "2.0",
+        "version" => "3.0",
         "title" => "The OpenGL vs Mesa matrix",
         "description" => "Show Mesa progress for the OpenGL implementation into an easy to read HTML page.",
         "xml_file" => "http/features.xml",
@@ -44,6 +44,7 @@ $CONFIG = array(
         "mesa_url" => "https://gitlab.freedesktop.org/mesa/mesa.git",
         "mesa_commit_url" => "https://gitlab.freedesktop.org/mesa/mesa/commit/",
         "mesa_dir" => "mesa.git",
+        "branch" => "main",
         "gl_filepaths" => [
             [
                 "name" => "docs/GL3.txt",

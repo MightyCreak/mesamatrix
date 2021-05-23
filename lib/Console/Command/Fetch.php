@@ -35,7 +35,8 @@ class Fetch extends \Symfony\Component\Console\Command\Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $fetch = new \Mesamatrix\Git\Process(array('fetch', '-f', 'origin', 'master:master'));
+        $branch = \Mesamatrix::$config->getValue("git", "branch");
+        $fetch = new \Mesamatrix\Git\Process(array('fetch', '-f', 'origin', "$branch:$branch"));
         $this->getHelper('process')->mustRun($output, $fetch);
     }
 }
