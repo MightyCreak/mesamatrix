@@ -20,6 +20,8 @@
 
 namespace Mesamatrix\Parser;
 
+use \Mesamatrix\Git\Commit;
+
 class OglExtension
 {
     /**
@@ -28,11 +30,11 @@ class OglExtension
      * @param string $name The extension name.
      * @param string $status The extension status (@see Constants::STATUS_...).
      * @param string $hint The extension hint.
-     * @param \Mesamatrix\Parser\Hints $hints The hint manager.
+     * @param Hints $hints The hint manager.
      * @param string[] $supportedDrivers The drivers supporting the extension.
      * @param string[] $apiDrivers All the possible drivers for the API.
      */
-    public function __construct($name, $status, $hint, \Mesamatrix\Parser\Hints $hints,
+    public function __construct($name, $status, $hint, Hints $hints,
             array $supportedDrivers = array(), array $apiDrivers = array()) {
         $this->hints = $hints;
         $this->subextensions = array();
@@ -45,7 +47,7 @@ class OglExtension
         foreach ($supportedDrivers as $driverNameAndHint) {
             list($driverName, $driverHint) = self::splitDriverNameAndHint($driverNameAndHint, $apiDrivers);
             if ($driverName === null) {
-                \Mesamatrix::$logger->error('Unrecognized driver: '.$driverName);
+                \Mesamatrix::$logger->error("Unrecognized driver: '$driverNameAndHint'");
             }
 
             $supportedDriver = new OglSupportedDriver($driverName, $this->hints);
@@ -106,7 +108,7 @@ class OglExtension
     }
 
     // supported drivers
-    public function addSupportedDriver(OglSupportedDriver $driver, \Mesamatrix\Git\Commit $commit = null) {
+    public function addSupportedDriver(OglSupportedDriver $driver, Commit $commit = null) {
         if ($existingDriver = $this->getSupportedDriverByName($driver->getName())) {
             $existingDriver->incorporate($driver, $commit);
             return $existingDriver;
@@ -140,7 +142,7 @@ class OglExtension
     }
 
     // merge
-    public function incorporate($other, $commit) {
+    public function incorporate(OglExtension $other, Commit $commit) {
         if ($this->name !== $other->name) {
             \Mesamatrix::$logger->error('Merging extensions with different names');
         }
@@ -162,9 +164,9 @@ class OglExtension
      * Add a sub-extension, or merge it if it already exists.
      *
      * @param OglExtension $extension The extension to add/merge.
-     * @param \Mesamatrix\Git\Commit $commit The commit used by the parser.
+     * @param Commit $commit The commit used by the parser.
      */
-    public function addSubExtension(OglExtension $extension, \Mesamatrix\Git\Commit $commit) {
+    public function addSubExtension(OglExtension $extension, Commit $commit) {
         $retSubExt = null;
         $existingSubExt = $this->findSubExtensionByName($extension->getName());
         if($existingSubExt !== null) {
@@ -237,7 +239,7 @@ class OglExtension
         }
     }
 
-    public function merge(OglVersion $glSection, \SimpleXMLElement $xmlExt, \Mesamatrix\Git\Commit $commit) {
+    public function merge(OglVersion $glSection, \SimpleXMLElement $xmlExt, Commit $commit) {
         $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
 
         // Remove old sub-extensions.
