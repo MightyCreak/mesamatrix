@@ -20,6 +20,8 @@
 
 namespace Mesamatrix\Parser;
 
+use \Mesamatrix\Git\Commit;
+
 class OglSupportedDriver
 {
     public function __construct($name, $hints) {
@@ -54,9 +56,9 @@ class OglSupportedDriver
     }
 
     // merge
-    public function incorporate($other, $commit) {
+    public function incorporate(OglSupportedDriver $other, Commit $commit) {
         if ($this->name !== $other->name) {
-            \Mesamatrix::$logger->error('Merging supported drivers with different names');
+            \Mesamatrix::$logger->error("Merging supported drivers with different names ('$this->name' != '$other->name')");
         }
         if ($this->hintIdx !== $other->hintIdx) {
             $this->hintIdx = $other->hintIdx;
