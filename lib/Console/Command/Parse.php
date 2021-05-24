@@ -293,7 +293,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $api->addAttribute('name', Constants::OPENCL_EXTRA_NAME);
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_EXTRA_NAME);
 
-        // Write OpenCL vendor specific API.
+        // Write OpenCL vendor-specific API.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::OPENCL_VENDOR_SPECIFIC_NAME);
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_VENDOR_SPECIFIC_NAME);

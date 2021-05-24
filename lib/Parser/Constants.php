@@ -89,7 +89,7 @@ abstract class Constants
     // OpenCL.
     const OPENCL_NAME = "OpenCL";
     const OPENCL_EXTRA_NAME = "Extensions that are not part of any OpenCL version";
-    const OPENCL_VENDOR_SPECIFIC_NAME = "Vendor specific extensions that are not part of any OpenCL version";
+    const OPENCL_VENDOR_SPECIFIC_NAME = "Vendor-specific extensions that are not part of any OpenCL version";
 
     const OPENCL_ALL_DRIVERS = [
         "nvc0",
