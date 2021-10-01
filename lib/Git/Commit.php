@@ -49,6 +49,11 @@ class Commit
         return $this;
     }
 
+    /**
+     * Get the commit date.
+     *
+     * @return \DateTime The commit date.
+     */
     public function getDate() {
         return $this->date;
     }

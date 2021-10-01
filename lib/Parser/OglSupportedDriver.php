@@ -46,6 +46,13 @@ class OglSupportedDriver
     public function getHintIdx() {
         return $this->hintIdx;
     }
+    public function getHint() {
+        if ($this->hintIdx === -1) {
+            return null;
+        }
+
+        return $this->hints->allHints[$this->hintIdx];
+    }
 
     // modified at
     public function setModifiedAt($commit) {
@@ -53,17 +60,6 @@ class OglSupportedDriver
     }
     public function getModifiedAt() {
         return $this->modifiedAt;
-    }
-
-    // merge
-    public function incorporate(OglSupportedDriver $other, Commit $commit) {
-        if ($this->name !== $other->name) {
-            \Mesamatrix::$logger->error("Merging supported drivers with different names ('$this->name' != '$other->name')");
-        }
-        if ($this->hintIdx !== $other->hintIdx) {
-            $this->hintIdx = $other->hintIdx;
-            $this->setModifiedAt($commit);
-        }
     }
 
     private $name;

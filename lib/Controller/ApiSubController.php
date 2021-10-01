@@ -246,7 +246,11 @@ class ApiSubController
         $section['subsections'][] = $subsection;
     }
 
-    private function addExtension(array &$subsection, \SimpleXMLElement $xmlExt, $isSubExt, \SimpleXMLElement $vendors) {
+    private function addExtension(
+        array &$subsection,
+        \SimpleXMLElement $xmlExt,
+        bool $isSubExt,
+        \SimpleXMLElement $vendors) {
         $extension = array(
             'name' => $xmlExt['name'],
         );
@@ -283,7 +287,8 @@ class ApiSubController
                 $xmlSupportedDriver = !empty($xmlSupportedDrivers) ? $xmlSupportedDrivers[0] : null;
                 if ($xmlSupportedDriver) {
                     $extTask['class'] = 'isDone';
-                    $extTask['timestamp'] = (int) $xmlSupportedDriver->modified->date;
+                    if (!empty($xmlSupportedDriver->modified))
+                        $extTask['timestamp'] = (int) $xmlSupportedDriver->modified->date;
                     $extTask['hint'] = $xmlSupportedDriver['hint'];
                 }
                 else {
@@ -418,23 +423,23 @@ foreach($this->matrix['sections'] as $section):
 <?php
                 elseif ($col['type'] === 'driver'):
                     $driverTask = $extension['tasks'][$col['name']];
-                    $cssClasses = array($driverTask['class']);
+                    $cssClasses = array('task', $driverTask['class']);
                     $title = '';
                     if (isset($driverTask['hint'])):
                         $cssClasses[] = 'footnote';
                         $title = ' title="'.$driverTask['hint'].'"';
                     endif;
+?>
+            <td class="<?= join(' ', $cssClasses) ?>"<?= $title ?>>
+<?php
                     if (isset($driverTask['timestamp'])):
 ?>
-            <td class="task <?= join(' ', $cssClasses) ?>"<?= $title ?>>
                 <span data-timestamp="<?= $driverTask['timestamp'] ?>"><?= date('Y-m-d', $driverTask['timestamp']) ?></span>
-            </td>
-<?php
-                    else:
-?>
-            <td class="task <?= $driverTask['class'] ?>"></td>
 <?php
                     endif;
+?>
+            </td>
+<?php
                 else:
 ?>
             <td></td>

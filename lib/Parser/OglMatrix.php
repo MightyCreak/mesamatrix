@@ -22,8 +22,8 @@ namespace Mesamatrix\Parser;
 
 class OglMatrix
 {
-    private $glVersions;
-    private $hints;
+    private array $glVersions;
+    private Hints $hints;
 
     public function __construct() {
         $this->glVersions = array();
@@ -32,13 +32,6 @@ class OglMatrix
 
     public function addGlVersion(OglVersion $glVersion) {
         array_push($this->glVersions, $glVersion);
-    }
-
-    public function removeGlVersion(OglVersion $glVersion) {
-        $idx = array_search($glVersion, $this->glVersions);
-        if ($idx !== false) {
-            array_splice($this->glVersions, $idx, 1);
-        }
     }
 
     /**
@@ -87,71 +80,52 @@ class OglMatrix
     }
 
     /**
-     * Merge an XML formatted commit.
+     * Load an XML formatted commit.
      *
      * @param \SimpleXMLElement $mesa The root element of the XML file.
-     * @param \Mesamatrix\Git\Commit $commit The commit used by the parser.
-     * @remark The merged commit is always considered as more recent than the
-     *         ones already merged.
      */
-    public function merge(\SimpleXMLElement $mesa, \Mesamatrix\Git\Commit $commit) {
+    public function loadXml(\SimpleXMLElement $mesa) {
         foreach ($mesa->apis->api as $api) {
-            $this->mergeApi($api, $commit);
+            $this->loadXmlApi($api);
         }
     }
 
-    private function mergeApi(\SimpleXMLElement $api, \Mesamatrix\Git\Commit $commit) {
+    private function loadXmlApi(\SimpleXMLElement $api) {
         $xmlSections = $api->versions->version;
 
-        // Remove old sections.
-        $numXmlSections = count($xmlSections);
-        foreach ($this->getGlVersions() as $glSection) {
-            $glName = $glSection->getGlName();
-            if ($glName !== (string) $api['name'])
-                break;
-
-            // Find section in the XML.
-            $glVersion = $glSection->getGlVersion();
-            $i = 0;
-            while ($i < $numXmlSections) {
-                $xmlSection = $xmlSections[$i];
-                if ($glVersion === (string) $xmlSection['version']) {
-                    break;
-                }
-
-                ++$i;
-            }
-
-            if ($i === $numXmlSections) {
-                // Section not found in XML, remove it.
-                \Mesamatrix::$logger->debug('Remove GL version: '.$glName.' '.$glVersion);
-                $this->removeGlVersion($glSection);
-            }
-        }
-
-        // Add and merge new sections.
+        // Add new sections.
         foreach ($xmlSections as $xmlSection) {
             $glName = (string) $xmlSection['name'];
             $glVersion = (string) $xmlSection['version'];
 
-            $glSection = $this->getGlVersionByName($glName, $glVersion);
-            if (!$glSection) {
-                $xmlShaderVersion = $xmlSection->{'shader-version'};
-                $shaderName = (string) $xmlShaderVersion['name'];
-                $shaderVersion = (string) $xmlShaderVersion['version'];
+            $xmlShaderVersion = $xmlSection->{'shader-version'};
+            $shaderName = (string) $xmlShaderVersion['name'];
+            $shaderVersion = (string) $xmlShaderVersion['version'];
 
-                $glSection = new OglVersion($glName, $glVersion, $shaderName, $shaderVersion, $this->getHints());
-                $this->addGlVersion($glSection);
-            }
+            $glSection = new OglVersion($glName, $glVersion, $shaderName, $shaderVersion, $this->getHints());
+            $this->addGlVersion($glSection);
 
-            $glSection->merge($xmlSection, $commit);
+            $glSection->loadXml($xmlSection);
         }
     }
 
+    /**
+     * Get the GL versions.
+     *
+     * @return \Mesamatrix\Parser\OglVersion[] The GL versions array.
+     */
     public function getGlVersions() {
         return $this->glVersions;
     }
 
+    /**
+     * Get the GL version based on its name.
+     *
+     * @param string $name The GL name.
+     * @param string $version The GL version.
+     *
+     * @return \Mesamatrix\Parser\OglVersion The GL version is found; NULL otherwise.
+     */
     public function getGlVersionByName($name, $version) {
         foreach ($this->glVersions as $glVersion) {
             if ($glVersion->getGlName() === $name &&
@@ -162,6 +136,11 @@ class OglMatrix
         return null;
     }
 
+    /**
+     * Get the hints.
+     *
+     * @return \Mesamatrix\Parser\Hints The hints.
+     */
     public function getHints() {
         return $this->hints;
     }

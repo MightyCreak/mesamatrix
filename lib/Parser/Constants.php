@@ -107,7 +107,6 @@ abstract class Constants
     // 1: use hint?
     const RE_ALL_DRIVERS_HINTS = [
         [ "/^all drivers$/i", FALSE ],
-        [ "/^0 binary formats$/i", TRUE ],
         [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", TRUE ],
         [ "/^all - but needs GLX\/EGL extension to be useful$/i", TRUE ],
     ];

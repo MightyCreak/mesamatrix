@@ -64,39 +64,12 @@ class OglVersion
     }
 
     /**
-     * Add an extension, or merge it if it already exists.
+     * Add an extension.
      *
-     * @param OglExtension $extension The extension to add/merge.
-     * @param \Mesamatrix\Git\Commit $commit The commit used by the parser.
-     *
-     * @return OglExtension The new or existing extension.
+     * @param OglExtension $extension The extension to add.
      */
-    public function addExtension(OglExtension $extension, \Mesamatrix\Git\Commit $commit) {
-        $retExt = null;
-        $existingExt = $this->getExtensionByName($extension->getName());
-        if ($existingExt !== null) {
-            $existingExt->incorporate($extension, $commit);
-            $retExt = $existingExt;
-        }
-        else {
-            $extension->setModifiedAt($commit);
-            $this->extensions[] = $extension;
-            $retExt = $extension;
-        }
-
-        return $retExt;
-    }
-
-    /**
-     * Remove an extension.
-     *
-     * @param \Mesamatrix\Parser\OglExtension $extension The extension to remove.
-     */
-    public function removeExtension(OglExtension $extension) {
-        $idx = array_search($extension, $this->extensions);
-        if ($idx !== false) {
-            array_splice($this->extensions, $idx, 1);
-        }
+    public function addExtension(OglExtension $extension) {
+        $this->extensions[] = $extension;
     }
 
     /**
@@ -162,31 +135,10 @@ class OglVersion
         }
     }
 
-    public function merge(\SimpleXMLElement $xmlSection, \Mesamatrix\Git\Commit $commit) {
+    public function loadXml(\SimpleXMLElement $xmlSection) {
         $xmlExts = $xmlSection->extensions->extension;
 
-        // Remove old extensions.
-        $glName = $this->getGlName();
-        $glVersion = $this->getGlVersion();
-        $numXmlExts = count($xmlExts);
-        foreach ($this->getExtensions() as $glExt) {
-            $glExtName = $glExt->getName();
-
-            // Find extension in the XML.
-            $i = 0;
-            while ($i < $numXmlExts && (string) $xmlExts[$i]['name'] !== $glExtName) {
-                ++$i;
-            }
-
-            if ($i === $numXmlExts) {
-                // Extension not found in XML, remove it.
-                \Mesamatrix::$logger->debug('In '.$glName.' '.$glVersion.
-                                            ', remove GL extension: '.$glExtName);
-                $this->removeExtension($glExt);
-            }
-        }
-
-        // Add and merge new extensions.
+        // Add new extensions.
         $apiDrivers = $this->getAllApiDrivers();
         foreach ($xmlExts as $xmlExt) {
             $extName = (string) $xmlExt['name'];
@@ -194,6 +146,7 @@ class OglVersion
             $extHint = (string) $xmlExt->mesa['hint'];
 
             $newExtension = new OglExtension($extName, $extStatus, $extHint, $this->hints, array());
+
             $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver");
             foreach ($xmlSupportedDrivers as $xmlSupportedDriver) {
                 // Get driver name and verify it's valid.
@@ -208,13 +161,13 @@ class OglVersion
 
                 $driver = new OglSupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);
-                $newExtension->addSupportedDriver($driver, $commit);
+                $newExtension->addSupportedDriver($driver);
             }
 
             // Add the extension.
-            $glExt = $this->addExtension($newExtension, $commit);
+            $this->addExtension($newExtension);
 
-            $glExt->merge($this, $xmlExt, $commit);
+            $newExtension->loadXml($this, $xmlExt);
         }
     }
 
