@@ -155,9 +155,9 @@ class OglExtension
     /**
      * Detects if the current extension depends on another one and merge the drivers.
      *
-     * @param \Mesamatrix\Parser\OglMatrix $glMatrix The entire matrix.
+     * @param \Mesamatrix\Parser\Matrix $matrix The entire matrix.
      */
-    public function solveExtensionDependencies($glMatrix) {
+    public function solveExtensionDependencies($matrix) {
         $hint = $this->getHint();
         if ($hint === null) {
             return;
@@ -168,7 +168,7 @@ class OglExtension
                 switch ($reDepDriversHint[2]) {
                     case DependsOn::Extension:
                     {
-                        $glDepExt = $glMatrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
+                        $glDepExt = $matrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
                         if ($glDepExt !== NULL) {
                             foreach ($glDepExt->supportedDrivers as $supportedDriver) {
                                 $this->addSupportedDriver($supportedDriver);
@@ -179,7 +179,7 @@ class OglExtension
 
                     case DependsOn::GlesVersion:
                     {
-                        $supportedDriverNames = $glMatrix->getDriversSupportingGlesVersion($matches[$reDepDriversHint[3]]);
+                        $supportedDriverNames = $matrix->getDriversSupportingGlesVersion($matches[$reDepDriversHint[3]]);
                         if ($supportedDriverNames !== NULL) {
                             foreach ($supportedDriverNames as $supportedDriverName) {
                                 $supportedDriver = new OglSupportedDriver($supportedDriverName, $this->hints);
@@ -197,7 +197,7 @@ class OglExtension
         }
     }
 
-    public function loadXml(OglVersion $glSection, \SimpleXMLElement $xmlExt) {
+    public function loadXml(ApiVersion $glSection, \SimpleXMLElement $xmlExt) {
         $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
 
         // Add new sub-extensions.

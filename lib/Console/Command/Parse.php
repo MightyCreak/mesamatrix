@@ -26,8 +26,8 @@ use \Symfony\Component\Console\Input\InputOption;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \Mesamatrix\Parser\Constants;
 use \Mesamatrix\Parser\Parser;
-use \Mesamatrix\Parser\OglMatrix;
-use \Mesamatrix\Parser\OglVersion;
+use \Mesamatrix\Parser\Matrix;
+use \Mesamatrix\Parser\ApiVersion;
 use \Mesamatrix\Parser\OglExtension;
 use \Mesamatrix\Parser\UrlCache;
 use \Mesamatrix\Parser\Hints;
@@ -329,7 +329,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
                  . '/commits/commit_'.$hash.'.xml';
         $mesa = simplexml_load_file($xmlPath);
 
-        $matrix = new OglMatrix();
+        $matrix = new Matrix();
         $matrix->loadXml($mesa);
 
         $nextCommit = $latestCommit;
@@ -341,7 +341,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
                      . '/commits/commit_'.$hash.'.xml';
             $mesa = simplexml_load_file($xmlPath);
 
-            $prevMatrix = new OglMatrix();
+            $prevMatrix = new Matrix();
             $prevMatrix->loadXml($mesa);
 
             $this->compareMatricesAndSetModificationCommit($prevMatrix, $matrix, $nextCommit);
@@ -433,17 +433,17 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * Compare the two matrices, when a difference is seen, sets the commit as
      * the one that modified the extension and/or its drivers.
      *
-     * @param OglMatrix $prevMatrix The previous matrix.
-     * @param OglMatrix $matrix The current matrix.
+     * @param Matrix $prevMatrix The previous matrix.
+     * @param Matrix $matrix The current matrix.
      * @param \Mesamatrix\Git\Commit $commit The commit inducing the changes
      *                                       from previous to current matrix.
      */
     private function compareMatricesAndSetModificationCommit(
-        OglMatrix $prevMatrix,
-        OglMatrix $matrix,
+        Matrix $prevMatrix,
+        Matrix $matrix,
         \Mesamatrix\Git\Commit $commit) {
-        foreach ($matrix->getGlVersions() as $version) {
-            foreach ($version->getExtensions() as $ext) {
+        foreach ($matrix->getApiVersions() as $apiVersion) {
+            foreach ($apiVersion->getExtensions() as $ext) {
                 $prevExt = $prevMatrix->getExtensionBySubstr($ext->getName());
 
                 $this->compareExtensionsAndSetModificationCommit($prevExt, $ext, $commit);
@@ -542,26 +542,26 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
     }
 
-    protected function generateApiVersions(\SimpleXMLElement $api, OglMatrix $matrix, $name) {
+    protected function generateApiVersions(\SimpleXMLElement $api, Matrix $matrix, $name) {
         $xmlVersions = $api->addChild("versions");
-        foreach ($matrix->getGlVersions() as $glVersion) {
-            if ($glVersion->getGlName() === $name) {
-                $version = $xmlVersions->addChild('version');
-                $this->generateGlVersion($version, $glVersion, $matrix->getHints());
+        foreach ($matrix->getApiVersions() as $apiVersion) {
+            if ($apiVersion->getGlName() === $name) {
+                $xmlVersion = $xmlVersions->addChild('version');
+                $this->generateGlVersion($xmlVersion, $apiVersion, $matrix->getHints());
             }
         }
     }
 
-    protected function generateGlVersion(\SimpleXMLElement $version, OglVersion $glVersion, Hints $hints) {
-        $version->addAttribute("name", $glVersion->getGlName());
-        $version->addAttribute("version", $glVersion->getGlVersion());
+    protected function generateGlVersion(\SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints) {
+        $xmlVersion->addAttribute("name", $apiVersion->getGlName());
+        $xmlVersion->addAttribute("version", $apiVersion->getGlVersion());
 
-        $shaderVersion = $version->addChild("shader-version");
-        $shaderVersion->addAttribute("name", $glVersion->getGlslName());
-        $shaderVersion->addAttribute("version", $glVersion->getGlslVersion());
+        $shaderVersion = $xmlVersion->addChild("shader-version");
+        $shaderVersion->addAttribute("name", $apiVersion->getGlslName());
+        $shaderVersion->addAttribute("version", $apiVersion->getGlslVersion());
 
-        $extensions = $version->addChild("extensions");
-        foreach ($glVersion->getExtensions() as $glExt) {
+        $extensions = $xmlVersion->addChild("extensions");
+        foreach ($apiVersion->getExtensions() as $glExt) {
             $ext = $extensions->addChild("extension");
             $this->generateExtension($ext, $glExt, $hints);
         }

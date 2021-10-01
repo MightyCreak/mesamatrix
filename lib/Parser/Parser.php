@@ -46,10 +46,10 @@ class Parser
      * Parse a stream of features.txt.
      *
      * @param $handle The stream handle.
-     * @return \Mesamatrix\Parser\OglMatrix The matrix.
+     * @return \Mesamatrix\Parser\Matrix The matrix.
      */
     public function parseStream($handle) {
-        $matrix = new OglMatrix();
+        $matrix = new Matrix();
 
         // Regexp patterns.
         $reTableHeader = "/^(Feature[ ]+)Status/";
@@ -73,62 +73,62 @@ class Parser
             $line = fgets($handle);
             while ($line !== FALSE) {
                 // Find version line (i.e. "GL 3.0, GLSL 1.30 ...").
-                $glVersion = NULL;
+                $apiVersion = NULL;
                 if (preg_match($reGlVersion, $line, $matches) === 1) {
                     // Get or create new OpenGL version.
                     $glName = $matches[1] === 'GL' ? Constants::GL_NAME : Constants::GLES_NAME;
-                    $glVersion = $matrix->getGlVersionByName($glName, $matches[3]);
-                    if (!$glVersion) {
-                        $glVersion = new OglVersion($glName, $matches[3], $matches[4], $matches[6], $matrix->getHints());
-                        $matrix->addGlVersion($glVersion);
+                    $apiVersion = $matrix->getApiVersionByName($glName, $matches[3]);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($glName, $matches[3], $matches[4], $matches[6], $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
                     }
                 }
                 else if($line === self::OTHER_OFFICIAL_GL_EXTENSIONS) {
                     $glName = Constants::GL_OR_ES_EXTRA_NAME;
-                    $glVersion = $matrix->getGlVersionByName($glName, NULL);
-                    if (!$glVersion) {
-                        $glVersion = new OglVersion($glName, NULL, NULL, NULL, $matrix->getHints());
-                        $matrix->addGlVersion($glVersion);
+                    $apiVersion = $matrix->getApiVersionByName($glName, NULL);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($glName, NULL, NULL, NULL, $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
                     }
                 }
                 else if (preg_match($reVkVersion, $line, $matches) === 1) {
                     $vkName = Constants::VK_NAME;
-                    $glVersion = $matrix->getGlVersionByName($vkName, $matches[1]);
-                    if (!$glVersion) {
-                        $glVersion = new OglVersion($vkName, $matches[1], NULL, NULL, $matrix->getHints());
-                        $matrix->addGlVersion($glVersion);
+                    $apiVersion = $matrix->getApiVersionByName($vkName, $matches[1]);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($vkName, $matches[1], NULL, NULL, $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
                     }
                 }
                 else if ($line === self::OTHER_OFFICIAL_VK_EXTENSIONS) {
                     $vkName = Constants::VK_EXTRA_NAME;
-                    $glVersion = $matrix->getGlVersionByName($vkName, NULL);
-                    if (!$glVersion) {
-                        $glVersion = new OglVersion($vkName, NULL, NULL, NULL, $matrix->getHints());
-                        $matrix->addGlVersion($glVersion);
+                    $apiVersion = $matrix->getApiVersionByName($vkName, NULL);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($vkName, NULL, NULL, NULL, $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
                     }
                 }
                 else if (preg_match($reOpenClVersion, $line, $matches) === 1) {
                     $openClName = Constants::OPENCL_NAME;
-                    $glVersion = $matrix->getGlVersionByName($openClName, $matches[1]);
-                    if (!$glVersion) {
-                        $glVersion = new OglVersion($openClName, $matches[1], NULL, NULL, $matrix->getHints());
-                        $matrix->addGlVersion($glVersion);
+                    $apiVersion = $matrix->getApiVersionByName($openClName, $matches[1]);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($openClName, $matches[1], NULL, NULL, $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
                     }
                 }
                 else if ($line === self::OTHER_OFFICIAL_OPENCL_EXTENSIONS) {
                     $openClName = Constants::OPENCL_EXTRA_NAME;
-                    $glVersion = $matrix->getGlVersionByName($openClName, NULL);
-                    if (!$glVersion) {
-                        $glVersion = new OglVersion($openClName, NULL, NULL, NULL, $matrix->getHints());
-                        $matrix->addGlVersion($glVersion);
+                    $apiVersion = $matrix->getApiVersionByName($openClName, NULL);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($openClName, NULL, NULL, NULL, $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
                     }
                 }
                 else if ($line === self::OTHER_VENDOR_SPECIFIC_OPENCL_EXTENSIONS) {
                     $openClName = Constants::OPENCL_VENDOR_SPECIFIC_NAME;
-                    $glVersion = $matrix->getGlVersionByName($openClName, NULL);
-                    if (!$glVersion) {
-                        $glVersion = new OglVersion($openClName, NULL, NULL, NULL, $matrix->getHints());
-                        $matrix->addGlVersion($glVersion);
+                    $apiVersion = $matrix->getApiVersionByName($openClName, NULL);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($openClName, NULL, NULL, NULL, $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
                     }
                 }
                 else {
@@ -137,9 +137,9 @@ class Parser
                     continue;
                 }
 
-                if ($glVersion) {
+                if ($apiVersion) {
                     // Get all the drivers for this API.
-                    $this->apiDrivers = $glVersion->getAllApiDrivers();
+                    $this->apiDrivers = $apiVersion->getAllApiDrivers();
 
                     // Set "all DONE" drivers.
                     $allSupportedDrivers = array();
@@ -148,7 +148,7 @@ class Parser
                     }
 
                     // Parse section.
-                    $line = $this->parseSection($glVersion, $matrix, $handle, $allSupportedDrivers);
+                    $line = $this->parseSection($apiVersion, $matrix, $handle, $allSupportedDrivers);
                 }
             }
         }
@@ -166,15 +166,15 @@ class Parser
      * "All extensions". This is needed for Vulkan 1.0 (until there is a better
      * parser).
      *
-     * @param \Mesamatrix\Parser\OglVersion $glVersion The version section to feed during parsing.
-     * @param \Mesamatrix\Parser\OglMatrix $matrix The matrix to feed during parsing.
+     * @param \Mesamatrix\Parser\ApiVersion $apiVersion The version section to feed during parsing.
+     * @param \Mesamatrix\Parser\Matrix $matrix The matrix to feed during parsing.
      * @param $handle The file handle.
      * @param array() $allSupportedDrivers Drivers that already support all the extension in the section.
      *
      * @return The next line unparsed.
      */
-    private function parseSection(\Mesamatrix\Parser\OglVersion $glVersion,
-                                  \Mesamatrix\Parser\OglMatrix $matrix,
+    private function parseSection(\Mesamatrix\Parser\ApiVersion $apiVersion,
+                                  \Mesamatrix\Parser\Matrix $matrix,
                                   $handle,
                                   $allSupportedDrivers = array()) {
         $line = $this->skipEmptyLines(fgets($handle), $handle);
@@ -182,9 +182,9 @@ class Parser
         // Verify the line is indented.
         if (preg_match("/^  [^ ]/", $line) === 0) {
             // Special case: no indentation means no extension, add a fake one.
-            if ($glVersion->getNumExtensions() === 0) {
+            if ($apiVersion->getNumExtensions() === 0) {
                 $fakeExtension = new OglExtension("All extensions", Constants::STATUS_DONE, "", $matrix->getHints(), $allSupportedDrivers, $this->apiDrivers);
-                $glVersion->addExtension($fakeExtension);
+                $apiVersion->addExtension($fakeExtension);
             }
 
             return $line;
@@ -278,7 +278,7 @@ class Parser
 
                     // Add the extension.
                     $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
-                    $glVersion->addExtension($newExtension);
+                    $apiVersion->addExtension($newExtension);
                     $lastExt = $newExtension;
                 }
                 else {

@@ -20,7 +20,7 @@
 
 namespace Mesamatrix\Parser;
 
-class OglVersion
+class ApiVersion
 {
     public function __construct($glName, $glVersion, $glslName, $glslVersion, $hints) {
         $this->setGlName($glName);
@@ -127,11 +127,11 @@ class OglVersion
     /**
      * Parse all the extensions in the version and solve them.
      *
-     * @param \Mesamatrix\Parser\OglMatrix $glMatrix The entire matrix.
+     * @param \Mesamatrix\Parser\Matrix $matrix The entire matrix.
      */
-    public function solveExtensionDependencies($glMatrix) {
+    public function solveExtensionDependencies($matrix) {
         foreach ($this->getExtensions() as $glExt) {
-            $glExt->solveExtensionDependencies($glMatrix);
+            $glExt->solveExtensionDependencies($matrix);
         }
     }
 
