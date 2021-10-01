@@ -241,7 +241,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         // Parse the content.
         \Mesamatrix::$logger->info('Parsing '.(basename($filepath)).' for commit '.$hash);
         $parser = new OglParser();
-        $matrix = $parser->parseContent($cat->getOutput(), $commit);
+        $matrix = $parser->parseContent($cat->getOutput());
 
         // Create the XML.
         $xml = new \SimpleXMLElement("<mesa></mesa>");
@@ -314,16 +314,39 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * @param array \Mesamatrix\Git\Commit $commits The commits to merge.
      */
     protected function generateMergedXml(array $commits) {
+        if (count($commits) == 0) {
+            \Mesamatrix::$logger->error('No commits to merge.');
+            return;
+        }
+
         \Mesamatrix::$logger->info('Merge all the commits.');
 
+        // Get latest commit, this will be our base.
+        $latestCommit = $commits[count($commits) - 1];
+
+        $hash = $latestCommit->getHash();
+        $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
+                 . '/commits/commit_'.$hash.'.xml';
+        $mesa = simplexml_load_file($xmlPath);
+
         $matrix = new OglMatrix();
-        foreach ($commits as $commit) {
+        $matrix->loadXml($mesa);
+
+        $nextCommit = $latestCommit;
+        for ($i = count($commits) - 2; $i >= 0; --$i) {
+            $commit = $commits[$i];
+
             $hash = $commit->getHash();
             $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
                      . '/commits/commit_'.$hash.'.xml';
-
             $mesa = simplexml_load_file($xmlPath);
-            $matrix->merge($mesa, $commit);
+
+            $prevMatrix = new OglMatrix();
+            $prevMatrix->loadXml($mesa);
+
+            $this->compareMatricesAndSetModificationCommit($prevMatrix, $matrix, $nextCommit);
+
+            $nextCommit = $commit;
         }
 
         \Mesamatrix::$logger->info('Generating XML file');
@@ -404,6 +427,76 @@ class Parse extends \Symfony\Component\Console\Command\Command
         file_put_contents($xmlPath, $dom->saveXML());
 
         \Mesamatrix::$logger->info('XML saved to '.$xmlPath);
+    }
+
+    /**
+     * Compare the two matrices, when a difference is seen, sets the commit as
+     * the one that modified the extension and/or its drivers.
+     *
+     * @param OglMatrix $prevMatrix The previous matrix.
+     * @param OglMatrix $matrix The current matrix.
+     * @param \Mesamatrix\Git\Commit $commit The commit inducing the changes
+     *                                       from previous to current matrix.
+     */
+    private function compareMatricesAndSetModificationCommit(
+        OglMatrix $prevMatrix,
+        OglMatrix $matrix,
+        \Mesamatrix\Git\Commit $commit) {
+        foreach ($matrix->getGlVersions() as $version) {
+            foreach ($version->getExtensions() as $ext) {
+                $prevExt = $prevMatrix->getExtensionBySubstr($ext->getName());
+
+                $this->compareExtensionsAndSetModificationCommit($prevExt, $ext, $commit);
+            }
+        }
+    }
+
+    /**
+     * Compare the two extensions, when a difference is seen, sets the commit
+     * as the one that modified the extension and/or its drivers.
+     *
+     * @param OglExtension $prevExt The previous extension.
+     * @param OglExtension $ext The current extension.
+     * @param Commit $commit The commit inducing the changes from previous to
+     *                       current extension.
+     */
+    private function compareExtensionsAndSetModificationCommit(
+        ?OglExtension $prevExt,
+        OglExtension $ext,
+        \Mesamatrix\Git\Commit $commit) {
+
+        if ($ext->getModifiedAt() === null) {
+            if ($prevExt === null ||
+                $ext->getStatus() !== $prevExt->getStatus() ||
+                $ext->getHint() !== $prevExt->getHint()) {
+                // Extension didn't exist before or status/hint changed.
+                $ext->setModifiedAt($commit);
+            }
+        }
+
+        // Supported drivers.
+        foreach ($ext->getSupportedDrivers() as $driver) {
+            if ($driver->getModifiedAt() !== null) {
+                continue;
+            }
+
+            $prevDriver = $prevExt !== null ?
+                $prevExt->getSupportedDriverByName($driver->getName()) :
+                null;
+            if ($prevDriver === null ||
+                $driver->getHint() !== $prevDriver->getHint()) {
+                $driver->setModifiedAt($commit);
+            }
+        }
+
+        // Sub-extensions.
+        foreach ($ext->getSubExtensions() as $subExt) {
+            $prevSubExt = $prevExt !== null ?
+                $prevExt->findSubExtensionByName($subExt->getName()) :
+                null;
+
+            $this->compareExtensionsAndSetModificationCommit($prevSubExt, $subExt, $commit);
+        }
     }
 
     protected function populateStatuses(\SimpleXMLElement $xmlStatuses) {

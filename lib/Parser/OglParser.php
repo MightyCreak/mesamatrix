@@ -22,22 +22,22 @@ namespace Mesamatrix\Parser;
 
 class OglParser
 {
-    public function parse($filename, $commit = null) {
+    public function parse($filename) {
         $handle = fopen($filename, "r");
         if ($handle === FALSE) {
             return NULL;
         }
 
-        $matrix = $this->parseStream($handle, $commit);
+        $matrix = $this->parseStream($handle);
         fclose($handle);
         return $matrix;
     }
 
-    public function parseContent($content, $commit = null) {
+    public function parseContent($content) {
         $handle = fopen("php://memory", "r+");
         fwrite($handle, $content);
         rewind($handle);
-        $matrix = $this->parseStream($handle, $commit);
+        $matrix = $this->parseStream($handle);
         fclose($handle);
         return $matrix;
     }
@@ -46,10 +46,9 @@ class OglParser
      * Parse a stream of features.txt.
      *
      * @param $handle The stream handle.
-     * @param \Mesamatrix\Git\Commit $commit The commit for the stream.
-     * @return A \Mesamatrix\Parser\OglMatrix.
+     * @return \Mesamatrix\Parser\OglMatrix The matrix.
      */
-    public function parseStream($handle, \Mesamatrix\Git\Commit $commit = null) {
+    public function parseStream($handle) {
         $matrix = new OglMatrix();
 
         // Regexp patterns.
@@ -149,7 +148,7 @@ class OglParser
                     }
 
                     // Parse section.
-                    $line = $this->parseSection($glVersion, $matrix, $commit, $handle, $allSupportedDrivers);
+                    $line = $this->parseSection($glVersion, $matrix, $handle, $allSupportedDrivers);
                 }
             }
         }
@@ -169,7 +168,6 @@ class OglParser
      *
      * @param \Mesamatrix\Parser\OglVersion $glVersion The version section to feed during parsing.
      * @param \Mesamatrix\Parser\OglMatrix $matrix The matrix to feed during parsing.
-     * @param \Mesamatrix\Git\Commit $commit The commit of this file.
      * @param $handle The file handle.
      * @param array() $allSupportedDrivers Drivers that already support all the extension in the section.
      *
@@ -177,7 +175,6 @@ class OglParser
      */
     private function parseSection(\Mesamatrix\Parser\OglVersion $glVersion,
                                   \Mesamatrix\Parser\OglMatrix $matrix,
-                                  \Mesamatrix\Git\Commit $commit,
                                   $handle,
                                   $allSupportedDrivers = array()) {
         $line = $this->skipEmptyLines(fgets($handle), $handle);
@@ -187,7 +184,7 @@ class OglParser
             // Special case: no indentation means no extension, add a fake one.
             if ($glVersion->getNumExtensions() === 0) {
                 $fakeExtension = new OglExtension("All extensions", Constants::STATUS_DONE, "", $matrix->getHints(), $allSupportedDrivers, $this->apiDrivers);
-                $glVersion->addExtension($fakeExtension, $commit);
+                $glVersion->addExtension($fakeExtension);
             }
 
             return $line;
@@ -239,13 +236,14 @@ class OglParser
                     }
                     elseif (isset($matches[4])) {
                         // Done but there are parenthesis after.
-                        $useHint = FALSE;
+                        $useHint = null;
                         $hintDrivers = $this->getDriversFromHint($matches[4], $useHint);
                         if ($hintDrivers !== NULL) {
                             $this->mergeDrivers($supportedDrivers, $hintDrivers);
                         }
-                        if ($useHint) {
-                            $inHint = $matches[4];
+
+                        if ($useHint !== null) {
+                            $inHint = $useHint;
                         }
                     }
                 }
@@ -280,12 +278,13 @@ class OglParser
 
                     // Add the extension.
                     $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
-                    $lastExt = $glVersion->addExtension($newExtension, $commit);
+                    $glVersion->addExtension($newExtension);
+                    $lastExt = $newExtension;
                 }
                 else {
                     // Add the sub-extension.
                     $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
-                    $lastExt->addSubExtension($newSubExtension, $commit);
+                    $lastExt->addSubExtension($newSubExtension);
                 }
             }
 
@@ -363,48 +362,52 @@ class OglParser
      * Parse the hint and extract the drivers from it.
      *
      * @param string $hint The hint to test.
-     * @param bool $useHint[out] Should the hint be displayed?
+     * @param string $useHint[out] Hint to use; null otherwise.
      *
-     * @return array() The drivers list, or NULL.
+     * @return array() The drivers list, or null.
      */
-    private function getDriversFromHint($hint, &$useHint) {
-        if (empty($hint)) {
-            return NULL;
+    private function getDriversFromHint($hintStr, &$useHint) {
+        if (empty($hintStr)) {
+            return null;
         }
 
-        $useHint = FALSE;
-
-        // Find drivers considering the hint as a list of drivers.
-        $drivers = array();
-        $driversList = explode(", ", $hint);
-        foreach ($driversList as $hintDriver) {
-            if ($this->isInDriversArray($hintDriver)) {
-                $drivers[] = $hintDriver;
-            }
-        }
-
-        if (count($drivers) > 0) {
-            // Driver found.
-            return $drivers;
-        }
+        $useHint = null;
 
         // Is the hint saying it's supporting all drivers?
         foreach (Constants::RE_ALL_DRIVERS_HINTS as $reAllDriversHint) {
-            if (preg_match($reAllDriversHint[0], $hint) === 1) {
-                $useHint = $reAllDriversHint[1];
+            if (preg_match($reAllDriversHint[0], $hintStr) === 1) {
+                if ($reAllDriversHint[1] === true) {
+                    $useHint = $hintStr;
+                }
+
                 return $this->apiDrivers;
             }
         }
 
-        // Is the hint saying it depends on something else?
-        foreach (Constants::RE_DEP_DRIVERS_HINTS as $reDepDriversHint) {
-            if (preg_match($reDepDriversHint[0], $hint) === 1) {
-                $useHint = $reDepDriversHint[1];
-                return NULL;
+        // Find drivers considering the hint as a list of drivers.
+        $drivers = array();
+        $hintsList = explode(", ", $hintStr);
+        foreach ($hintsList as $hintItem) {
+            if ($this->isInDriversArray($hintItem)) {
+                $drivers[] = $hintItem;
+            }
+            else {
+                // Is the hint saying it depends on something else?
+                foreach (Constants::RE_DEP_DRIVERS_HINTS as $reDepDriversHint) {
+                    if (preg_match($reDepDriversHint[0], $hintItem) === 1) {
+                        if ($reAllDriversHint[1] === true) {
+                            if ($useHint !== null) {
+                                \Mesamatrix::$logger->warning('Unhandled situation: more than one extension dependency');
+                            }
+
+                            $useHint = $hintItem;
+                        }
+                    }
+                }
             }
         }
 
-        return NULL;
+        return !empty($drivers) ? $drivers : null;
     }
 
     private $reExtension = "";
