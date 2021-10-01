@@ -34,8 +34,13 @@ class OglExtension
      * @param string[] $supportedDrivers The drivers supporting the extension.
      * @param string[] $apiDrivers All the possible drivers for the API.
      */
-    public function __construct($name, $status, $hint, Hints $hints,
-            array $supportedDrivers = array(), array $apiDrivers = array()) {
+    public function __construct(
+            string $name,
+            string $status,
+            string $hint,
+            Hints $hints,
+            array $supportedDrivers = array(),
+            array $apiDrivers = array()) {
         $this->hints = $hints;
         $this->subextensions = array();
         $this->setName($name);
@@ -136,7 +141,7 @@ class OglExtension
     }
 
     // modified at
-    public function setModifiedAt($commit) {
+    public function setModifiedAt(?Commit $commit) {
         $this->modifiedAt = $commit;
     }
     public function getModifiedAt() {
@@ -197,7 +202,7 @@ class OglExtension
         }
     }
 
-    public function loadXml(ApiVersion $glSection, \SimpleXMLElement $xmlExt) {
+    public function loadXml(\SimpleXMLElement $xmlExt) {
         $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
 
         // Add new sub-extensions.
@@ -249,11 +254,11 @@ class OglExtension
         return null;
     }
 
-    private $name;
-    private $status;
-    private $hints;
-    private $hintIdx;
-    private $supportedDrivers;
-    private $modifiedAt;
-    private $subextensions;
+    private string $name;
+    private string $status;
+    private Hints $hints;
+    private int $hintIdx;
+    private array $supportedDrivers;
+    private ?Commit $modifiedAt;
+    private array $subextensions;
 };

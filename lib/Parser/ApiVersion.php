@@ -22,33 +22,38 @@ namespace Mesamatrix\Parser;
 
 class ApiVersion
 {
-    public function __construct($glName, $glVersion, $glslName, $glslVersion, $hints) {
-        $this->setGlName($glName);
-        $this->setGlVersion($glVersion);
+    public function __construct(
+            string $name,
+            ?string $version,
+            ?string $glslName,
+            ?string $glslVersion,
+            Hints $hints) {
+        $this->setName($name);
+        $this->setVersion($version);
         $this->setGlslName($glslName);
         $this->setGlslVersion($glslVersion);
         $this->hints = $hints;
         $this->extensions = array();
     }
 
-    // GL name
-    public function setGlName($name) {
-        $this->glName = $name;
+    // API name
+    public function setName(string $name) {
+        $this->name = $name;
     }
-    public function getGlName() {
-        return $this->glName;
+    public function getName() {
+        return $this->name;
     }
 
-    // GL version
-    public function setGlVersion($version) {
-        $this->glVersion = $version;
+    // API version
+    public function setVersion(?string $version) {
+        $this->version = $version;
     }
-    public function getGlVersion() {
-        return $this->glVersion;
+    public function getVersion() {
+        return $this->version;
     }
 
     // GLSL name
-    public function setGlslName($name) {
+    public function setGlslName(?string $name) {
         $this->glslName = $name;
     }
     public function getGlslName() {
@@ -56,7 +61,7 @@ class ApiVersion
     }
 
     // GLSL version
-    public function setGlslVersion($version) {
+    public function setGlslVersion(?string $version) {
         $this->glslVersion = $version;
     }
     public function getGlslVersion() {
@@ -78,8 +83,8 @@ class ApiVersion
      * @return string[] The list of supported drivers names; null if API not recognized.
      */
     public function getAllApiDrivers() {
-        $glVersionName = $this->getGlName();
-        switch ($glVersionName) {
+        $apiName = $this->getName();
+        switch ($apiName) {
         case Constants::GL_NAME:
         case Constants::GLES_NAME:
         case Constants::GL_OR_ES_EXTRA_NAME:
@@ -167,7 +172,7 @@ class ApiVersion
             // Add the extension.
             $this->addExtension($newExtension);
 
-            $newExtension->loadXml($this, $xmlExt);
+            $newExtension->loadXml($xmlExt);
         }
     }
 
@@ -221,10 +226,10 @@ class ApiVersion
         return null;
     }
 
-    private $glName;
-    private $glVersion;
-    private $glslName;
-    private $glslVersion;
-    private $hints;
-    private $extensions;
+    private string $name;
+    private ?string $version;
+    private ?string $glslName;
+    private ?string $glslVersion;
+    private Hints $hints;
+    private array $extensions;
 };

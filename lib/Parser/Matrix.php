@@ -53,8 +53,8 @@ class Matrix
      */
     public function getApiVersionByName($name, $version) {
         foreach ($this->apiVersions as $apiVersion) {
-            if ($apiVersion->getGlName() === $name &&
-                $apiVersion->getGlVersion() === $version) {
+            if ($apiVersion->getName() === $name &&
+                $apiVersion->getVersion() === $version) {
                 return $apiVersion;
             }
         }
@@ -89,7 +89,7 @@ class Matrix
      */
     public function getDriversSupportingGlesVersion($version) {
         foreach ($this->getApiVersions() as $apiVersion) {
-            if ($apiVersion->getGlName() === Constants::GLES_NAME && $apiVersion->getGlVersion() === $version) {
+            if ($apiVersion->getName() === Constants::GLES_NAME && $apiVersion->getVersion() === $version) {
                 return $apiVersion->getSupportedDrivers();
             }
         }

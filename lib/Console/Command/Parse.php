@@ -545,16 +545,16 @@ class Parse extends \Symfony\Component\Console\Command\Command
     protected function generateApiVersions(\SimpleXMLElement $api, Matrix $matrix, $name) {
         $xmlVersions = $api->addChild("versions");
         foreach ($matrix->getApiVersions() as $apiVersion) {
-            if ($apiVersion->getGlName() === $name) {
+            if ($apiVersion->getName() === $name) {
                 $xmlVersion = $xmlVersions->addChild('version');
-                $this->generateGlVersion($xmlVersion, $apiVersion, $matrix->getHints());
+                $this->generateApiVersion($xmlVersion, $apiVersion, $matrix->getHints());
             }
         }
     }
 
-    protected function generateGlVersion(\SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints) {
-        $xmlVersion->addAttribute("name", $apiVersion->getGlName());
-        $xmlVersion->addAttribute("version", $apiVersion->getGlVersion());
+    protected function generateApiVersion(\SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints) {
+        $xmlVersion->addAttribute("name", $apiVersion->getName());
+        $xmlVersion->addAttribute("version", $apiVersion->getVersion());
 
         $shaderVersion = $xmlVersion->addChild("shader-version");
         $shaderVersion->addAttribute("name", $apiVersion->getGlslName());
@@ -562,8 +562,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         $extensions = $xmlVersion->addChild("extensions");
         foreach ($apiVersion->getExtensions() as $glExt) {
-            $ext = $extensions->addChild("extension");
-            $this->generateExtension($ext, $glExt, $hints);
+            $xmlExt = $extensions->addChild("extension");
+            $this->generateExtension($xmlExt, $glExt, $hints);
         }
     }
 
