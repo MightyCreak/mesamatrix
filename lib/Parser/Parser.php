@@ -160,7 +160,7 @@ class Parser
     }
 
     /**
-     * Parse an OpenGL section.
+     * Parse an API section.
      *
      * Special case for section without any extension: add a fake one called
      * "All extensions". This is needed for Vulkan 1.0 (until there is a better
@@ -183,14 +183,14 @@ class Parser
         if (preg_match("/^  [^ ]/", $line) === 0) {
             // Special case: no indentation means no extension, add a fake one.
             if ($apiVersion->getNumExtensions() === 0) {
-                $fakeExtension = new OglExtension("All extensions", Constants::STATUS_DONE, "", $matrix->getHints(), $allSupportedDrivers, $this->apiDrivers);
+                $fakeExtension = new Extension("All extensions", Constants::STATUS_DONE, "", $matrix->getHints(), $allSupportedDrivers, $this->apiDrivers);
                 $apiVersion->addExtension($fakeExtension);
             }
 
             return $line;
         }
 
-        // Parse OpenGL version extensions.
+        // Parse API version extensions.
         $lastExt = null;
         $parentDrivers = NULL;
         while ($line !== FALSE && $line !== "\n") {
@@ -277,13 +277,13 @@ class Parser
                     $parentDrivers = $supportedDrivers;
 
                     // Add the extension.
-                    $newExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
+                    $newExtension = new Extension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
                     $apiVersion->addExtension($newExtension);
                     $lastExt = $newExtension;
                 }
                 else {
                     // Add the sub-extension.
-                    $newSubExtension = new OglExtension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
+                    $newSubExtension = new Extension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
                     $lastExt->addSubExtension($newSubExtension);
                 }
             }

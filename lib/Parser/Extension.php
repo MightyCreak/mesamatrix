@@ -22,10 +22,10 @@ namespace Mesamatrix\Parser;
 
 use \Mesamatrix\Git\Commit;
 
-class OglExtension
+class Extension
 {
     /**
-     * OglExtension constructor.
+     * Extension constructor.
      *
      * @param string $name The extension name.
      * @param string $status The extension status (@see Constants::STATUS_...).
@@ -151,9 +151,9 @@ class OglExtension
     /**
      * Add a sub-extension.
      *
-     * @param OglExtension $extension The extension to add.
+     * @param Extension $extension The extension to add.
      */
-    public function addSubExtension(OglExtension $extension) {
+    public function addSubExtension(Extension $extension) {
         $this->subextensions[] = $extension;
     }
 
@@ -173,9 +173,9 @@ class OglExtension
                 switch ($reDepDriversHint[2]) {
                     case DependsOn::Extension:
                     {
-                        $glDepExt = $matrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
-                        if ($glDepExt !== NULL) {
-                            foreach ($glDepExt->supportedDrivers as $supportedDriver) {
+                        $depExt = $matrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
+                        if ($depExt !== NULL) {
+                            foreach ($depExt->supportedDrivers as $supportedDriver) {
                                 $this->addSupportedDriver($supportedDriver);
                             }
                         }
@@ -211,7 +211,7 @@ class OglExtension
             $subExtStatus = (string) $xmlSubExt->mesa['status'];
             $subExtHint = (string) $xmlSubExt->mesa['hint'];
 
-            $newSubExtension = new OglExtension($subExtName, $subExtStatus, $subExtHint, $this->hints, array());
+            $newSubExtension = new Extension($subExtName, $subExtStatus, $subExtHint, $this->hints, array());
             $xmlSupportedDrivers = $xmlSubExt->xpath("./supported-drivers/driver");
             foreach ($xmlSupportedDrivers as $xmlSupportedDriver) {
                 // Create new supported driver.
@@ -231,7 +231,7 @@ class OglExtension
     /**
      * Get the list of all sub-extensions.
      *
-     * @return OglExtension[] All the sub-extensions.
+     * @return Extension[] All the sub-extensions.
      */
     public function getSubExtensions() {
         return $this->subextensions;
@@ -242,7 +242,7 @@ class OglExtension
      *
      * @param string $name The name of the extension to find.
      *
-     * @return OglExtension The extension or null if not found.
+     * @return Extension The extension or null if not found.
      */
     public function findSubExtensionByName($name) {
         foreach ($this->subextensions as $subext) {

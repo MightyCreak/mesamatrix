@@ -71,9 +71,9 @@ class ApiVersion
     /**
      * Add an extension.
      *
-     * @param OglExtension $extension The extension to add.
+     * @param Extension $extension The extension to add.
      */
-    public function addExtension(OglExtension $extension) {
+    public function addExtension(Extension $extension) {
         $this->extensions[] = $extension;
     }
 
@@ -114,8 +114,8 @@ class ApiVersion
         $apiDrivers = $this->getAllApiDrivers();
         foreach ($apiDrivers as $driverName) {
             $driver = NULL;
-            foreach ($this->getExtensions() as $glExt) {
-                $driver = $glExt->getSupportedDriverByName($driverName);
+            foreach ($this->getExtensions() as $ext) {
+                $driver = $ext->getSupportedDriverByName($driverName);
                 if ($driver === NULL) {
                     break;
                 }
@@ -135,8 +135,8 @@ class ApiVersion
      * @param \Mesamatrix\Parser\Matrix $matrix The entire matrix.
      */
     public function solveExtensionDependencies($matrix) {
-        foreach ($this->getExtensions() as $glExt) {
-            $glExt->solveExtensionDependencies($matrix);
+        foreach ($this->getExtensions() as $ext) {
+            $ext->solveExtensionDependencies($matrix);
         }
     }
 
@@ -150,7 +150,7 @@ class ApiVersion
             $extStatus = (string) $xmlExt->mesa['status'];
             $extHint = (string) $xmlExt->mesa['hint'];
 
-            $newExtension = new OglExtension($extName, $extStatus, $extHint, $this->hints, array());
+            $newExtension = new Extension($extName, $extStatus, $extHint, $this->hints, array());
 
             $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver");
             foreach ($xmlSupportedDrivers as $xmlSupportedDriver) {
@@ -179,7 +179,7 @@ class ApiVersion
     /**
      * Get the list of all extensions.
      *
-     * @return OglExtension[] All the extensions.
+     * @return Extension[] All the extensions.
      */
     public function getExtensions() {
         return $this->extensions;
@@ -199,7 +199,7 @@ class ApiVersion
      *
      * @param string $name The name of the extension to find.
      *
-     * @return OglExtension The extension or null if not found.
+     * @return Extension The extension or null if not found.
      */
     public function getExtensionByName($name) {
         foreach ($this->extensions as $extension) {
@@ -215,7 +215,7 @@ class ApiVersion
      *
      * @param string $str The substring to find in the extension name.
      *
-     * @return OglExtension The extension or null if not found.
+     * @return Extension The extension or null if not found.
      */
     public function getExtensionBySubstr($substr) {
         foreach ($this->extensions as $extension) {

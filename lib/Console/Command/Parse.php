@@ -28,7 +28,7 @@ use \Mesamatrix\Parser\Constants;
 use \Mesamatrix\Parser\Parser;
 use \Mesamatrix\Parser\Matrix;
 use \Mesamatrix\Parser\ApiVersion;
-use \Mesamatrix\Parser\OglExtension;
+use \Mesamatrix\Parser\Extension;
 use \Mesamatrix\Parser\UrlCache;
 use \Mesamatrix\Parser\Hints;
 
@@ -455,14 +455,14 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * Compare the two extensions, when a difference is seen, sets the commit
      * as the one that modified the extension and/or its drivers.
      *
-     * @param OglExtension $prevExt The previous extension.
-     * @param OglExtension $ext The current extension.
+     * @param Extension $prevExt The previous extension.
+     * @param Extension $ext The current extension.
      * @param Commit $commit The commit inducing the changes from previous to
      *                       current extension.
      */
     private function compareExtensionsAndSetModificationCommit(
-        ?OglExtension $prevExt,
-        OglExtension $ext,
+        ?Extension $prevExt,
+        Extension $ext,
         \Mesamatrix\Git\Commit $commit) {
 
         if ($ext->getModifiedAt() === null) {
@@ -561,17 +561,17 @@ class Parse extends \Symfony\Component\Console\Command\Command
         $shaderVersion->addAttribute("version", $apiVersion->getGlslVersion());
 
         $extensions = $xmlVersion->addChild("extensions");
-        foreach ($apiVersion->getExtensions() as $glExt) {
+        foreach ($apiVersion->getExtensions() as $ext) {
             $xmlExt = $extensions->addChild("extension");
-            $this->generateExtension($xmlExt, $glExt, $hints);
+            $this->generateExtension($xmlExt, $ext, $hints);
         }
     }
 
-    protected function generateExtension(\SimpleXMLElement $xmlExt, OglExtension $glExt, Hints $hints) {
-        $xmlExt->addAttribute("name", $glExt->getName());
+    protected function generateExtension(\SimpleXMLElement $xmlExt, Extension $ext, Hints $hints) {
+        $xmlExt->addAttribute("name", $ext->getName());
 
         if ($this->urlCache) {
-            if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
+            if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $ext->getName(), $matches) === 1) {
                 $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url_gl").urlencode($matches[2])."/";
                 if ($matches[1] === "GLX") {
                     // Found a GLX_TYPE_Extension.
@@ -588,12 +588,12 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
 
         $mesaStatus = $xmlExt->addChild("mesa");
-        $mesaStatus->addAttribute("status", $glExt->getStatus());
-        $mesaHintId = $glExt->getHintIdx();
+        $mesaStatus->addAttribute("status", $ext->getStatus());
+        $mesaHintId = $ext->getHintIdx();
         if ($mesaHintId !== -1) {
             $mesaStatus->addAttribute("hint", $hints->allHints[$mesaHintId]);
         }
-        if ($commit = $glExt->getModifiedAt()) {
+        if ($commit = $ext->getModifiedAt()) {
             $modified = $mesaStatus->addChild("modified");
             $modified->addChild("commit", $commit->getHash());
             $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
@@ -601,7 +601,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
 
         $supportedDrivers = $xmlExt->addChild("supported-drivers");
-        foreach ($glExt->getSupportedDrivers() as $glDriver) {
+        foreach ($ext->getSupportedDrivers() as $glDriver) {
             $driver = $supportedDrivers->addChild("driver");
             $driver->addAttribute("name", $glDriver->getName());
             $hintId = $glDriver->getHintIdx();
@@ -616,12 +616,12 @@ class Parse extends \Symfony\Component\Console\Command\Command
             }
         }
 
-        $glSubExts = $glExt->getSubExtensions();
-        if (!empty($glSubExts)) {
+        $subExts = $ext->getSubExtensions();
+        if (!empty($subExts)) {
             $xmlSubExts = $xmlExt->addChild("subextensions");
-            foreach ($glSubExts as $glSubExt) {
+            foreach ($subExts as $subExt) {
                 $xmlSubExt = $xmlSubExts->addChild("subextension");
-                $this->generateExtension($xmlSubExt, $glSubExt, $hints);
+                $this->generateExtension($xmlSubExt, $subExt, $hints);
             }
         }
     }

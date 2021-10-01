@@ -66,13 +66,13 @@ class Matrix
      *
      * @param string $substr The substring to find.
      *
-     * @return \Mesamatrix\Parser\OglExtension The extension if found; NULL otherwise.
+     * @return \Mesamatrix\Parser\Extension The extension if found; NULL otherwise.
      */
     public function getExtensionBySubstr($substr) {
         foreach ($this->getApiVersions() as $apiVersion) {
-            $glExt = $apiVersion->getExtensionBySubstr($substr);
-            if ($glExt !== NULL) {
-                return $glExt;
+            $ext = $apiVersion->getExtensionBySubstr($substr);
+            if ($ext !== NULL) {
+                return $ext;
             }
         }
 
