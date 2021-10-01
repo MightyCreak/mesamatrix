@@ -25,7 +25,7 @@ use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Input\InputOption;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \Mesamatrix\Parser\Constants;
-use \Mesamatrix\Parser\OglParser;
+use \Mesamatrix\Parser\Parser;
 use \Mesamatrix\Parser\OglMatrix;
 use \Mesamatrix\Parser\OglVersion;
 use \Mesamatrix\Parser\OglExtension;
@@ -240,7 +240,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Parse the content.
         \Mesamatrix::$logger->info('Parsing '.(basename($filepath)).' for commit '.$hash);
-        $parser = new OglParser();
+        $parser = new Parser();
         $matrix = $parser->parseContent($cat->getOutput());
 
         // Create the XML.

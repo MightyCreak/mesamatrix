@@ -20,7 +20,7 @@
 
 namespace Mesamatrix\Parser;
 
-class OglParser
+class Parser
 {
     public function parse($filename) {
         $handle = fopen($filename, "r");
