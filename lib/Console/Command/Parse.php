@@ -65,10 +65,10 @@ class Parse extends \Symfony\Component\Console\Command\Command
             'incomplete' => 'not started*',
             'started' => '*');
 
-        // Get commits for each files in gl_filepaths.
+        // Get commits for each files in filepaths.
         $commits = array();
-        $glFilepaths = \Mesamatrix::$config->getValue('git', 'gl_filepaths', array());
-        foreach ($glFilepaths as $filepath) {
+        $filepaths = \Mesamatrix::$config->getValue('git', 'filepaths', array());
+        foreach ($filepaths as $filepath) {
             $fileCommits = $this->fetchCommits($filepath['name'], $filepath['excluded_commits']);
             if ($fileCommits !== NULL) {
                 foreach ($fileCommits as $commit) {
@@ -76,7 +76,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
                 }
             }
         }
-        unset($glFilepaths);
+        unset($filepaths);
 
         if (empty($commits)) {
             // No commit found, exit.
