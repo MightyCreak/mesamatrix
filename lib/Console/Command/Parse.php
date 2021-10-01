@@ -164,7 +164,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
     /**
      * Fetch commits from mesa's git.
      *
-     * @param string $filepath GL text file path.
+     * @param string $filepath Features text file path.
      * @param string[] $excludedCommits The commits to exclude from the list.
      * @return \Mesamatrix\Git\Commit[]|null Array of commits.
      */
@@ -600,16 +600,16 @@ class Parse extends \Symfony\Component\Console\Command\Command
             $modified->addChild("author", $commit->getAuthor());
         }
 
-        $supportedDrivers = $xmlExt->addChild("supported-drivers");
-        foreach ($ext->getSupportedDrivers() as $glDriver) {
-            $driver = $supportedDrivers->addChild("driver");
-            $driver->addAttribute("name", $glDriver->getName());
-            $hintId = $glDriver->getHintIdx();
+        $xmlSupportedDrivers = $xmlExt->addChild("supported-drivers");
+        foreach ($ext->getSupportedDrivers() as $supportedDriver) {
+            $xmlDriver = $xmlSupportedDrivers->addChild("driver");
+            $xmlDriver->addAttribute("name", $supportedDriver->getName());
+            $hintId = $supportedDriver->getHintIdx();
             if ($hintId !== -1) {
-                $driver->addAttribute("hint", $hints->allHints[$hintId]);
+                $xmlDriver->addAttribute("hint", $hints->allHints[$hintId]);
             }
-            if ($commit = $glDriver->getModifiedAt()) {
-                $modified = $driver->addChild("modified");
+            if ($commit = $supportedDriver->getModifiedAt()) {
+                $modified = $xmlDriver->addChild("modified");
                 $modified->addChild("commit", $commit->getHash());
                 $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
                 $modified->addChild("author", $commit->getAuthor());
