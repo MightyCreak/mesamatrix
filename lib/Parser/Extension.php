@@ -55,7 +55,7 @@ class Extension
                 \Mesamatrix::$logger->error("Unrecognized driver: '$driverNameAndHint'");
             }
 
-            $supportedDriver = new OglSupportedDriver($driverName, $this->hints);
+            $supportedDriver = new SupportedDriver($driverName, $this->hints);
             $supportedDriver->setHint($driverHint);
             $this->addSupportedDriver($supportedDriver);
         }
@@ -120,7 +120,7 @@ class Extension
     }
 
     // supported drivers
-    public function addSupportedDriver(OglSupportedDriver $driver) {
+    public function addSupportedDriver(SupportedDriver $driver) {
         $existingDriver = $this->getSupportedDriverByName($driver->getName());
         if ($existingDriver === null) {
             $this->supportedDrivers[] = $driver;
@@ -187,7 +187,7 @@ class Extension
                         $supportedDriverNames = $matrix->getDriversSupportingGlesVersion($matches[$reDepDriversHint[3]]);
                         if ($supportedDriverNames !== NULL) {
                             foreach ($supportedDriverNames as $supportedDriverName) {
-                                $supportedDriver = new OglSupportedDriver($supportedDriverName, $this->hints);
+                                $supportedDriver = new SupportedDriver($supportedDriverName, $this->hints);
                                 if ($reDepDriversHint[2]) {
                                     $supportedDriver->setHint($hint);
                                 }
@@ -218,7 +218,7 @@ class Extension
                 $driverName = (string) $xmlSupportedDriver['name'];
                 $driverHint = (string) $xmlSupportedDriver['hint'];
 
-                $driver = new OglSupportedDriver($driverName, $this->hints);
+                $driver = new SupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);
                 $newSubExtension->addSupportedDriver($driver);
             }

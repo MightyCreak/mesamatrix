@@ -164,7 +164,7 @@ class ApiVersion
                 // Create new supported driver.
                 $driverHint = (string) $xmlSupportedDriver['hint'];
 
-                $driver = new OglSupportedDriver($driverName, $this->hints);
+                $driver = new SupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);
                 $newExtension->addSupportedDriver($driver);
             }
