@@ -220,16 +220,14 @@ class ApiSubController
             'extensions' => array()
         );
 
-        $lbGlVersion = $this->leaderboard->findGlVersion($xmlVersion['name'].$xmlVersion['version']);
-        if ($lbGlVersion !== NULL) {
-            $numGlVersionExts = $lbGlVersion->getNumExts();
-
+        $lbApiVersion = $this->leaderboard->findApiVersion($xmlVersion['name'].$xmlVersion['version']);
+        if ($lbApiVersion !== NULL) {
             $driverScores = array();
-            $driverScores['mesa'] = $lbGlVersion->getDriverScore('mesa')->getScore();
+            $driverScores['mesa'] = $lbApiVersion->getDriverScore('mesa')->getScore();
             foreach ($vendors->vendor as $vendor) {
                 foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver['name'];
-                    $driverScores[$driverName] = $lbGlVersion->getDriverScore($driverName)->getScore();
+                    $driverScores[$driverName] = $lbApiVersion->getDriverScore($driverName)->getScore();
                 }
             }
 
