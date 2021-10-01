@@ -53,10 +53,10 @@ class ApiSubController
     }
 
     private function loadMesamatrixXml() {
-        $gl3Path = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'xml_file'));
-        $xml = simplexml_load_file($gl3Path);
+        $featuresXmlFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'xml_file'));
+        $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
-            \Mesamatrix::$logger->critical('Can\'t read '.$gl3Path);
+            \Mesamatrix::$logger->critical('Can\'t read '.$featuresXmlFilepath);
             exit();
         }
 
@@ -220,16 +220,14 @@ class ApiSubController
             'extensions' => array()
         );
 
-        $lbGlVersion = $this->leaderboard->findGlVersion($xmlVersion['name'].$xmlVersion['version']);
-        if ($lbGlVersion !== NULL) {
-            $numGlVersionExts = $lbGlVersion->getNumExts();
-
+        $lbApiVersion = $this->leaderboard->findApiVersion($xmlVersion['name'].$xmlVersion['version']);
+        if ($lbApiVersion !== NULL) {
             $driverScores = array();
-            $driverScores['mesa'] = $lbGlVersion->getDriverScore('mesa')->getScore();
+            $driverScores['mesa'] = $lbApiVersion->getDriverScore('mesa')->getScore();
             foreach ($vendors->vendor as $vendor) {
                 foreach ($vendor->drivers->driver as $driver) {
                     $driverName = (string) $driver['name'];
-                    $driverScores[$driverName] = $lbGlVersion->getDriverScore($driverName)->getScore();
+                    $driverScores[$driverName] = $lbApiVersion->getDriverScore($driverName)->getScore();
                 }
             }
 

@@ -25,10 +25,10 @@ use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Input\InputOption;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \Mesamatrix\Parser\Constants;
-use \Mesamatrix\Parser\OglParser;
-use \Mesamatrix\Parser\OglMatrix;
-use \Mesamatrix\Parser\OglVersion;
-use \Mesamatrix\Parser\OglExtension;
+use \Mesamatrix\Parser\Parser;
+use \Mesamatrix\Parser\Matrix;
+use \Mesamatrix\Parser\ApiVersion;
+use \Mesamatrix\Parser\Extension;
 use \Mesamatrix\Parser\UrlCache;
 use \Mesamatrix\Parser\Hints;
 
@@ -65,10 +65,10 @@ class Parse extends \Symfony\Component\Console\Command\Command
             'incomplete' => 'not started*',
             'started' => '*');
 
-        // Get commits for each files in gl_filepaths.
+        // Get commits for each files in filepaths.
         $commits = array();
-        $glFilepaths = \Mesamatrix::$config->getValue('git', 'gl_filepaths', array());
-        foreach ($glFilepaths as $filepath) {
+        $filepaths = \Mesamatrix::$config->getValue('git', 'filepaths', array());
+        foreach ($filepaths as $filepath) {
             $fileCommits = $this->fetchCommits($filepath['name'], $filepath['excluded_commits']);
             if ($fileCommits !== NULL) {
                 foreach ($fileCommits as $commit) {
@@ -76,7 +76,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
                 }
             }
         }
-        unset($glFilepaths);
+        unset($filepaths);
 
         if (empty($commits)) {
             // No commit found, exit.
@@ -164,7 +164,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
     /**
      * Fetch commits from mesa's git.
      *
-     * @param string $filepath GL text file path.
+     * @param string $filepath Features text file path.
      * @param string[] $excludedCommits The commits to exclude from the list.
      * @return \Mesamatrix\Git\Commit[]|null Array of commits.
      */
@@ -240,7 +240,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         // Parse the content.
         \Mesamatrix::$logger->info('Parsing '.(basename($filepath)).' for commit '.$hash);
-        $parser = new OglParser();
+        $parser = new Parser();
         $matrix = $parser->parseContent($cat->getOutput());
 
         // Create the XML.
@@ -329,7 +329,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
                  . '/commits/commit_'.$hash.'.xml';
         $mesa = simplexml_load_file($xmlPath);
 
-        $matrix = new OglMatrix();
+        $matrix = new Matrix();
         $matrix->loadXml($mesa);
 
         $nextCommit = $latestCommit;
@@ -341,7 +341,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
                      . '/commits/commit_'.$hash.'.xml';
             $mesa = simplexml_load_file($xmlPath);
 
-            $prevMatrix = new OglMatrix();
+            $prevMatrix = new Matrix();
             $prevMatrix->loadXml($mesa);
 
             $this->compareMatricesAndSetModificationCommit($prevMatrix, $matrix, $nextCommit);
@@ -433,17 +433,17 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * Compare the two matrices, when a difference is seen, sets the commit as
      * the one that modified the extension and/or its drivers.
      *
-     * @param OglMatrix $prevMatrix The previous matrix.
-     * @param OglMatrix $matrix The current matrix.
+     * @param Matrix $prevMatrix The previous matrix.
+     * @param Matrix $matrix The current matrix.
      * @param \Mesamatrix\Git\Commit $commit The commit inducing the changes
      *                                       from previous to current matrix.
      */
     private function compareMatricesAndSetModificationCommit(
-        OglMatrix $prevMatrix,
-        OglMatrix $matrix,
+        Matrix $prevMatrix,
+        Matrix $matrix,
         \Mesamatrix\Git\Commit $commit) {
-        foreach ($matrix->getGlVersions() as $version) {
-            foreach ($version->getExtensions() as $ext) {
+        foreach ($matrix->getApiVersions() as $apiVersion) {
+            foreach ($apiVersion->getExtensions() as $ext) {
                 $prevExt = $prevMatrix->getExtensionBySubstr($ext->getName());
 
                 $this->compareExtensionsAndSetModificationCommit($prevExt, $ext, $commit);
@@ -455,14 +455,14 @@ class Parse extends \Symfony\Component\Console\Command\Command
      * Compare the two extensions, when a difference is seen, sets the commit
      * as the one that modified the extension and/or its drivers.
      *
-     * @param OglExtension $prevExt The previous extension.
-     * @param OglExtension $ext The current extension.
+     * @param Extension $prevExt The previous extension.
+     * @param Extension $ext The current extension.
      * @param Commit $commit The commit inducing the changes from previous to
      *                       current extension.
      */
     private function compareExtensionsAndSetModificationCommit(
-        ?OglExtension $prevExt,
-        OglExtension $ext,
+        ?Extension $prevExt,
+        Extension $ext,
         \Mesamatrix\Git\Commit $commit) {
 
         if ($ext->getModifiedAt() === null) {
@@ -542,36 +542,36 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
     }
 
-    protected function generateApiVersions(\SimpleXMLElement $api, OglMatrix $matrix, $name) {
+    protected function generateApiVersions(\SimpleXMLElement $api, Matrix $matrix, $name) {
         $xmlVersions = $api->addChild("versions");
-        foreach ($matrix->getGlVersions() as $glVersion) {
-            if ($glVersion->getGlName() === $name) {
-                $version = $xmlVersions->addChild('version');
-                $this->generateGlVersion($version, $glVersion, $matrix->getHints());
+        foreach ($matrix->getApiVersions() as $apiVersion) {
+            if ($apiVersion->getName() === $name) {
+                $xmlVersion = $xmlVersions->addChild('version');
+                $this->generateApiVersion($xmlVersion, $apiVersion, $matrix->getHints());
             }
         }
     }
 
-    protected function generateGlVersion(\SimpleXMLElement $version, OglVersion $glVersion, Hints $hints) {
-        $version->addAttribute("name", $glVersion->getGlName());
-        $version->addAttribute("version", $glVersion->getGlVersion());
+    protected function generateApiVersion(\SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints) {
+        $xmlVersion->addAttribute("name", $apiVersion->getName());
+        $xmlVersion->addAttribute("version", $apiVersion->getVersion());
 
-        $shaderVersion = $version->addChild("shader-version");
-        $shaderVersion->addAttribute("name", $glVersion->getGlslName());
-        $shaderVersion->addAttribute("version", $glVersion->getGlslVersion());
+        $shaderVersion = $xmlVersion->addChild("shader-version");
+        $shaderVersion->addAttribute("name", $apiVersion->getGlslName());
+        $shaderVersion->addAttribute("version", $apiVersion->getGlslVersion());
 
-        $extensions = $version->addChild("extensions");
-        foreach ($glVersion->getExtensions() as $glExt) {
-            $ext = $extensions->addChild("extension");
-            $this->generateExtension($ext, $glExt, $hints);
+        $extensions = $xmlVersion->addChild("extensions");
+        foreach ($apiVersion->getExtensions() as $ext) {
+            $xmlExt = $extensions->addChild("extension");
+            $this->generateExtension($xmlExt, $ext, $hints);
         }
     }
 
-    protected function generateExtension(\SimpleXMLElement $xmlExt, OglExtension $glExt, Hints $hints) {
-        $xmlExt->addAttribute("name", $glExt->getName());
+    protected function generateExtension(\SimpleXMLElement $xmlExt, Extension $ext, Hints $hints) {
+        $xmlExt->addAttribute("name", $ext->getName());
 
         if ($this->urlCache) {
-            if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $glExt->getName(), $matches) === 1) {
+            if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $ext->getName(), $matches) === 1) {
                 $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url_gl").urlencode($matches[2])."/";
                 if ($matches[1] === "GLX") {
                     // Found a GLX_TYPE_Extension.
@@ -588,40 +588,40 @@ class Parse extends \Symfony\Component\Console\Command\Command
         }
 
         $mesaStatus = $xmlExt->addChild("mesa");
-        $mesaStatus->addAttribute("status", $glExt->getStatus());
-        $mesaHintId = $glExt->getHintIdx();
+        $mesaStatus->addAttribute("status", $ext->getStatus());
+        $mesaHintId = $ext->getHintIdx();
         if ($mesaHintId !== -1) {
             $mesaStatus->addAttribute("hint", $hints->allHints[$mesaHintId]);
         }
-        if ($commit = $glExt->getModifiedAt()) {
+        if ($commit = $ext->getModifiedAt()) {
             $modified = $mesaStatus->addChild("modified");
             $modified->addChild("commit", $commit->getHash());
             $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
             $modified->addChild("author", $commit->getAuthor());
         }
 
-        $supportedDrivers = $xmlExt->addChild("supported-drivers");
-        foreach ($glExt->getSupportedDrivers() as $glDriver) {
-            $driver = $supportedDrivers->addChild("driver");
-            $driver->addAttribute("name", $glDriver->getName());
-            $hintId = $glDriver->getHintIdx();
+        $xmlSupportedDrivers = $xmlExt->addChild("supported-drivers");
+        foreach ($ext->getSupportedDrivers() as $supportedDriver) {
+            $xmlDriver = $xmlSupportedDrivers->addChild("driver");
+            $xmlDriver->addAttribute("name", $supportedDriver->getName());
+            $hintId = $supportedDriver->getHintIdx();
             if ($hintId !== -1) {
-                $driver->addAttribute("hint", $hints->allHints[$hintId]);
+                $xmlDriver->addAttribute("hint", $hints->allHints[$hintId]);
             }
-            if ($commit = $glDriver->getModifiedAt()) {
-                $modified = $driver->addChild("modified");
+            if ($commit = $supportedDriver->getModifiedAt()) {
+                $modified = $xmlDriver->addChild("modified");
                 $modified->addChild("commit", $commit->getHash());
                 $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
                 $modified->addChild("author", $commit->getAuthor());
             }
         }
 
-        $glSubExts = $glExt->getSubExtensions();
-        if (!empty($glSubExts)) {
+        $subExts = $ext->getSubExtensions();
+        if (!empty($subExts)) {
             $xmlSubExts = $xmlExt->addChild("subextensions");
-            foreach ($glSubExts as $glSubExt) {
+            foreach ($subExts as $subExt) {
                 $xmlSubExt = $xmlSubExts->addChild("subextension");
-                $this->generateExtension($xmlSubExt, $glSubExt, $hints);
+                $this->generateExtension($xmlSubExt, $subExt, $hints);
             }
         }
     }

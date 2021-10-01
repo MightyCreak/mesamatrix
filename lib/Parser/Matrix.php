@@ -20,18 +20,45 @@
 
 namespace Mesamatrix\Parser;
 
-class OglMatrix
+class Matrix
 {
-    private array $glVersions;
+    private array $apiVersions;
     private Hints $hints;
 
     public function __construct() {
-        $this->glVersions = array();
+        $this->apiVersions = array();
         $this->hints = new Hints();
     }
 
-    public function addGlVersion(OglVersion $glVersion) {
-        array_push($this->glVersions, $glVersion);
+    public function addApiVersion(ApiVersion $apiVersion) {
+        array_push($this->apiVersions, $apiVersion);
+    }
+
+    /**
+     * Get the API versions.
+     *
+     * @return \Mesamatrix\Parser\ApiVersion[] The API versions array.
+     */
+    public function getApiVersions() {
+        return $this->apiVersions;
+    }
+
+    /**
+     * Get the API version based on its name.
+     *
+     * @param string $name The API name.
+     * @param string $version The API version.
+     *
+     * @return \Mesamatrix\Parser\ApiVersion The API version is found; NULL otherwise.
+     */
+    public function getApiVersionByName($name, $version) {
+        foreach ($this->apiVersions as $apiVersion) {
+            if ($apiVersion->getName() === $name &&
+                $apiVersion->getVersion() === $version) {
+                return $apiVersion;
+            }
+        }
+        return null;
     }
 
     /**
@@ -39,13 +66,13 @@ class OglMatrix
      *
      * @param string $substr The substring to find.
      *
-     * @return \Mesamatrix\Parser\OglExtension The extension if found; NULL otherwise.
+     * @return \Mesamatrix\Parser\Extension The extension if found; NULL otherwise.
      */
     public function getExtensionBySubstr($substr) {
-        foreach ($this->getGlVersions() as $glVersion) {
-            $glExt = $glVersion->getExtensionBySubstr($substr);
-            if ($glExt !== NULL) {
-                return $glExt;
+        foreach ($this->getApiVersions() as $apiVersion) {
+            $ext = $apiVersion->getExtensionBySubstr($substr);
+            if ($ext !== NULL) {
+                return $ext;
             }
         }
 
@@ -61,9 +88,9 @@ class OglMatrix
      *         the OpenGL ES; NULL otherwise.
      */
     public function getDriversSupportingGlesVersion($version) {
-        foreach ($this->getGlVersions() as $glVersion) {
-            if ($glVersion->getGlName() === Constants::GLES_NAME && $glVersion->getGlVersion() === $version) {
-                return $glVersion->getSupportedDrivers();
+        foreach ($this->getApiVersions() as $apiVersion) {
+            if ($apiVersion->getName() === Constants::GLES_NAME && $apiVersion->getVersion() === $version) {
+                return $apiVersion->getSupportedDrivers();
             }
         }
 
@@ -71,11 +98,11 @@ class OglMatrix
     }
 
     /**
-     * Parse all the GL versions and solve their extensions.
+     * Parse all the API versions and solve their extensions.
      */
     public function solveExtensionDependencies() {
-        foreach ($this->getGlVersions() as $glVersion) {
-            $glVersion->solveExtensionDependencies($this);
+        foreach ($this->getApiVersions() as $apiVersion) {
+            $apiVersion->solveExtensionDependencies($this);
         }
     }
 
@@ -95,45 +122,18 @@ class OglMatrix
 
         // Add new sections.
         foreach ($xmlSections as $xmlSection) {
-            $glName = (string) $xmlSection['name'];
-            $glVersion = (string) $xmlSection['version'];
+            $name = (string) $xmlSection['name'];
+            $version = (string) $xmlSection['version'];
 
             $xmlShaderVersion = $xmlSection->{'shader-version'};
             $shaderName = (string) $xmlShaderVersion['name'];
             $shaderVersion = (string) $xmlShaderVersion['version'];
 
-            $glSection = new OglVersion($glName, $glVersion, $shaderName, $shaderVersion, $this->getHints());
-            $this->addGlVersion($glSection);
+            $apiVersion = new ApiVersion($name, $version, $shaderName, $shaderVersion, $this->getHints());
+            $this->addApiVersion($apiVersion);
 
-            $glSection->loadXml($xmlSection);
+            $apiVersion->loadXml($xmlSection);
         }
-    }
-
-    /**
-     * Get the GL versions.
-     *
-     * @return \Mesamatrix\Parser\OglVersion[] The GL versions array.
-     */
-    public function getGlVersions() {
-        return $this->glVersions;
-    }
-
-    /**
-     * Get the GL version based on its name.
-     *
-     * @param string $name The GL name.
-     * @param string $version The GL version.
-     *
-     * @return \Mesamatrix\Parser\OglVersion The GL version is found; NULL otherwise.
-     */
-    public function getGlVersionByName($name, $version) {
-        foreach ($this->glVersions as $glVersion) {
-            if ($glVersion->getGlName() === $name &&
-                $glVersion->getGlVersion() === $version) {
-                return $glVersion;
-            }
-        }
-        return null;
     }
 
     /**

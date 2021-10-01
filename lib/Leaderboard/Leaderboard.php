@@ -27,7 +27,7 @@ class Leaderboard {
      * Leaderboard default constructor.
      */
     public function __construct(bool $useVersions) {
-        $this->glVersions = array();
+        $this->apiVersions = array();
         $this->useVersions = $useVersions;
     }
 
@@ -39,19 +39,19 @@ class Leaderboard {
     public function load(\SimpleXMLElement $xmlApi) {
         $this->loadApi($xmlApi);
 
-        // Sort by OpenGL versions descending.
-        usort($this->glVersions, function($a, $b) {
-            // Sort OpenGL before OpenGLES and higher versions before lower ones.
-            if ($a->getGlName() === $b->getGlName()) {
-                $diff = (float) $b->getGlVersion() - (float) $a->getGlVersion();
+        // Sort by API versions descending.
+        usort($this->apiVersions, function($a, $b) {
+            // Sort by API name, then API version descending.
+            if ($a->getName() === $b->getName()) {
+                $diff = (float) $b->getVersion() - (float) $a->getVersion();
                 if ($diff === 0)
                     return 0;
                 else
                     return $diff < 0 ? -1 : 1;
             }
-            elseif ($a->getGlName() === Constants::GL_NAME ||
-                $a->getGlName() === Constants::VK_NAME ||
-                $a->getGlName() === Constants::OPENCL_NAME) {
+            elseif ($a->getName() === Constants::GL_NAME ||
+                $a->getName() === Constants::VK_NAME ||
+                $a->getName() === Constants::OPENCL_NAME) {
                 return -1;
             }
             else {
@@ -74,7 +74,7 @@ class Leaderboard {
                 $numTotalExts += count($xmlSubExts);
             }
 
-            $lbGlVersion = $this->createGlVersion(
+            $lbApiVersion = $this->createApiVersion(
                 (string) $xmlVersion["name"],
                 (string) $xmlVersion["version"],
                 $numTotalExts);
@@ -96,7 +96,7 @@ class Leaderboard {
                 }
             }
 
-            $lbGlVersion->addDriver("mesa", $numDoneExts);
+            $lbApiVersion->addDriver("mesa", $numDoneExts);
 
             // Count done extensions and sub-extensions for each drivers.
             foreach ($xmlApi->vendors->vendor as $vendor) {
@@ -124,26 +124,26 @@ class Leaderboard {
                         }
                     }
 
-                    $lbGlVersion->addDriver($driverName, $numDoneExts);
+                    $lbApiVersion->addDriver($driverName, $numDoneExts);
                 }
             }
         }
     }
 
     /**
-     * Find the leaderboard for a specific OpenGL version.
+     * Find the leaderboard for a specific API version.
      *
-     * @param string $glid OpenGL ID (format example: GL4.5, GL4.4, GLES3.1, ...).
-     * @return LbGlVersion The leaderboard for the given GL version.
+     * @param string $id API ID (format example: OpenGL4.5, Vulkan1.1, ...).
+     * @return LbApiVersion The leaderboard for the given API version.
      */
-    public function findGlVersion($glid) {
+    public function findApiVersion($id) {
         $i = 0;
-        $numGlVersions = count($this->glVersions);
-        while ($i < $numGlVersions && $this->glVersions[$i]->getGlId() !== $glid) {
+        $numApiVersions = count($this->apiVersions);
+        while ($i < $numApiVersions && $this->apiVersions[$i]->getId() !== $id) {
             $i++;
         }
 
-        return $i < $numGlVersions ? $this->glVersions[$i] : NULL;
+        return $i < $numApiVersions ? $this->apiVersions[$i] : NULL;
      }
 
     /**
@@ -151,8 +151,8 @@ class Leaderboard {
      */
     public function getNumTotalExts() {
         $numExts = 0;
-        foreach ($this->glVersions as &$glVersion) {
-            $numExts += $glVersion->getNumExts();
+        foreach ($this->apiVersions as &$apiVersion) {
+            $numExts += $apiVersion->getNumExts();
         }
 
         return $numExts;
@@ -160,7 +160,7 @@ class Leaderboard {
 
     /**
      * Get an array of driver with their number of extensions done for all the
-     * OpenGL versions. The array is sorted by the drivers score (descending).
+     * API versions. The array is sorted by the drivers score (descending).
      *
      * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan, ...).
      * @return LbDriverScore[] An associative array: the key is the driver name, the
@@ -169,9 +169,9 @@ class Leaderboard {
     public function getDriversSortedByExtsDone(string $api) {
         $sortedDriversScores = array();
         $numTotalExts = $this->getNumTotalExts();
-        foreach ($this->glVersions as &$glVersion) {
-            $glVersionDrivers = $glVersion->getDriverScores();
-            foreach ($glVersionDrivers as $drivername => $driverScore) {
+        foreach ($this->apiVersions as &$apiVersion) {
+            $apiVersionDrivers = $apiVersion->getDriverScores();
+            foreach ($apiVersionDrivers as $drivername => $driverScore) {
                 if (!array_key_exists($drivername, $sortedDriversScores)) {
                     // Add new driver.
                     $sortedDriversScores[$drivername] = new LbDriverScore(0, $numTotalExts, 0);
@@ -210,43 +210,43 @@ class Leaderboard {
      *
      * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan, ...).
      * @param string $drivername Name of the driver (mesa, r600, ...).
-     * @return string The OpenGL version string; NULL otherwise.
+     * @return string The API version string; NULL otherwise.
      */
     public function getDriverApiVersion(string $api, string $drivername) {
-        $apiVersion = NULL;
+        $apiVersionNbr = NULL;
 
         // Parse from first to latest API version.
         // Continue as long as all the extensions are done for this driver in
         // this version, and remember the version.
-        $i = count($this->glVersions);
+        $i = count($this->apiVersions);
         while ($i > 0) {
-            $glVersion = $this->glVersions[--$i];
-            if ($glVersion->getGlName() === $api) {
-                if ($glVersion->getDriverScore($drivername)->getNumExtensionsDone() !== $glVersion->getNumExts()) {
+            $apiVersion = $this->apiVersions[--$i];
+            if ($apiVersion->getName() === $api) {
+                if ($apiVersion->getDriverScore($drivername)->getNumExtensionsDone() !== $apiVersion->getNumExts()) {
                     break;
                 }
 
-                $apiVersion = $glVersion->getGlVersion();
+                $apiVersionNbr = $apiVersion->getVersion();
             }
         }
 
-        return $apiVersion;
+        return $apiVersionNbr;
     }
 
     /**
-     * Create a new LbGlVersion and add it to the $glVersions array.
+     * Create a new LbApiVersion and add it to the $apiVersions array.
      *
-     * @param string $glname OpenGL name.
-     * @param string $glversion OpenGL version.
+     * @param string $name API name.
+     * @param string $version API version.
      * @param integer $numExts Total number of extensions.
-     * @return LbGlVersion The new item.
+     * @return LbApiVersion The new item.
      */
-    private function createGlVersion(string $glname, string $glversion, int $numExts) {
-        $glVersion = new LbGlVersion($glname, $glversion, $numExts);
-        $this->glVersions[] = $glVersion;
-        return $glVersion;
+    private function createApiVersion(string $name, string $version, int $numExts) {
+        $apiVersion = new LbApiVersion($name, $version, $numExts);
+        $this->apiVersions[] = $apiVersion;
+        return $apiVersion;
     }
 
-    private $glVersions;    ///< LbGlVersion[].
-    private $useVersions;   ///< bool.
+    private array $apiVersions;
+    private bool $useVersions;
 }

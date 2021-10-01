@@ -20,35 +20,40 @@
 
 namespace Mesamatrix\Parser;
 
-class OglVersion
+class ApiVersion
 {
-    public function __construct($glName, $glVersion, $glslName, $glslVersion, $hints) {
-        $this->setGlName($glName);
-        $this->setGlVersion($glVersion);
+    public function __construct(
+            string $name,
+            ?string $version,
+            ?string $glslName,
+            ?string $glslVersion,
+            Hints $hints) {
+        $this->setName($name);
+        $this->setVersion($version);
         $this->setGlslName($glslName);
         $this->setGlslVersion($glslVersion);
         $this->hints = $hints;
         $this->extensions = array();
     }
 
-    // GL name
-    public function setGlName($name) {
-        $this->glName = $name;
+    // API name
+    public function setName(string $name) {
+        $this->name = $name;
     }
-    public function getGlName() {
-        return $this->glName;
+    public function getName() {
+        return $this->name;
     }
 
-    // GL version
-    public function setGlVersion($version) {
-        $this->glVersion = $version;
+    // API version
+    public function setVersion(?string $version) {
+        $this->version = $version;
     }
-    public function getGlVersion() {
-        return $this->glVersion;
+    public function getVersion() {
+        return $this->version;
     }
 
     // GLSL name
-    public function setGlslName($name) {
+    public function setGlslName(?string $name) {
         $this->glslName = $name;
     }
     public function getGlslName() {
@@ -56,7 +61,7 @@ class OglVersion
     }
 
     // GLSL version
-    public function setGlslVersion($version) {
+    public function setGlslVersion(?string $version) {
         $this->glslVersion = $version;
     }
     public function getGlslVersion() {
@@ -66,9 +71,9 @@ class OglVersion
     /**
      * Add an extension.
      *
-     * @param OglExtension $extension The extension to add.
+     * @param Extension $extension The extension to add.
      */
-    public function addExtension(OglExtension $extension) {
+    public function addExtension(Extension $extension) {
         $this->extensions[] = $extension;
     }
 
@@ -78,8 +83,8 @@ class OglVersion
      * @return string[] The list of supported drivers names; null if API not recognized.
      */
     public function getAllApiDrivers() {
-        $glVersionName = $this->getGlName();
-        switch ($glVersionName) {
+        $apiName = $this->getName();
+        switch ($apiName) {
         case Constants::GL_NAME:
         case Constants::GLES_NAME:
         case Constants::GL_OR_ES_EXTRA_NAME:
@@ -109,8 +114,8 @@ class OglVersion
         $apiDrivers = $this->getAllApiDrivers();
         foreach ($apiDrivers as $driverName) {
             $driver = NULL;
-            foreach ($this->getExtensions() as $glExt) {
-                $driver = $glExt->getSupportedDriverByName($driverName);
+            foreach ($this->getExtensions() as $ext) {
+                $driver = $ext->getSupportedDriverByName($driverName);
                 if ($driver === NULL) {
                     break;
                 }
@@ -127,11 +132,11 @@ class OglVersion
     /**
      * Parse all the extensions in the version and solve them.
      *
-     * @param \Mesamatrix\Parser\OglMatrix $glMatrix The entire matrix.
+     * @param \Mesamatrix\Parser\Matrix $matrix The entire matrix.
      */
-    public function solveExtensionDependencies($glMatrix) {
-        foreach ($this->getExtensions() as $glExt) {
-            $glExt->solveExtensionDependencies($glMatrix);
+    public function solveExtensionDependencies($matrix) {
+        foreach ($this->getExtensions() as $ext) {
+            $ext->solveExtensionDependencies($matrix);
         }
     }
 
@@ -145,7 +150,7 @@ class OglVersion
             $extStatus = (string) $xmlExt->mesa['status'];
             $extHint = (string) $xmlExt->mesa['hint'];
 
-            $newExtension = new OglExtension($extName, $extStatus, $extHint, $this->hints, array());
+            $newExtension = new Extension($extName, $extStatus, $extHint, $this->hints, array());
 
             $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver");
             foreach ($xmlSupportedDrivers as $xmlSupportedDriver) {
@@ -159,7 +164,7 @@ class OglVersion
                 // Create new supported driver.
                 $driverHint = (string) $xmlSupportedDriver['hint'];
 
-                $driver = new OglSupportedDriver($driverName, $this->hints);
+                $driver = new SupportedDriver($driverName, $this->hints);
                 $driver->setHint($driverHint);
                 $newExtension->addSupportedDriver($driver);
             }
@@ -167,14 +172,14 @@ class OglVersion
             // Add the extension.
             $this->addExtension($newExtension);
 
-            $newExtension->loadXml($this, $xmlExt);
+            $newExtension->loadXml($xmlExt);
         }
     }
 
     /**
      * Get the list of all extensions.
      *
-     * @return OglExtension[] All the extensions.
+     * @return Extension[] All the extensions.
      */
     public function getExtensions() {
         return $this->extensions;
@@ -194,7 +199,7 @@ class OglVersion
      *
      * @param string $name The name of the extension to find.
      *
-     * @return OglExtension The extension or null if not found.
+     * @return Extension The extension or null if not found.
      */
     public function getExtensionByName($name) {
         foreach ($this->extensions as $extension) {
@@ -210,7 +215,7 @@ class OglVersion
      *
      * @param string $str The substring to find in the extension name.
      *
-     * @return OglExtension The extension or null if not found.
+     * @return Extension The extension or null if not found.
      */
     public function getExtensionBySubstr($substr) {
         foreach ($this->extensions as $extension) {
@@ -221,10 +226,10 @@ class OglVersion
         return null;
     }
 
-    private $glName;
-    private $glVersion;
-    private $glslName;
-    private $glslVersion;
-    private $hints;
-    private $extensions;
+    private string $name;
+    private ?string $version;
+    private ?string $glslName;
+    private ?string $glslVersion;
+    private Hints $hints;
+    private array $extensions;
 };

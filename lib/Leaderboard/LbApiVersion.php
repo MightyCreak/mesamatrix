@@ -20,43 +20,43 @@
 
 namespace Mesamatrix\Leaderboard;
 
-class LbGlVersion {
+class LbApiVersion {
     /**
-     * LbGlVersion constructor.
+     * LbApiVersion constructor.
      *
-     * @param string $glname OpenGL name (e.g. OpenGL, OpenGL ES).
-     * @param string $glversion OpenGL version (e.g. 3.1, 4.0).
+     * @param string $name API name (e.g. OpenGL, Vulkan, ...).
+     * @param string $version API version (e.g. 4.5, 1.1, ...).
      * @param integer $numExts Total number of extensions.
-     * @remark Versions are identified by `glid` which is the concatenation of
-     *         the name and the version (examples: OpenGL4.5, OpenGL ES3.1, ...).
+     * @remark Versions are identified by `id` which is the concatenation of
+     *         the name and the version (examples: OpenGL4.5, Vulkan1.1, ...).
      */
-    public function __construct(string $glname, string $glversion, int $numExts) {
-        $this->glid = $glname.$glversion;
-        $this->glName = $glname;
-        $this->glVersion = $glversion;
+    public function __construct(string $name, string $version, int $numExts) {
+        $this->id = $name.$version;
+        $this->name = $name;
+        $this->version = $version;
         $this->numExts = $numExts;
         $this->drivers = array();
     }
 
     /**
-     * Get the OpenGL ID for this version.
+     * Get the API ID for this version.
      */
-    public function getGlId() {
-        return $this->glid;
+    public function getId() {
+        return $this->id;
     }
 
     /**
-     * Get the OpenGL name.
+     * Get the API name.
      */
-    public function getGlName() {
-        return $this->glName;
+    public function getName() {
+        return $this->name;
     }
 
     /**
-     * Get the OpenGL version.
+     * Get the API version.
      */
-    public function getGlVersion() {
-        return $this->glVersion;
+    public function getVersion() {
+        return $this->version;
     }
 
     /**
@@ -69,11 +69,11 @@ class LbGlVersion {
         $this->driverScores[$drivername] = new LbDriverScore(
             $numExtsDone,
             $this->getNumExts(),
-            (float) $this->getGlVersion());
+            (float) $this->getVersion());
     }
 
     /**
-     * Set the number of extensions for this OpenGL version.
+     * Set the number of extensions for this API version.
      *
      * @param integer $num Number of extensions.
      */
@@ -82,7 +82,7 @@ class LbGlVersion {
     }
 
     /**
-     * Get the number of extensions for this OpenGL version.
+     * Get the number of extensions for this API version.
      */
     public function getNumExts() {
         return $this->numExts;
@@ -99,7 +99,7 @@ class LbGlVersion {
     }
 
     /**
-     * Get all the drivers scores for this OpenGL version.
+     * Get all the drivers scores for this API version.
      *
      * @return mixed[] An associative array: the key is the driver name, the
      *                 value is an LbDriverScore.
@@ -108,9 +108,9 @@ class LbGlVersion {
         return $this->driverScores;
     }
 
-    private $glid;
-    private $glName;
-    private $glVersion;
-    private $numExts;
-    private $driverScores;
+    private string $id;
+    private string $name;
+    private string $version;
+    private int $numExts;
+    private array $driverScores;
 }

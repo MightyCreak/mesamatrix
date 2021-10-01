@@ -57,10 +57,10 @@ class HomeController extends BaseController
     }
 
     private function loadMesamatrixXml() {
-        $gl3Path = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'xml_file'));
-        $xml = simplexml_load_file($gl3Path);
+        $featuresXmlFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'xml_file'));
+        $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
-            \Mesamatrix::$logger->critical('Can\'t read '.$gl3Path);
+            \Mesamatrix::$logger->critical('Can\'t read '.$featuresXmlFilepath);
             exit();
         }
 

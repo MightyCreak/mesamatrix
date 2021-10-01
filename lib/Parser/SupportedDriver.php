@@ -22,7 +22,7 @@ namespace Mesamatrix\Parser;
 
 use \Mesamatrix\Git\Commit;
 
-class OglSupportedDriver
+class SupportedDriver
 {
     public function __construct($name, $hints) {
         $this->name = $name;
