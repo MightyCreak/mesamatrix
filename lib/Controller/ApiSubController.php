@@ -205,9 +205,6 @@ class ApiSubController
                 $name .= ' - '.$xmlShaderVersion['name'].' '.$xmlShaderVersion['version'];
             }
         }
-        else {
-            $name = "Extensions";
-        }
 
         $target = $xmlVersion['name'];
         $target .= !empty($xmlVersion['version']) ? $xmlVersion['version'] : '_Extensions';
@@ -333,12 +330,17 @@ foreach($this->matrix['sections'] as $section):
     foreach($section['subsections'] as $subsection):
         $subsectionName = (string)$subsection['name'];
         $subsectionId = (string)$subsection['target'];
+
+        if (!empty($subsectionName)):
 ?>
             <tr>
                 <td colspan="<?= count($this->matrix['columns']) ?>">
                     <h2 id="<?= $subsectionId ?>"><?= $subsectionName ?><a href="#<?= $subsectionId ?>" class="permalink">&para;</a></h2>
                 </td>
             </tr>
+<?php
+        endif;
+?>
             <tr>
 <?php
         // Header (vendors).
