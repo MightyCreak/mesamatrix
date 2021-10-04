@@ -26,7 +26,7 @@ html{box-sizing:border-box}*,*:after,*:before{box-sizing:inherit}
 body {
     font-family: 'Liberation Sans', 'Arial', sans-serif;
     background-color: #ffffff;
-    margin-bottom: 2em;
+    margin: 0 2em 2em 2em;
 }
 
 a:link {
@@ -40,29 +40,13 @@ a:hover, a:active {
     text-decoration: underline;
 }
 
-#main {
-    width: 1100px;
-    margin: auto;
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-}
-.header img.banner {
+header img.banner {
     width: 663px;
     height: 132px;
 }
-.header .header-icons {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-.header .header-icons img.rss {
-    width: 32px;
-    height: 32px;
-    margin: 3px;
+
+main p {
+    max-width: 1000px;
 }
 
 .commits th                         { text-align: left; }
@@ -199,13 +183,15 @@ a:hover, a:active {
     display: flex;
     list-style: none;
     margin: 0;
-    padding: 0.3em 0;
+    padding: 0;
 }
 .menu-item {
     margin: 0 0.3em 0 0;
     padding: 0;
+    align-self: center;
 }
 .menu-item > a {
+    display: inline-block;
     padding: 0.5em 1em;
     text-decoration: none;
     color: #777;
@@ -218,6 +204,18 @@ a:hover, a:active {
 }
 .menu-selected > a, .menu-selected > a:visited {
     color: #333;
+}
+.menu-item > .rss {
+    margin: 0;
+    padding: 0 0.5em;
+}
+.menu-item > a:hover.rss {
+    background-color: transparent;
+}
+.menu-item > .rss > img {
+    vertical-align: middle;
+    width: 32px;
+    height: 32px;
 }
 
 #github-ribbon > img {
