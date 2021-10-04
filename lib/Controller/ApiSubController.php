@@ -482,18 +482,25 @@ endforeach;
         $index = 1;
         $rank = 1;
         $prevNumExtsDone = -1;
-        foreach($sortedDrivers as $drivername => $driverScore) {
+        foreach($sortedDrivers as $driverName => $driverScore) {
             $numExtsDone = $driverScore->getNumExtensionsDone();
             $sameRank = $prevNumExtsDone === $numExtsDone;
             if (!$sameRank) {
                 $rank = $index;
             }
+
             switch ($rank) {
-            case 1: $rankClass = "lbCol-1st"; break;
-            case 2: $rankClass = "lbCol-2nd"; break;
-            case 3: $rankClass = "lbCol-3rd"; break;
-            default: $rankClass = "";
+            case 1: $rankRowClass = "lbCol-1st"; break;
+            case 2: $rankRowClass = "lbCol-2nd"; break;
+            case 3: $rankRowClass = "lbCol-3rd"; break;
+            default: $rankRowClass = "";
             }
+
+            $rankCellClasses = array('lbCol-rank');
+            if ($sameRank) {
+                $rankCellClasses[] = 'lbCol-rank-same';
+            }
+
             $pctScore = sprintf("%.1f%%", $driverScore->getScore() * 100);
             $apiVersion = null;
             if ($this->showLbVersion) {
@@ -503,9 +510,9 @@ endforeach;
                 }
             }
 ?>
-            <tr class="<?= $rankClass ?>">
-                <th class="lbCol-rank"><?= !$sameRank ? $rank : "" ?></th>
-                <td class="lbCol-driver"><?= $drivername ?></td>
+            <tr class="<?= $rankRowClass ?>">
+                <th class="<?= join(" ", $rankCellClasses) ?>"><?= $rank ?></th>
+                <td class="lbCol-driver"><?= $driverName ?></td>
                 <td class="lbCol-score"><span class="lbCol-pctScore">(<?= $pctScore ?>)</span> <?= $numExtsDone ?></td>
 <?php
                         if ($this->showLbVersion):
