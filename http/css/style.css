@@ -76,12 +76,11 @@ main p {
 .matrix {
     border-spacing: 1px;
     border-collapse: separate;
-    width: 100%;
 }
 
 .hCellHeader {
     font-size: 85%;
-    min-width: 4em;
+    min-width: 4.1em;
     padding: 0.2em;
     font-weight: bold;
     text-align: center;
@@ -117,20 +116,21 @@ main p {
 .permalink:visited { text-decoration: none; color: #DDDDDD; }
 :hover > .permalink { visibility: visible; }
 
-.extension-child { padding-left: 1em; }
-
 .extension {
     font-size: 85%;
 }
-
 .extension > td.hover {
     opacity: 0.75;
 }
-
-.extension > td:nth-child(1).hover {
+.extension > td:first-of-type {
+    min-width: 32em;
+}
+.extension > td:first-of-type.hover {
     background-color: #ededed;
     opacity: 1.0;
 }
+
+.extension-child { padding-left: 1em; }
 
 .task {
     position: relative;
