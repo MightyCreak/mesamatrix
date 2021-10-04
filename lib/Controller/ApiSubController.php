@@ -307,10 +307,6 @@ foreach($this->matrix['sections'] as $section):
 ?>
     <h1 id="<?= $sectionId ?>"><?= $sectionName ?><a href="#<?= $sectionId ?>" class="permalink">&para;</a></h1>
 <?php
-    $leaderboardId = $sectionId."_Leaderboard";
-?>
-    <h2 id="<?= $leaderboardId ?>">Leaderboard<a href="#<?= $leaderboardId ?>" class="permalink">&para;</a></h2>
-<?php
     $this->writeLeaderboard();
 ?>
     <details>
