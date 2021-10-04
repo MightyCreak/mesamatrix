@@ -57,13 +57,13 @@ main p {
 }
 .commits .commitsAge::first-letter  { text-transform: uppercase; }
 
-.lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; min-width: 50%; }
+.lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; }
 .lb th, .lb td                  { padding: 0.25em 0.5em; }
 .lb th                          { background-color: #d3d7cf; }
 .lb td                          { border: 1px solid #d3d7cf; }
 .lbCol-rank                     { text-align: center; }
-.lbCol-driver                   { min-width: 10em; }
-.lbCol-score, .lbCol-version    { text-align: right; }
+.lbCol-driver                   { min-width: 16em; }
+.lbCol-score, .lbCol-version    { text-align: right; min-width: 8em; }
 .lbCol-pctScore                 { font-size: 0.8em; color: rgb(120, 120, 120); }
 .lbCol-1st td                   { background-color: rgba(195, 255, 155, 1.00); }
 .lbCol-2nd td                   { background-color: rgba(195, 255, 155, 0.67); }
@@ -72,6 +72,16 @@ main p {
 /**
  * Matrix table
  */
+
+details {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+details > summary {
+    font-size: x-large;
+    font-weight: bold;
+}
 
 .matrix {
     border-spacing: 1px;
