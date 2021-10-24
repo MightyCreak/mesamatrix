@@ -95,7 +95,7 @@ function parametricBlend(t) {
     return sqt / (2.0 * (sqt - t) + 1.0);
 }
 
-$(document).ready(function() {
+function manageDates() {
     // Convert to relative date.
     $('.toRelativeDate').each(function() {
         $(this).text(getRelativeDate($(this).data('timestamp')));
@@ -106,9 +106,6 @@ $(document).ready(function() {
         $(this).text(getLocalDate($(this).data('timestamp')));
     });
 
-    // Add tipsy for the footnote.
-    $('.footnote').tipsy({gravity: 'w', fade: true});
-
     // adjust the opacity of the 'modified' text based on age
     const timeNow = Date.now() / 1000;
     const timeConst = 31536000; // A year in seconds
@@ -117,7 +114,9 @@ $(document).ready(function() {
         var opacity = 1.0 - parametricBlend(Math.min(timeDiff, timeConst) / timeConst);
         $(this).css('opacity', opacity);
     });
+}
 
+function manageScores() {
     // Change mesa score color based on completion
     $('.hCellDriverScore').each(function() {
         var blend = Math.round($(this).data('score'));
@@ -131,7 +130,9 @@ $(document).ready(function() {
             $(this).addClass('hCellDriverScore-almost');
         }
     });
+}
 
+function manageMatrixCellsHighlight() {
     $('.matrix').delegate('td', 'mouseover mouseleave', function(e) {
         // Get cell, row and table elements
         var cell = $(this);
@@ -176,4 +177,48 @@ $(document).ready(function() {
             }
         }
     });
+}
+
+function manageTheme() {
+    // Apply preferred theme, if defined.
+    const currentTheme = window.localStorage.getItem("preferred-theme");
+    if (currentTheme !== null) {
+        document.body.classList.toggle(currentTheme);
+    }
+
+    // Get switch button and OS preference.
+    const switchBtn = document.querySelector('.theme-switch input[type="checkbox"]');
+    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+    // Change button state depending on current theme.
+    if ((currentTheme !== null && currentTheme === "dark-theme") ||
+        (prefersDarkScheme.matches && (currentTheme === null || currentTheme === "dark-theme"))) {
+        switchBtn.checked = true;
+    }
+
+    // Listen for a click on the button.
+    switchBtn.addEventListener("change", function() {
+        if (prefersDarkScheme.matches) {
+            // If OS pref matches dark mode, apply the .light-theme class to override those styles
+            const darkThemeEnabled = document.body.classList.toggle("dark-theme");
+            document.body.classList.toggle("light-theme");
+            window.localStorage.setItem("preferred-theme", darkThemeEnabled ? "dark-theme" : "light-theme");
+        }
+        else {
+            // Otherwise, apply the .dark-theme class to override the default light styles
+            const darkThemeEnabled = document.body.classList.toggle("dark-theme");
+            document.body.classList.toggle("light-theme");
+            window.localStorage.setItem("preferred-theme", darkThemeEnabled ? "dark-theme" : "light-theme");
+        }
+    });
+}
+
+$(document).ready(function () {
+    manageTheme();
+    manageDates();
+    manageScores();
+    manageMatrixCellsHighlight();
+
+    // Add tipsy for the footnote.
+    $('.footnote').tipsy({gravity: 'w', fade: true});
 });
