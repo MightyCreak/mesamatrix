@@ -24,17 +24,126 @@ html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}main{display:b
 html{box-sizing:border-box}*,*:after,*:before{box-sizing:inherit}
 
 body {
+    --text-color: #222;
+    --bkg-color: #fff;
+    --anchor-color: #0033cc;
+    --visited-anchor-color: #8282d2;
+
+    --lb-bkg-color: #d3d7cf;
+    --lb-same-rank-color: #9e9e9e;
+    --lb-1st-color: rgba(195, 255, 155, 1.00);
+    --lb-2nd-color: rgba(195, 255, 155, 0.67);
+    --lb-3rd-color: rgba(195, 255, 155, 0.33);
+    --lb-pct-score-color: rgb(120, 120, 120);
+
+    --matrix-ext-default-color: var(--lb-bkg-color);
+    --matrix-ext-software-color: #d1b4ce;
+    --matrix-ext-intel-color: #b9cee4;
+    --matrix-ext-nvidia-color: #d5f796;
+    --matrix-ext-amd-color: #f7b5b2;
+    --matrix-ext-qualcomm-color: #c7dce8;
+    --matrix-ext-vivante-color: #a6d87a;
+    --matrix-ext-broadcom-color: #ff8e8e;
+    --matrix-ext-arm-color: #7acde8;
+    --matrix-ext-emulation-color:  #ffd6fc;
+    --matrix-ext-hover-color: #ededed;
+}
+
+/* Dark theme OS override */
+body.dark-theme {
+    --text-color: #cfcfcf;
+    --bkg-color: #3b3b3b;
+    --anchor-color: #809fff;
+    --visited-anchor-color: #8282d2;
+
+    --lb-bkg-color: #6f726d;
+    --lb-same-rank-color: #9e9e9e;
+    --lb-1st-color: rgb(90, 122, 68);
+    --lb-2nd-color: rgba(90, 122, 68, 0.67);
+    --lb-3rd-color: rgba(90, 122, 68, 0.33);
+    --lb-pct-score-color: rgb(163, 163, 163);
+
+    --matrix-ext-default-color: var(--lb-bkg-color);
+    --matrix-ext-software-color: #726170;
+    --matrix-ext-intel-color: #667280;
+    --matrix-ext-nvidia-color: #798f52;
+    --matrix-ext-amd-color: #9e7371;
+    --matrix-ext-qualcomm-color: #77848b;
+    --matrix-ext-vivante-color: #638148;
+    --matrix-ext-broadcom-color: #a15959;
+    --matrix-ext-arm-color: #497b8b;
+    --matrix-ext-emulation-color:  #8f778d;
+    --matrix-ext-hover-color: #535353;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        --text-color: #cfcfcf;
+        --bkg-color: #3b3b3b;
+        --anchor-color: #809fff;
+        --visited-anchor-color: #8282d2;
+
+        --lb-bkg-color: #6f726d;
+        --lb-same-rank-color: #9e9e9e;
+        --lb-1st-color: rgb(90, 122, 68);
+        --lb-2nd-color: rgba(90, 122, 68, 0.67);
+        --lb-3rd-color: rgba(90, 122, 68, 0.33);
+        --lb-pct-score-color: rgb(163, 163, 163);
+
+        --matrix-ext-default-color: var(--lb-bkg-color);
+        --matrix-ext-software-color: #726170;
+        --matrix-ext-intel-color: #667280;
+        --matrix-ext-nvidia-color: #798f52;
+        --matrix-ext-amd-color: #9e7371;
+        --matrix-ext-qualcomm-color: #77848b;
+        --matrix-ext-vivante-color: #638148;
+        --matrix-ext-broadcom-color: #a15959;
+        --matrix-ext-arm-color: #497b8b;
+        --matrix-ext-emulation-color:  #8f778d;
+        --matrix-ext-hover-color: #535353;
+    }
+
+    /* Light theme OS override */
+    body.light-theme {
+        --text-color: #222;
+        --bkg-color: #fff;
+        --anchor-color: #0033cc;
+        --visited-anchor-color: #8282d2;
+
+        --lb-bkg-color: #d3d7cf;
+        --lb-same-rank-color: #9e9e9e;
+        --lb-1st-color: rgba(195, 255, 155, 1.00);
+        --lb-2nd-color: rgba(195, 255, 155, 0.67);
+        --lb-3rd-color: rgba(195, 255, 155, 0.33);
+        --lb-pct-score-color: rgb(120, 120, 120);
+
+        --matrix-ext-default-color: var(--lb-bkg-color);
+        --matrix-ext-software-color: #d1b4ce;
+        --matrix-ext-intel-color: #b9cee4;
+        --matrix-ext-nvidia-color: #d5f796;
+        --matrix-ext-amd-color: #f7b5b2;
+        --matrix-ext-qualcomm-color: #c7dce8;
+        --matrix-ext-vivante-color: #a6d87a;
+        --matrix-ext-broadcom-color: #ff8e8e;
+        --matrix-ext-arm-color: #7acde8;
+        --matrix-ext-emulation-color:  #ffd6fc;
+        --matrix-ext-hover-color: #ededed;
+    }
+}
+
+body {
     font-family: 'Liberation Sans', 'Arial', sans-serif;
-    background-color: #ffffff;
+    background-color: var(--bkg-color);
+    color: var(--text-color);
     margin: 0 2em 2em 2em;
 }
 
 a:link {
     text-decoration: none;
-    color: rgb(20, 20, 210);
+    color: var(--anchor-color);
 }
 a:visited{
-    color: rgb(130, 130, 210);
+    color: var(--visited-anchor-color);
 }
 a:hover, a:active {
     text-decoration: underline;
@@ -59,16 +168,16 @@ main p {
 
 .lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; }
 .lb th, .lb td                  { padding: 0.25em 0.5em; }
-.lb th                          { background-color: #d3d7cf; }
-.lb td                          { border: 1px solid #d3d7cf; }
+.lb th                          { background-color: var(--lb-bkg-color); }
+.lb td                          { border: 1px solid var(--lb-bkg-color); }
 .lbCol-rank                     { text-align: center; }
-.lbCol-rank-same                { color: #9e9e9e; }
+.lbCol-rank-same                { color: var(--lb-same-rank-color); }
 .lbCol-driver                   { min-width: 16em; }
 .lbCol-score, .lbCol-version    { text-align: right; min-width: 8em; }
-.lbCol-pctScore                 { font-size: 0.8em; color: rgb(120, 120, 120); }
-.lbCol-1st td                   { background-color: rgba(195, 255, 155, 1.00); }
-.lbCol-2nd td                   { background-color: rgba(195, 255, 155, 0.67); }
-.lbCol-3rd td                   { background-color: rgba(195, 255, 155, 0.33); }
+.lbCol-pctScore                 { font-size: 0.8em; color: var(--lb-pct-score-color); }
+.lbCol-1st td                   { background-color: var(--lb-1st-color); }
+.lbCol-2nd td                   { background-color: var(--lb-2nd-color); }
+.lbCol-3rd td                   { background-color: var(--lb-3rd-color); }
 
 /**
  * Matrix table
@@ -109,16 +218,16 @@ details > summary {
 .hCellDriverScore-almost { color: #E1A25E; }
 .hCellDriverScore-notyet { color: #B94B3D; }
 
-.hCellVendor-default    { background-color: #d3d7cf; }
-.hCellVendor-software   { background-color: #d1b4ce; }
-.hCellVendor-intel      { background-color: #b9cee4; }
-.hCellVendor-nvidia     { background-color: #d5f796; }
-.hCellVendor-amd        { background-color: #f7b5b2; }
-.hCellVendor-qualcomm   { background-color: #c7dce8; }
-.hCellVendor-vivante    { background-color: #a6d87a; }
-.hCellVendor-broadcom   { background-color: #ff8e8e; }
-.hCellVendor-arm        { background-color: #7acde8; }
-.hCellVendor-emulation  { background-color: #ffd6fc; }
+.hCellVendor-default    { background-color: var(--matrix-ext-default-color); }
+.hCellVendor-software   { background-color: var(--matrix-ext-software-color); }
+.hCellVendor-intel      { background-color: var(--matrix-ext-intel-color); }
+.hCellVendor-nvidia     { background-color: var(--matrix-ext-nvidia-color); }
+.hCellVendor-amd        { background-color: var(--matrix-ext-amd-color); }
+.hCellVendor-qualcomm   { background-color: var(--matrix-ext-qualcomm-color); }
+.hCellVendor-vivante    { background-color: var(--matrix-ext-vivante-color); }
+.hCellVendor-broadcom   { background-color: var(--matrix-ext-broadcom-color); }
+.hCellVendor-arm        { background-color: var(--matrix-ext-arm-color); }
+.hCellVendor-emulation  { background-color: var(--matrix-ext-emulation-color); }
 
 .hCellSep       { width: 0px; }
 
@@ -137,7 +246,7 @@ details > summary {
     min-width: 32em;
 }
 .extension > td:first-of-type.hover {
-    background-color: #ededed;
+    background-color: var(--matrix-ext-hover-color);
     opacity: 1.0;
 }
 
@@ -236,10 +345,66 @@ details > summary {
     border: 0;
 }
 
-@media screen and (max-width: 1400px) {
+/* Simple CSS for toggle switch */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+}
 
-#github-ribbon {
+.theme-switch {
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    width: 40px;
+}
+
+.theme-switch-wrapper input {
     display: none;
 }
 
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+}
+
+.slider::before {
+    background-color: #fff;
+    bottom: 3px;
+    content: "";
+    height: 18px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 18px;
+}
+
+input:checked + .slider {
+    background-color: #66bb6a;
+}
+
+input:checked + .slider::before {
+    transform: translateX(14px);
+}
+
+.slider.round {
+    border-radius: 12px;
+}
+
+.slider.round::before {
+    border-radius: 50%;
+}
+
+@media screen and (max-width: 1400px) {
+    #github-ribbon {
+        display: none;
+    }
 }
