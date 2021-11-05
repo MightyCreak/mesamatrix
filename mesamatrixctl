@@ -20,7 +20,8 @@
  */
 
 require_once "lib/base.php";
-ini_set('display_errors', 1);
+
+ini_set('display_errors', '1');
 
 $application = new \Mesamatrix\Console\Application();
 $application->run();

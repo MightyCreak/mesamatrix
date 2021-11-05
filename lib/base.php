@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//declare(strict_types=1);
+
 use Monolog\Logger;
 use Monolog\ErrorHandler;
 use Monolog\Handler\ErrorLogHandler;
@@ -72,8 +74,8 @@ class Mesamatrix
         }
 
         if ($logLevel < Logger::INFO) {
-            ini_set('error_reporting', E_ALL);
-            ini_set('display_errors', 1);
+            ini_set('display_errors', '1');
+            error_reporting(E_ALL);
         }
 
         // Check extensions dependencies
@@ -82,10 +84,10 @@ class Mesamatrix
             exit(1);
         }
 
-        // initialise request
+        // Initialize request
         self::$request = HTTPRequest::createFromGlobals();
 
-        self::$logger->debug('Base initialisation complete');
+        self::$logger->debug('Base initialization complete');
 
         self::$logger->debug('Log level: '.self::$logger->getLevelName($logLevel));
         self::$logger->debug('PHP error_reporting: 0x'.dechex(ini_get('error_reporting')));
@@ -98,4 +100,3 @@ class Mesamatrix
 }
 
 \Mesamatrix::init();
-
