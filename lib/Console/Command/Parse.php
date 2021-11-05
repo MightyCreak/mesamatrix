@@ -590,6 +590,14 @@ class Parse extends Command
                     $linkNode->addAttribute("href", $openglUrl);
                 }
             }
+            else if (preg_match("/VK_[^_]+_[a-zA-Z0-9_]+/", $ext->getName(), $matches) === 1) {
+                $vulkanUrl = \Mesamatrix::$config->getValue("vulkan_links", "url_vk").urlencode($matches[0]).".txt";
+
+                if ($this->urlCache->isValid($vulkanUrl)) {
+                    $linkNode = $xmlExt->addChild("link", $matches[0]);
+                    $linkNode->addAttribute("href", $vulkanUrl);
+                }
+            }
         }
 
         $mesaStatus = $xmlExt->addChild("mesa");

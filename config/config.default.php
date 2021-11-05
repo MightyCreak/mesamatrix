@@ -39,6 +39,12 @@ $CONFIG = array(
         "cache_file" => "urlcache.json",
     ),
 
+    "vulkan_links" => array(
+        "enabled" => TRUE,
+        "url_vk" => "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/main/appendices/",
+        "cache_file" => "urlcache.json",
+    ),
+
     "git" => array(
         "mesa_web" => "https://gitlab.freedesktop.org/mesa/mesa",
         "mesa_url" => "https://gitlab.freedesktop.org/mesa/mesa.git",
