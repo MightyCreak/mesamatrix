@@ -21,6 +21,7 @@
 
 namespace Mesamatrix\Console\Command;
 
+use \Symfony\Component\Console\Command\Command;
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Input\InputOption;
 use \Symfony\Component\Console\Output\OutputInterface;
@@ -38,13 +39,14 @@ use \Mesamatrix\Parser\Hints;
  * It reads all the commits of the file features.txt and transform it to an XML
  * file. The entry point for this class is the `execute()` method.
  */
-class Parse extends \Symfony\Component\Console\Command\Command
+class Parse extends Command
 {
     protected $output;
     protected $statuses;
     protected $urlCache;
 
-    protected function configure() {
+    protected function configure(): void
+    {
         $this->setName('parse')
              ->setDescription('Parse data and generate XML')
              ->addOption('force', '-f',
@@ -55,7 +57,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
                          'Regenerate the XML based on the already parsed commits');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $force = $input->getOption('force');
         $regenXml = $input->getOption('regenerate-xml');
 
@@ -80,7 +83,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
 
         if (empty($commits)) {
             // No commit found, exit.
-            return 1;
+            return Command::FAILURE;
         }
 
         $numCommits = count($commits);
@@ -112,7 +115,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         if ($lastCommitFetched === $lastCommitParsed) {
             \Mesamatrix::$logger->info("No new commit, no need to parse.");
             if (!$regenXml)
-                return 0;
+                return Command::SUCCESS;
         }
 
         // Ensure existence of the commits directory.
@@ -121,7 +124,7 @@ class Parse extends \Symfony\Component\Console\Command\Command
         if (!is_dir($commitsDir)) {
             if (!mkdir($commitsDir)) {
                 \Mesamatrix::$logger->critical('Couldn\'t create directory `'.$commitsDir.'`.');
-                return 1;
+                return Command::FAILURE;
             }
         }
 
@@ -159,6 +162,8 @@ class Parse extends \Symfony\Component\Console\Command\Command
             fwrite($h, $lastCommitFetched);
             fclose($h);
         }
+
+        return Command::SUCCESS;
     }
 
     /**
