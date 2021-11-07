@@ -20,7 +20,8 @@
 
 namespace Mesamatrix\Parser;
 
-use \Mesamatrix\Git\Commit;
+use Mesamatrix\Git\Commit;
+use Mesamatrix\Mesamatrix;
 
 class Extension
 {
@@ -52,7 +53,7 @@ class Extension
         foreach ($supportedDrivers as $driverNameAndHint) {
             list($driverName, $driverHint) = self::splitDriverNameAndHint($driverNameAndHint, $apiDrivers);
             if ($driverName === null) {
-                \Mesamatrix::$logger->error("Unrecognized driver: '$driverNameAndHint'");
+                Mesamatrix::$logger->error("Unrecognized driver: '$driverNameAndHint'");
             }
 
             $supportedDriver = new SupportedDriver($driverName, $this->hints);
@@ -160,7 +161,7 @@ class Extension
     /**
      * Detects if the current extension depends on another one and merge the drivers.
      *
-     * @param \Mesamatrix\Parser\Matrix $matrix The entire matrix.
+     * @param Matrix $matrix The entire matrix.
      */
     public function solveExtensionDependencies($matrix) {
         $hint = $this->getHint();
@@ -171,7 +172,7 @@ class Extension
         foreach (Constants::RE_DEP_DRIVERS_HINTS as $reDepDriversHint) {
             if (preg_match($reDepDriversHint[0], $hint, $matches) === 1) {
                 switch ($reDepDriversHint[2]) {
-                    case DependsOn::Extension:
+                    case DependsOn::EXTENSION:
                     {
                         $depExt = $matrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
                         if ($depExt !== NULL) {
@@ -182,7 +183,7 @@ class Extension
                     }
                     break;
 
-                    case DependsOn::GlesVersion:
+                    case DependsOn::GLES_VERSION:
                     {
                         $supportedDriverNames = $matrix->getDriversSupportingGlesVersion($matches[$reDepDriversHint[3]]);
                         if ($supportedDriverNames !== NULL) {
@@ -261,4 +262,4 @@ class Extension
     private array $supportedDrivers;
     private ?Commit $modifiedAt;
     private array $subextensions;
-};
+}

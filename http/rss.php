@@ -21,16 +21,17 @@
 
 require_once "../lib/base.php";
 
-use \Symfony\Component\HttpFoundation\Response as HTTPResponse;
-use \Suin\RSSWriter\Feed as RSSFeed;
-use \Suin\RSSWriter\Channel as RSSChannel;
-use \Suin\RSSWriter\Item as RSSItem;
+use Mesamatrix\Mesamatrix;
+use Symfony\Component\HttpFoundation\Response as HTTPResponse;
+use Suin\RSSWriter\Feed as RSSFeed;
+use Suin\RSSWriter\Channel as RSSChannel;
+use Suin\RSSWriter\Item as RSSItem;
 
 function rssGenerationNeeded(string $featuresXmlFilepath, string $rssFilepath)
 {
     if (file_exists($featuresXmlFilepath) && file_exists($rssFilepath))
     {
-        $lastCommitFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
+        $lastCommitFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
             . '/last_commit_parsed';
         if (file_exists($lastCommitFilepath))
         {
@@ -46,7 +47,7 @@ function generateRss(string $featuresXmlFilepath)
 {
     $xml = simplexml_load_file($featuresXmlFilepath);
     if (!$xml) {
-        \Mesamatrix::$logger->critical("Can't read ".$featuresXmlFilepath);
+        Mesamatrix::$logger->critical("Can't read ".$featuresXmlFilepath);
         exit();
     }
 
@@ -60,17 +61,17 @@ function generateRss(string $featuresXmlFilepath)
     // prepare RSS
     $rss = new RSSFeed();
 
-    $baseUrl = \Mesamatrix::$request->getSchemeAndHttpHost()
-        . \Mesamatrix::$request->getBasePath();
+    $baseUrl = Mesamatrix::$request->getSchemeAndHttpHost()
+        . Mesamatrix::$request->getBasePath();
 
     $channel = new RSSChannel();
     $channel
-        ->title(\Mesamatrix::$config->getValue("info", "title"))
-        ->description(\Mesamatrix::$config->getValue("info", "description"))
+        ->title(Mesamatrix::$config->getValue("info", "title"))
+        ->description(Mesamatrix::$config->getValue("info", "description"))
         ->url($baseUrl)
         ->appendTo($rss);
 
-    //$commitWeb = \Mesamatrix::$config->getValue("git", "mesa_commit_url");
+    //$commitWeb = Mesamatrix::$config->getValue("git", "mesa_commit_url");
 
     foreach ($xml->commits->commit as $commit) {
         if ((int)$commit["timestamp"] < $minTime)
@@ -97,8 +98,8 @@ function generateRss(string $featuresXmlFilepath)
     return $rss->render();
 }
 
-$featuresXmlFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
-$rssFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
+$featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
+$rssFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
     . '/rss.xml';
 
 $mustGenerateRss = rssGenerationNeeded($featuresXmlFilepath, $rssFilepath);
@@ -116,7 +117,7 @@ if ($mustGenerateRss)
         fclose($h);
     }
 
-    \Mesamatrix::$logger->info('RSS file generated.');
+    Mesamatrix::$logger->info('RSS file generated.');
 }
 else
 {
@@ -131,5 +132,5 @@ $response = new HTTPResponse(
     ['Content-Type' => 'text/xml']
 );
 
-$response->prepare(\Mesamatrix::$request);
+$response->prepare(Mesamatrix::$request);
 $response->send();

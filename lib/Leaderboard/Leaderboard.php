@@ -20,7 +20,7 @@
 
 namespace Mesamatrix\Leaderboard;
 
-use \Mesamatrix\Parser\Constants;
+use Mesamatrix\Parser\Constants;
 
 class Leaderboard {
     /**

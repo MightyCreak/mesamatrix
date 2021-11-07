@@ -20,6 +20,8 @@
 
 namespace Mesamatrix\Parser;
 
+use Mesamatrix\Mesamatrix;
+
 class UrlCache
 {
     const EXPIRATIONDELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
@@ -38,13 +40,13 @@ class UrlCache
      * This file is encoded in JSON.
      */
     public function load() {
-        $privateDir = \Mesamatrix::$config->getValue("info", "private_dir");
-        $filepath = $privateDir.'/'.\Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
+        $privateDir = Mesamatrix::$config->getValue("info", "private_dir");
+        $filepath = $privateDir.'/'.Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
         if (file_exists($filepath) !== FALSE) {
             $urlCacheContents = file_get_contents($filepath);
             if ($urlCacheContents !== FALSE) {
                 $this->cachedUrls = json_decode($urlCacheContents, true);
-                \Mesamatrix::$logger->info("URL cache file loaded.");
+                Mesamatrix::$logger->info("URL cache file loaded.");
             }
         }
     }
@@ -55,15 +57,15 @@ class UrlCache
      * This file is encoded in JSON.
      */
     public function save() {
-        $privateDir = \Mesamatrix::$config->getValue("info", "private_dir", "private");
+        $privateDir = Mesamatrix::$config->getValue("info", "private_dir", "private");
         if (file_exists($privateDir) === FALSE)
             mkdir($privateDir, 0777, true);
-        $filepath = $privateDir.'/'.\Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
+        $filepath = $privateDir.'/'.Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
         $res = file_put_contents($filepath, json_encode($this->cachedUrls));
         if ($res !== FALSE)
-            \Mesamatrix::$logger->info("URL cache file saved: ".$filepath.".");
+            Mesamatrix::$logger->info("URL cache file saved: ".$filepath.".");
         else
-            \Mesamatrix::$logger->error("Can't save URL cache file in \"".$filepath."\".");
+            Mesamatrix::$logger->error("Can't save URL cache file in \"".$filepath."\".");
     }
 
     /**
@@ -99,7 +101,7 @@ class UrlCache
         $urlHeader = get_headers($url);
         $isValid = FALSE;
         if ($urlHeader !== FALSE) {
-            \Mesamatrix::$logger->info("Try URL \"".$url."\". Result: \"".$urlHeader[0]."\".");
+            Mesamatrix::$logger->info("Try URL \"".$url."\". Result: \"".$urlHeader[0]."\".");
             $isValid = $urlHeader[0] === "HTTP/1.1 200 OK";
         }
 

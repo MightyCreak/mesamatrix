@@ -21,9 +21,11 @@
 
 namespace Mesamatrix\Console\Command;
 
-use \Symfony\Component\Console\Command\Command;
-use \Symfony\Component\Console\Input\InputInterface;
-use \Symfony\Component\Console\Output\OutputInterface;
+use Mesamatrix\Mesamatrix;
+use Mesamatrix\Git\Process;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Setup extends Command
 {
@@ -37,10 +39,10 @@ class Setup extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $dateLastYear = date("Y-m-d", time() - 31536000);
-        $branch = \Mesamatrix::$config->getValue("git", "branch");
-        $git = new \Mesamatrix\Git\Process(array(
+        $branch = Mesamatrix::$config->getValue("git", "branch");
+        $git = new Process(array(
             'clone', '--bare', "--shallow-since=$dateLastYear", "--branch=$branch",
-            \Mesamatrix::$config->getValue('git', 'mesa_url'), '@gitDir@'
+            Mesamatrix::$config->getValue('git', 'mesa_url'), '@gitDir@'
         ));
         $git->setTimeout(null);
         $this->getHelper('process')->mustRun($output, $git);

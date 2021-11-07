@@ -20,6 +20,8 @@
 
 namespace Mesamatrix\Parser;
 
+use Mesamatrix\Mesamatrix;
+
 class ApiVersion
 {
     public function __construct(
@@ -132,7 +134,7 @@ class ApiVersion
     /**
      * Parse all the extensions in the version and solve them.
      *
-     * @param \Mesamatrix\Parser\Matrix $matrix The entire matrix.
+     * @param Matrix $matrix The entire matrix.
      */
     public function solveExtensionDependencies($matrix) {
         foreach ($this->getExtensions() as $ext) {
@@ -157,7 +159,7 @@ class ApiVersion
                 // Get driver name and verify it's valid.
                 $driverName = (string) $xmlSupportedDriver['name'];
                 if (!in_array($driverName, $apiDrivers)) {
-                    \Mesamatrix::$logger->error('Unrecognized driver: '.$driverName);
+                    Mesamatrix::$logger->error('Unrecognized driver: '.$driverName);
                     continue;
                 }
 
@@ -232,4 +234,4 @@ class ApiVersion
     private ?string $glslVersion;
     private Hints $hints;
     private array $extensions;
-};
+}

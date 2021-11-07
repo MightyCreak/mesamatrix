@@ -117,7 +117,7 @@ abstract class Constants
     // 2: dependency type
     // 3: dependency match index
     const RE_DEP_DRIVERS_HINTS = [
-        [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", TRUE, DependsOn::Extension, 1 ],
-        [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", TRUE, DependsOn::GlesVersion, 1 ],
+        [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", TRUE, DependsOn::EXTENSION, 1 ],
+        [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", TRUE, DependsOn::GLES_VERSION, 1 ],
     ];
 }

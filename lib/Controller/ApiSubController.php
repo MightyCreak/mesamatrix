@@ -20,24 +20,27 @@
 
 namespace Mesamatrix\Controller;
 
+use Mesamatrix\Mesamatrix;
+use Mesamatrix\Leaderboard\Leaderboard;
+use Mesamatrix\Parser\Constants;
+use SimpleXMLElement;
+
 class ApiSubController
 {
-    private $api = "";
-    private $xml = null;
-    private $leaderboard = null;
-    private $showLbVersion = true;
-    private $matrix = array();
+    private string $api = "";
+    private bool $showLbVersion;
+    private ?SimpleXMLElement $xml = null;
+    private ?Leaderboard $leaderboard = null;
+    private array $matrix;
 
-    public function __construct(string $api, bool $showLbVersion) {
+    public function __construct(string $api, bool $showLbVersion)
+    {
         $this->api = $api;
         $this->showLbVersion = $showLbVersion;
     }
 
-    public function getLeaderboard() {
-        return $this->leaderboard;
-    }
-
-    public function prepare() {
+    public function prepare(): void
+    {
         $this->xml = $this->loadMesamatrixXml();
 
         $xmlApi = null;
@@ -52,23 +55,26 @@ class ApiSubController
         $this->createMatrixModel($xmlApi);
     }
 
-    private function loadMesamatrixXml() {
-        $featuresXmlFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'xml_file'));
+    private function loadMesamatrixXml(): ?SimpleXMLElement
+    {
+        $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'xml_file'));
         $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
-            \Mesamatrix::$logger->critical('Can\'t read '.$featuresXmlFilepath);
+            Mesamatrix::$logger->critical('Can\'t read '.$featuresXmlFilepath);
             exit();
         }
 
         return $xml;
     }
 
-    private function createLeaderboard(\SimpleXMLElement $xmlApi) {
-        $this->leaderboard = new \Mesamatrix\Leaderboard\Leaderboard($this->showLbVersion);
+    private function createLeaderboard(SimpleXMLElement $xmlApi): void
+    {
+        $this->leaderboard = new Leaderboard($this->showLbVersion);
         $this->leaderboard->load($xmlApi);
     }
 
-    public function createMatrixModel(\SimpleXMLElement $xmlApi) {
+    public function createMatrixModel(SimpleXMLElement $xmlApi): void
+    {
         $this->matrix = array();
         $this->createColumns($this->matrix, $xmlApi);
 
@@ -78,11 +84,13 @@ class ApiSubController
         $this->matrix['last_updated'] = (int) $this->xml['updated'];
     }
 
-    public function getLastUpdatedTime() {
+    public function getLastUpdatedTime(): int
+    {
         return $this->matrix['last_updated'];
     }
 
-    private function createColumns(array &$matrix, \SimpleXMLElement $xmlApi) {
+    private function createColumns(array &$matrix, SimpleXMLElement $xmlApi): void
+    {
         $matrix['column_groups'] = array();
         $matrix['columns'] = array();
 
@@ -162,7 +170,8 @@ class ApiSubController
         }
     }
 
-    private function addApiSection(array &$matrix, \SimpleXmlElement $xmlApi) {
+    private function addApiSection(array &$matrix, \SimpleXmlElement $xmlApi): void
+    {
         $xmlVersions = array();
         foreach ($xmlApi->versions->version as $xmlVersion) {
             $xmlVersions[] = $xmlVersion;
@@ -193,7 +202,8 @@ class ApiSubController
         $matrix['sections'][] = $api;
     }
 
-    private function addSection(array &$section, \SimpleXMLElement $xmlVersion, \SimpleXMLElement $vendors) {
+    private function addSection(array &$section, SimpleXMLElement $xmlVersion, SimpleXMLElement $vendors): void
+    {
         $name = "";
         if (!empty($xmlVersion['version'])) {
             $name = $xmlVersion['name'];
@@ -243,9 +253,10 @@ class ApiSubController
 
     private function addExtension(
         array &$subsection,
-        \SimpleXMLElement $xmlExt,
+        SimpleXMLElement $xmlExt,
         bool $isSubExt,
-        \SimpleXMLElement $vendors) {
+        SimpleXMLElement $vendors): void
+    {
         $extension = array(
             'name' => $xmlExt['name'],
         );
@@ -262,9 +273,9 @@ class ApiSubController
         }
 
         $extTask = array();
-        if ($xmlExt->mesa['status'] == \Mesamatrix\Parser\Constants::STATUS_DONE)
+        if ($xmlExt->mesa['status'] == Constants::STATUS_DONE)
             $extTask['class'] = 'isDone';
-        elseif ($xmlExt->mesa['status'] == \Mesamatrix\Parser\Constants::STATUS_NOT_STARTED)
+        elseif ($xmlExt->mesa['status'] == Constants::STATUS_NOT_STARTED)
             $extTask['class'] = 'isNotStarted';
         else
             $extTask['class'] = 'isInProgress';
@@ -296,7 +307,8 @@ class ApiSubController
         $subsection['extensions'][] = $extension;
     }
 
-    public function writeMatrix() {
+    public function writeMatrix(): void
+    {
 // Sections.
 foreach($this->matrix['sections'] as $section):
     $sectionName = (string)$section['name'];
@@ -456,13 +468,13 @@ endforeach;
 <?php
     }
 
-    private function writeLeaderboard() {
-        $leaderboard = $this->getLeaderboard();
-        $sortedDrivers = $leaderboard->getDriversSortedByExtsDone($this->api);
-        $numTotalExts = $leaderboard->getNumTotalExts();
+    private function writeLeaderboard(): void
+    {
+        $sortedDrivers = $this->leaderboard->getDriversSortedByExtsDone($this->api);
+        $numTotalExts = $this->leaderboard->getNumTotalExts();
         $colNames = [ '#', 'Driver', 'Extensions' ];
         if ($this->showLbVersion) {
-            $colNames[] = $this->api;
+            $colNames[] = 'Version';
         }
 ?>
     <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
@@ -533,4 +545,4 @@ endforeach;
     </table>
 <?php
     }
-};
+}

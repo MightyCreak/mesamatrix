@@ -21,9 +21,11 @@
 
 namespace Mesamatrix\Console\Command;
 
-use \Symfony\Component\Console\Command\Command;
-use \Symfony\Component\Console\Input\InputInterface;
-use \Symfony\Component\Console\Output\OutputInterface;
+use Mesamatrix\Git\Process;
+use Mesamatrix\Mesamatrix;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Fetch extends Command
 {
@@ -36,8 +38,8 @@ class Fetch extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $branch = \Mesamatrix::$config->getValue("git", "branch");
-        $fetch = new \Mesamatrix\Git\Process(array('fetch', '-f', 'origin', "$branch:$branch"));
+        $branch = Mesamatrix::$config->getValue("git", "branch");
+        $fetch = new Process(array('fetch', '-f', 'origin', "$branch:$branch"));
         $this->getHelper('process')->mustRun($output, $fetch);
 
         return Command::SUCCESS;

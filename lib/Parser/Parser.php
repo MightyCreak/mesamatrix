@@ -20,6 +20,8 @@
 
 namespace Mesamatrix\Parser;
 
+use Mesamatrix\Mesamatrix;
+
 class Parser
 {
     public function parse($filename) {
@@ -46,7 +48,7 @@ class Parser
      * Parse a stream of features.txt.
      *
      * @param $handle The stream handle.
-     * @return \Mesamatrix\Parser\Matrix The matrix.
+     * @return Matrix The matrix.
      */
     public function parseStream($handle) {
         $matrix = new Matrix();
@@ -166,15 +168,15 @@ class Parser
      * "All extensions". This is needed for Vulkan 1.0 (until there is a better
      * parser).
      *
-     * @param \Mesamatrix\Parser\ApiVersion $apiVersion The version section to feed during parsing.
-     * @param \Mesamatrix\Parser\Matrix $matrix The matrix to feed during parsing.
+     * @param ApiVersion $apiVersion The version section to feed during parsing.
+     * @param Matrix $matrix The matrix to feed during parsing.
      * @param $handle The file handle.
      * @param array() $allSupportedDrivers Drivers that already support all the extension in the section.
      *
      * @return The next line unparsed.
      */
-    private function parseSection(\Mesamatrix\Parser\ApiVersion $apiVersion,
-                                  \Mesamatrix\Parser\Matrix $matrix,
+    private function parseSection(ApiVersion $apiVersion,
+                                  Matrix $matrix,
                                   $handle,
                                   $allSupportedDrivers = array()) {
         $line = $this->skipEmptyLines(fgets($handle), $handle);
@@ -397,7 +399,7 @@ class Parser
                     if (preg_match($reDepDriversHint[0], $hintItem) === 1) {
                         if ($reAllDriversHint[1] === true) {
                             if ($useHint !== null) {
-                                \Mesamatrix::$logger->warning('Unhandled situation: more than one extension dependency');
+                                Mesamatrix::$logger->warning('Unhandled situation: more than one extension dependency');
                             }
 
                             $useHint = $hintItem;
@@ -424,4 +426,4 @@ class Parser
 
     const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
     const RE_NOTE = "/^(\(.+\)) (.*)$/";
-};
+}
