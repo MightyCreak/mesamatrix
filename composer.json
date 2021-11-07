@@ -36,5 +36,9 @@
         "psr-4": {
             "Mesamatrix\\": "lib/"
         }
+    },
+
+    "scripts": {
+        "lint": "./vendor/bin/phpcs --standard=PSR1 --ignore='*.css,*.js' -n http lib"
     }
 }
