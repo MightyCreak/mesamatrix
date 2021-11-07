@@ -1,7 +1,7 @@
 {
     "name": "mesamatrix/mesamatrix",
     "description": "Mesamatrix website",
-    "license": "AGPL-3.0",
+    "license": "AGPL-3.0-or-later",
     "type": "project",
     "homepage": "https://mesamatrix.net",
 
@@ -19,13 +19,13 @@
     },
 
     "require": {
-        "symfony/console": "*",
-        "symfony/debug": "*",
-        "symfony/process": "*",
-        "symfony/monolog-bridge": "*",
-        "symfony/http-kernel": "*",
-        "monolog/monolog": "*",
-        "suin/php-rss-writer": "*"
+        "monolog/monolog": "2.*",
+        "suin/php-rss-writer": "1.*",
+        "symfony/console": "5.*",
+        "symfony/debug": "4.*",
+        "symfony/http-kernel": "5.*",
+        "symfony/monolog-bridge": "5.*",
+        "symfony/process": "5.*"
     },
 
     "require-dev": {
