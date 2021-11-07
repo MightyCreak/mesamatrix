@@ -44,7 +44,7 @@ class LbDriverScore
     /**
      * Set the number of extensions done.
      */
-    function setNumExtensionsDone($num)
+    public function setNumExtensionsDone($num)
     {
         $this->numExtsDone = $num;
     }
@@ -52,7 +52,7 @@ class LbDriverScore
     /**
      * Get the number of extensions done.
      */
-    function getNumExtensionsDone()
+    public function getNumExtensionsDone()
     {
         return $this->numExtsDone;
     }
@@ -60,7 +60,7 @@ class LbDriverScore
     /**
      * Set the total number of extensions.
      */
-    function setNumExtensions($num)
+    public function setNumExtensions($num)
     {
         $this->numExts = $num;
     }
@@ -68,7 +68,7 @@ class LbDriverScore
     /**
      * Get the total number of extensions.
      */
-    function getNumExtensions()
+    public function getNumExtensions()
     {
         return $this->numExts;
     }
@@ -76,7 +76,7 @@ class LbDriverScore
     /**
      * Get the score.
      */
-    function getScore()
+    public function getScore()
     {
         return $this->numExts !== 0 ? $this->numExtsDone / $this->numExts : 0;
     }
@@ -84,7 +84,7 @@ class LbDriverScore
     /**
      * Set the API version.
      */
-    function setApiVersion($apiVersion)
+    public function setApiVersion($apiVersion)
     {
         $this->apiVersion = $apiVersion;
     }
@@ -92,7 +92,7 @@ class LbDriverScore
     /**
      * Get the API version.
      */
-    function getApiVersion()
+    public function getApiVersion()
     {
         return $this->apiVersion;
     }

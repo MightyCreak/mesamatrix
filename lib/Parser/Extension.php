@@ -190,18 +190,15 @@ class Extension
             if (preg_match($reDepDriversHint[0], $hint, $matches) === 1) {
                 switch ($reDepDriversHint[2]) {
                     case DependsOn::EXTENSION:
-                    {
                         $depExt = $matrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
                         if ($depExt !== null) {
                             foreach ($depExt->supportedDrivers as $supportedDriver) {
                                 $this->addSupportedDriver($supportedDriver);
                             }
                         }
-                    }
-                    break;
+                        break;
 
                     case DependsOn::GLES_VERSION:
-                    {
                         $supportedDriverNames = $matrix->getDriversSupportingGlesVersion($matches[$reDepDriversHint[3]]);
                         if ($supportedDriverNames !== null) {
                             foreach ($supportedDriverNames as $supportedDriverName) {
@@ -213,8 +210,7 @@ class Extension
                                 $this->addSupportedDriver($supportedDriver);
                             }
                         }
-                    }
-                    break;
+                        break;
                 }
             }
         }
