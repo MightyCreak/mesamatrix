@@ -39,7 +39,7 @@ class UrlCache
      */
     public function load() {
         $privateDir = \Mesamatrix::$config->getValue("info", "private_dir");
-        $filepath = $privateDir.'/'.\Mesamatrix::$config->getValue("opengl_links", "cache_file", "urlcache.json");
+        $filepath = $privateDir.'/'.\Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
         if (file_exists($filepath) !== FALSE) {
             $urlCacheContents = file_get_contents($filepath);
             if ($urlCacheContents !== FALSE) {
@@ -58,7 +58,7 @@ class UrlCache
         $privateDir = \Mesamatrix::$config->getValue("info", "private_dir", "private");
         if (file_exists($privateDir) === FALSE)
             mkdir($privateDir, 0777, true);
-        $filepath = $privateDir.'/'.\Mesamatrix::$config->getValue("opengl_links", "cache_file", "urlcache.json");
+        $filepath = $privateDir.'/'.\Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
         $res = file_put_contents($filepath, json_encode($this->cachedUrls));
         if ($res !== FALSE)
             \Mesamatrix::$logger->info("URL cache file saved: ".$filepath.".");
