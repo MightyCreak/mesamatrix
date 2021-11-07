@@ -33,10 +33,11 @@ $CONFIG = array(
         "private_dir" => "private",
     ),
 
-    "opengl_links" => array(
+    "extension_links" => array(
         "enabled" => TRUE,
-        "url_gl" => "https://www.khronos.org/registry/OpenGL/extensions/",
         "cache_file" => "urlcache.json",
+        "opengl_base_url" => "https://www.khronos.org/registry/OpenGL/extensions/",
+        "vulkan_base_url" => "https://khronos.org/registry/vulkan/specs/1.2-extensions/man/html/",
     ),
 
     "git" => array(

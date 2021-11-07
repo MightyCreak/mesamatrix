@@ -577,7 +577,7 @@ class Parse extends Command
 
         if ($this->urlCache) {
             if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $ext->getName(), $matches) === 1) {
-                $openglUrl = \Mesamatrix::$config->getValue("opengl_links", "url_gl").urlencode($matches[2])."/";
+                $openglUrl = \Mesamatrix::$config->getValue("extension_links", "opengl_base_url").urlencode($matches[2])."/";
                 if ($matches[1] === "GLX") {
                     // Found a GLX_TYPE_Extension.
                     $openglUrl .= "GLX_";
@@ -588,6 +588,14 @@ class Parse extends Command
                 if ($this->urlCache->isValid($openglUrl)) {
                     $linkNode = $xmlExt->addChild("link", $matches[0]);
                     $linkNode->addAttribute("href", $openglUrl);
+                }
+            }
+            else if (preg_match("/VK_[^_]+_[a-zA-Z0-9_]+/", $ext->getName(), $matches) === 1) {
+                $vulkanUrl = \Mesamatrix::$config->getValue("extension_links", "vulkan_base_url").urlencode($matches[0]).".html";
+
+                if ($this->urlCache->isValid($vulkanUrl)) {
+                    $linkNode = $xmlExt->addChild("link", $matches[0]);
+                    $linkNode->addAttribute("href", $vulkanUrl);
                 }
             }
         }
@@ -633,7 +641,7 @@ class Parse extends Command
 
     protected function loadUrlCache() {
         $this->urlCache = NULL;
-        if(\Mesamatrix::$config->getValue("opengl_links", "enabled", false)) {
+        if(\Mesamatrix::$config->getValue("extension_links", "enabled", false)) {
             // Load URL cache.
             $this->urlCache = new UrlCache();
             $this->urlCache->load();
