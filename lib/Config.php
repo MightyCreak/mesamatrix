@@ -45,17 +45,17 @@ class Config
         }
         $logMsg = 'Unable to find config value for '.$section.'.'.$key;
         if (is_null($default)) {
-            \Mesamatrix::$logger->error($logMsg);
+            Mesamatrix::$logger->error($logMsg);
         }
         else {
-            \Mesamatrix::$logger->info($logMsg.', using default '.$default);
+            Mesamatrix::$logger->info($logMsg.', using default '.$default);
         }
         return $default;
     }
 
     public function readData($configFile) {
         if (file_exists($configFile)) {
-            \Mesamatrix::$logger->info('Loading configuration file '.$configFile);
+            Mesamatrix::$logger->info('Loading configuration file '.$configFile);
             @include $configFile;
             if (isset($CONFIG) && is_array($CONFIG)) {
                 foreach ($CONFIG as $section => $sectionConfig) {

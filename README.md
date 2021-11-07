@@ -45,7 +45,7 @@ copy this contents:
 ```php
 <?php
 
-use \Monolog\Logger as Log;
+use Monolog\Logger as Log;
 
 $CONFIG = array(
     "info" => array(

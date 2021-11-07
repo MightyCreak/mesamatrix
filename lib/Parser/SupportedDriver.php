@@ -20,7 +20,7 @@
 
 namespace Mesamatrix\Parser;
 
-use \Mesamatrix\Git\Commit;
+use Mesamatrix\Git\Commit;
 
 class SupportedDriver
 {
@@ -66,4 +66,4 @@ class SupportedDriver
     private $hints;
     private $hintIdx;
     private $modifiedAt;
-};
+}

@@ -48,4 +48,4 @@ class DriversController extends BaseController
             </p>
 <?php
     }
-};
+}

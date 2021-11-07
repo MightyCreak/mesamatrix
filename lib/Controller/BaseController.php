@@ -20,6 +20,8 @@
 
 namespace Mesamatrix\Controller;
 
+use Mesamatrix\Mesamatrix;
+
 abstract class BaseController
 {
     public $pages = array(
@@ -32,7 +34,7 @@ abstract class BaseController
     private $jsScripts = [];
 
     public function __construct() {
-        $this->addCssScript('css/style.css?v='.(\Mesamatrix::$config->getValue("info", "version")));
+        $this->addCssScript('css/style.css?v='.(Mesamatrix::$config->getValue("info", "version")));
 
         $this->addJsScript('js/jquery-1.11.3.min.js');
     }
@@ -93,11 +95,11 @@ abstract class BaseController
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
-        <meta name="description" content="<?= \Mesamatrix::$config->getValue("info", "description") ?>"/>
+        <meta name="description" content="<?= Mesamatrix::$config->getValue("info", "description") ?>"/>
 
-        <title><?= \Mesamatrix::$config->getValue("info", "title") ?></title>
+        <title><?= Mesamatrix::$config->getValue("info", "title") ?></title>
 
-        <meta property="og:title" content="Mesamatrix: <?= \Mesamatrix::$config->getValue("info", "title") ?>" />
+        <meta property="og:title" content="Mesamatrix: <?= Mesamatrix::$config->getValue("info", "title") ?>" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="//mesamatrix.net/images/mesamatrix-logo.png" />
 
@@ -157,7 +159,7 @@ abstract class BaseController
 ?>
         </main>
         <footer>
-            <a id="github-ribbon" href="<?= \Mesamatrix::$config->getValue("info", "project_url") ?>"><img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
+            <a id="github-ribbon" href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="checkbox">
                     <input type="checkbox" id="checkbox" />
@@ -169,4 +171,4 @@ abstract class BaseController
 </html>
 <?php
     }
-};
+}

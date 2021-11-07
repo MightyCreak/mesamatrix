@@ -37,7 +37,7 @@ class Matrix
     /**
      * Get the API versions.
      *
-     * @return \Mesamatrix\Parser\ApiVersion[] The API versions array.
+     * @return ApiVersion[] The API versions array.
      */
     public function getApiVersions() {
         return $this->apiVersions;
@@ -49,7 +49,7 @@ class Matrix
      * @param string $name The API name.
      * @param string $version The API version.
      *
-     * @return \Mesamatrix\Parser\ApiVersion The API version is found; NULL otherwise.
+     * @return ApiVersion The API version is found; NULL otherwise.
      */
     public function getApiVersionByName($name, $version) {
         foreach ($this->apiVersions as $apiVersion) {
@@ -66,7 +66,7 @@ class Matrix
      *
      * @param string $substr The substring to find.
      *
-     * @return \Mesamatrix\Parser\Extension The extension if found; NULL otherwise.
+     * @return Extension The extension if found; NULL otherwise.
      */
     public function getExtensionBySubstr($substr) {
         foreach ($this->getApiVersions() as $apiVersion) {
@@ -139,9 +139,9 @@ class Matrix
     /**
      * Get the hints.
      *
-     * @return \Mesamatrix\Parser\Hints The hints.
+     * @return Hints The hints.
      */
     public function getHints() {
         return $this->hints;
     }
-};
+}

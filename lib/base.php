@@ -20,83 +20,8 @@
 
 //declare(strict_types=1);
 
-use Monolog\Logger;
-use Monolog\ErrorHandler;
-use Monolog\Handler\ErrorLogHandler;
-use Monolog\Handler\StreamHandler;
-use Symfony\Component\HttpFoundation\Request as HTTPRequest;
+use Mesamatrix\Mesamatrix;
 
-class Mesamatrix
-{
-    public static $serverRoot; // Path to root of installation
-    public static $configDir; // Path to configuration directory
-    public static $config; // Config object
-    public static $autoloader; // Autoloader
-    public static $logger; // Logger
-    public static $request; // HTTP request object
+require_once dirname(__DIR__).'/vendor/autoload.php';
 
-    public static function init() {
-        date_default_timezone_set('UTC');
-
-        $dir = str_replace("\\", '/', __DIR__);
-        self::$serverRoot = implode('/', array_slice(explode('/', $dir), 0, -1));
-
-        self::$autoloader = (require self::path('vendor/autoload.php'));
-
-        self::$logger = new Logger('logger');
-        self::$logger->pushHandler(new ErrorLogHandler(
-            ErrorLogHandler::OPERATING_SYSTEM,
-            Logger::NOTICE
-        ));
-        ErrorHandler::register(self::$logger);
-
-        self::$configDir = self::path('config');
-        self::$config = new \Mesamatrix\Config(self::$configDir);
-
-        // attempt to create the private dir
-        $privateDir = self::path(self::$config->getValue('info', 'private_dir'));
-        if (!is_dir($privateDir)) {
-            mkdir($privateDir);
-        }
-
-        // register the log file
-        $logLevel = self::$config->getValue('info', 'log_level', Logger::WARNING);
-        $logPath = $privateDir.'/mesamatrix.log';
-        if (!file_exists($logPath) && is_dir($privateDir)) {
-            touch($logPath);
-        }
-        if (is_writable($logPath)) {
-            self::$logger->popHandler();
-            self::$logger->pushHandler(new StreamHandler($logPath, $logLevel));
-        }
-        else {
-            self::$logger->error('Error log '.$logPath.' is not writable!');
-        }
-
-        if ($logLevel < Logger::INFO) {
-            ini_set('display_errors', '1');
-            error_reporting(E_ALL);
-        }
-
-        // Check extensions dependencies
-        if (!extension_loaded('xml')) {
-            self::$logger->error('Could not find XML extension');
-            exit(1);
-        }
-
-        // Initialize request
-        self::$request = HTTPRequest::createFromGlobals();
-
-        self::$logger->debug('Base initialization complete');
-
-        self::$logger->debug('Log level: '.self::$logger->getLevelName($logLevel));
-        self::$logger->debug('PHP error_reporting: 0x'.dechex(ini_get('error_reporting')));
-        self::$logger->debug('PHP display_errors: '.ini_get('display_errors'));
-    }
-
-    public static function path($path) {
-        return self::$serverRoot.'/'.$path;
-    }
-}
-
-\Mesamatrix::init();
+Mesamatrix::init();

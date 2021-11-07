@@ -24,6 +24,6 @@ namespace Mesamatrix\Parser;
  * Enum for the type of a dependency
  */
 abstract class DependsOn {
-    const Extension = 0;
-    const GlesVersion = 1;
-};
+    const EXTENSION = 0;
+    const GLES_VERSION = 1;
+}

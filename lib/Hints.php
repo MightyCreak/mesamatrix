@@ -60,5 +60,4 @@ class Hints
     }
 
     private $list;
-};
-
+}

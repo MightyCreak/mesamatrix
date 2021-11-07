@@ -21,17 +21,20 @@
 
 namespace Mesamatrix\Console\Command;
 
-use \Symfony\Component\Console\Command\Command;
-use \Symfony\Component\Console\Input\InputInterface;
-use \Symfony\Component\Console\Input\InputOption;
-use \Symfony\Component\Console\Output\OutputInterface;
-use \Mesamatrix\Parser\Constants;
-use \Mesamatrix\Parser\Parser;
-use \Mesamatrix\Parser\Matrix;
-use \Mesamatrix\Parser\ApiVersion;
-use \Mesamatrix\Parser\Extension;
-use \Mesamatrix\Parser\UrlCache;
-use \Mesamatrix\Parser\Hints;
+use Mesamatrix\Mesamatrix;
+use Mesamatrix\Git\Commit;
+use Mesamatrix\Git\Process;
+use Mesamatrix\Parser\Constants;
+use Mesamatrix\Parser\Parser;
+use Mesamatrix\Parser\Matrix;
+use Mesamatrix\Parser\ApiVersion;
+use Mesamatrix\Parser\Extension;
+use Mesamatrix\Parser\UrlCache;
+use Mesamatrix\Parser\Hints;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class that handles the 'parse' command.
@@ -70,7 +73,7 @@ class Parse extends Command
 
         // Get commits for each files in filepaths.
         $commits = array();
-        $filepaths = \Mesamatrix::$config->getValue('git', 'filepaths', array());
+        $filepaths = Mesamatrix::$config->getValue('git', 'filepaths', array());
         foreach ($filepaths as $filepath) {
             $fileCommits = $this->fetchCommits($filepath['name'], $filepath['excluded_commits']);
             if ($fileCommits !== NULL) {
@@ -88,7 +91,7 @@ class Parse extends Command
 
         $numCommits = count($commits);
 
-        $lastCommitFilename = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
+        $lastCommitFilename = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
                             . '/last_commit_parsed';
 
         // Get last commit parsed.
@@ -103,27 +106,27 @@ class Parse extends Command
             }
         }
         else {
-            \Mesamatrix::$logger->info('Commits parsing forced.');
+            Mesamatrix::$logger->info('Commits parsing forced.');
         }
 
         // Get last commit fetched.
         $lastCommitFetched = $commits[$numCommits - 1]->getHash();
 
         // Compare last parsed and fetched commits.
-        \Mesamatrix::$logger->debug("Last commit fetched: ${lastCommitFetched}");
-        \Mesamatrix::$logger->debug("Last commit parsed:  ${lastCommitParsed}");
+        Mesamatrix::$logger->debug("Last commit fetched: ${lastCommitFetched}");
+        Mesamatrix::$logger->debug("Last commit parsed:  ${lastCommitParsed}");
         if ($lastCommitFetched === $lastCommitParsed) {
-            \Mesamatrix::$logger->info("No new commit, no need to parse.");
+            Mesamatrix::$logger->info("No new commit, no need to parse.");
             if (!$regenXml)
                 return Command::SUCCESS;
         }
 
         // Ensure existence of the commits directory.
-        $commitsDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
+        $commitsDir = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir'))
                    . '/commits';
         if (!is_dir($commitsDir)) {
             if (!mkdir($commitsDir)) {
-                \Mesamatrix::$logger->critical('Couldn\'t create directory `'.$commitsDir.'`.');
+                Mesamatrix::$logger->critical('Couldn\'t create directory `'.$commitsDir.'`.');
                 return Command::FAILURE;
             }
         }
@@ -142,7 +145,7 @@ class Parse extends Command
         }
 
         $newCommits = array_slice($commits, $firstNewCommitIdx);
-        \Mesamatrix::$logger->info("New commit(s) found: ".count($newCommits).".");
+        Mesamatrix::$logger->info("New commit(s) found: ".count($newCommits).".");
 
         $this->loadUrlCache();
 
@@ -171,26 +174,27 @@ class Parse extends Command
      *
      * @param string $filepath Features text file path.
      * @param string[] $excludedCommits The commits to exclude from the list.
-     * @return \Mesamatrix\Git\Commit[]|null Array of commits.
+     * @return Commit[]|null Array of commits.
      */
-    protected function fetchCommits($filepath, array $excludedCommits) {
-        $branch = \Mesamatrix::$config->getValue("git", "branch");
-        $gitCommitGet = new \Mesamatrix\Git\Process(array(
+    protected function fetchCommits($filepath, array $excludedCommits)
+    {
+        $branch = Mesamatrix::$config->getValue("git", "branch");
+        $gitCommitGet = new Process(array(
             'rev-list', $branch, '--reverse', '--', $filepath
         ));
         $gitCommitGet->mustRun();
         $oldestCommit = strtok($gitCommitGet->getOutput(), "\n");
 
         if (empty($oldestCommit)) {
-            \Mesamatrix::$logger->info('No oldest commit found for '.$filepath);
+            Mesamatrix::$logger->info('No oldest commit found for '.$filepath);
             return NULL;
         }
 
-        \Mesamatrix::$logger->info('Oldest commit for '.$filepath.': '.$oldestCommit);
+        Mesamatrix::$logger->info('Oldest commit for '.$filepath.': '.$oldestCommit);
 
         $logSeparator = uniqid('mesamatrix_separator_');
         $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
-        $gitLog = new \Mesamatrix\Git\Process(array(
+        $gitLog = new Process(array(
             'log', '--pretty=format:'.$logFormat, '--reverse', '-p',
             $oldestCommit.'..', '--', $filepath
         ));
@@ -199,7 +203,7 @@ class Parse extends Command
         $commitSections = explode($logSeparator . PHP_EOL, $gitLog->getOutput());
         if (empty($commitSections)) {
             // No commit? There must be a problem.
-            \Mesamatrix::$logger->error("No commit found.");
+            Mesamatrix::$logger->error("No commit found.");
             return NULL;
         }
 
@@ -215,7 +219,7 @@ class Parse extends Command
                 if (in_array($commitHash, $excludedCommits))
                     continue;
 
-                $commit = new \Mesamatrix\Git\Commit();
+                $commit = new Commit();
                 $commit->setFilepath($filepath)
                        ->setHash($commitHash)
                        ->setDate($commitData[1])
@@ -234,17 +238,18 @@ class Parse extends Command
     /**
      * Parse a commit.
      *
-     * @param \Mesamatrix\Git\Commit $commit The commit to parse.
+     * @param Commit $commit The commit to parse.
      */
-    protected function parseCommit(\Mesamatrix\Git\Commit $commit) {
+    protected function parseCommit(Commit $commit)
+    {
         // Show content for this commit.
         $filepath = $commit->getFilepath();
         $hash = $commit->getHash();
-        $cat = new \Mesamatrix\Git\Process(array('show', $hash.':'.$filepath));
+        $cat = new Process(array('show', $hash.':'.$filepath));
         $this->getHelper('process')->mustRun($this->output, $cat);
 
         // Parse the content.
-        \Mesamatrix::$logger->info('Parsing '.(basename($filepath)).' for commit '.$hash);
+        Mesamatrix::$logger->info('Parsing '.(basename($filepath)).' for commit '.$hash);
         $parser = new Parser();
         $matrix = $parser->parseContent($cat->getOutput());
 
@@ -304,33 +309,34 @@ class Parse extends Command
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
 
         // Write file.
-        $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
+        $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir'))
                    . '/commits/commit_'.$hash.'.xml';
         $dom = dom_import_simplexml($xml)->ownerDocument;
         $dom->formatOutput = true;
 
         file_put_contents($xmlPath, $dom->saveXML());
-        \Mesamatrix::$logger->info('XML saved to '.$xmlPath);
+        Mesamatrix::$logger->info('XML saved to '.$xmlPath);
     }
 
     /**
      * Take all the parsed commits and merged them to generate the final XML.
      *
-     * @param array \Mesamatrix\Git\Commit $commits The commits to merge.
+     * @param array Commit $commits The commits to merge.
      */
-    protected function generateMergedXml(array $commits) {
+    protected function generateMergedXml(array $commits)
+    {
         if (count($commits) == 0) {
-            \Mesamatrix::$logger->error('No commits to merge.');
+            Mesamatrix::$logger->error('No commits to merge.');
             return;
         }
 
-        \Mesamatrix::$logger->info('Merge all the commits.');
+        Mesamatrix::$logger->info('Merge all the commits.');
 
         // Get latest commit, this will be our base.
         $latestCommit = $commits[count($commits) - 1];
 
         $hash = $latestCommit->getHash();
-        $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
+        $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir'))
                  . '/commits/commit_'.$hash.'.xml';
         $mesa = simplexml_load_file($xmlPath);
 
@@ -342,7 +348,7 @@ class Parse extends Command
             $commit = $commits[$i];
 
             $hash = $commit->getHash();
-            $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir'))
+            $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir'))
                      . '/commits/commit_'.$hash.'.xml';
             $mesa = simplexml_load_file($xmlPath);
 
@@ -354,12 +360,12 @@ class Parse extends Command
             $nextCommit = $commit;
         }
 
-        \Mesamatrix::$logger->info('Generating XML file');
+        Mesamatrix::$logger->info('Generating XML file');
         $xml = new \SimpleXMLElement("<mesa></mesa>");
 
         // Get time of last fetch.
-        $gitDir = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'private_dir')).'/';
-        $gitDir .= \Mesamatrix::$config->getValue('git', 'mesa_dir', 'mesa.git');
+        $gitDir = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir')).'/';
+        $gitDir .= Mesamatrix::$config->getValue('git', 'mesa_dir', 'mesa.git');
         $fetchHeadPath = $gitDir . '/FETCH_HEAD';
         if (!file_exists($fetchHeadPath)) {
             // If FETCH_HEAD doesn't exists, fallback on HEAD.
@@ -425,13 +431,13 @@ class Parse extends Command
         $this->populateOpenClVendors($api);
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
 
-        $xmlPath = \Mesamatrix::path(\Mesamatrix::$config->getValue("info", "xml_file"));
+        $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
 
         $dom = dom_import_simplexml($xml)->ownerDocument;
         $dom->formatOutput = true;
         file_put_contents($xmlPath, $dom->saveXML());
 
-        \Mesamatrix::$logger->info('XML saved to '.$xmlPath);
+        Mesamatrix::$logger->info('XML saved to '.$xmlPath);
     }
 
     /**
@@ -440,13 +446,14 @@ class Parse extends Command
      *
      * @param Matrix $prevMatrix The previous matrix.
      * @param Matrix $matrix The current matrix.
-     * @param \Mesamatrix\Git\Commit $commit The commit inducing the changes
-     *                                       from previous to current matrix.
+     * @param Commit $commit The commit inducing the changes from previous to
+     *                       current matrix.
      */
     private function compareMatricesAndSetModificationCommit(
         Matrix $prevMatrix,
         Matrix $matrix,
-        \Mesamatrix\Git\Commit $commit) {
+        Commit $commit)
+    {
         foreach ($matrix->getApiVersions() as $apiVersion) {
             foreach ($apiVersion->getExtensions() as $ext) {
                 $prevExt = $prevMatrix->getExtensionBySubstr($ext->getName());
@@ -468,7 +475,8 @@ class Parse extends Command
     private function compareExtensionsAndSetModificationCommit(
         ?Extension $prevExt,
         Extension $ext,
-        \Mesamatrix\Git\Commit $commit) {
+        Commit $commit)
+    {
 
         if ($ext->getModifiedAt() === null) {
             if ($prevExt === null ||
@@ -504,14 +512,16 @@ class Parse extends Command
         }
     }
 
-    protected function populateStatuses(\SimpleXMLElement $xmlStatuses) {
+    protected function populateStatuses(\SimpleXMLElement $xmlStatuses)
+    {
         foreach ($this->statuses as $status => $match) {
             $xmlStatus = $xmlStatuses->addChild($status);
             $xmlStatus->addChild('match', $match);
         }
     }
 
-    protected function generateCommitsLog(\SimpleXMLElement $xml, array $commits) {
+    protected function generateCommitsLog(\SimpleXMLElement $xml, array $commits)
+    {
         foreach (array_reverse($commits) as $commit) {
             $commitNode = $xml->addChild("commit", htmlspecialchars($commit->getData()));
             $commitNode->addAttribute("hash", $commit->getHash());
@@ -520,22 +530,26 @@ class Parse extends Command
         }
     }
 
-    protected function populateGlVendors(\SimpleXMLElement $xmlParent) {
+    protected function populateGlVendors(\SimpleXMLElement $xmlParent)
+    {
         $xmlVendors = $xmlParent->addChild("vendors");
         $this->populateDrivers($xmlVendors, Constants::GL_ALL_DRIVERS_VENDORS);
     }
 
-    protected function populateVulkanVendors(\SimpleXMLElement $xmlParent) {
+    protected function populateVulkanVendors(\SimpleXMLElement $xmlParent)
+    {
         $xmlVendors = $xmlParent->addChild("vendors");
         $this->populateDrivers($xmlVendors, Constants::VK_ALL_DRIVERS_VENDORS);
     }
 
-    protected function populateOpenClVendors(\SimpleXMLElement $xmlParent) {
+    protected function populateOpenClVendors(\SimpleXMLElement $xmlParent)
+    {
         $xmlVendors = $xmlParent->addChild("vendors");
         $this->populateDrivers($xmlVendors, Constants::OPENCL_ALL_DRIVERS_VENDORS);
     }
 
-    protected function populateDrivers(\SimpleXMLElement $xmlVendors, array $vendors) {
+    protected function populateDrivers(\SimpleXMLElement $xmlVendors, array $vendors)
+    {
         foreach ($vendors as $vendor => $drivers) {
             $xmlVendor = $xmlVendors->addChild("vendor");
             $xmlVendor->addAttribute("name", $vendor);
@@ -547,7 +561,8 @@ class Parse extends Command
         }
     }
 
-    protected function generateApiVersions(\SimpleXMLElement $api, Matrix $matrix, $name) {
+    protected function generateApiVersions(\SimpleXMLElement $api, Matrix $matrix, $name)
+    {
         $xmlVersions = $api->addChild("versions");
         foreach ($matrix->getApiVersions() as $apiVersion) {
             if ($apiVersion->getName() === $name) {
@@ -557,7 +572,8 @@ class Parse extends Command
         }
     }
 
-    protected function generateApiVersion(\SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints) {
+    protected function generateApiVersion(\SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints)
+    {
         $xmlVersion->addAttribute("name", $apiVersion->getName());
         $xmlVersion->addAttribute("version", $apiVersion->getVersion());
 
@@ -572,12 +588,13 @@ class Parse extends Command
         }
     }
 
-    protected function generateExtension(\SimpleXMLElement $xmlExt, Extension $ext, Hints $hints) {
+    protected function generateExtension(\SimpleXMLElement $xmlExt, Extension $ext, Hints $hints)
+    {
         $xmlExt->addAttribute("name", $ext->getName());
 
         if ($this->urlCache) {
             if (preg_match("/(GLX?)_([^_]+)_([a-zA-Z0-9_]+)/", $ext->getName(), $matches) === 1) {
-                $openglUrl = \Mesamatrix::$config->getValue("extension_links", "opengl_base_url").urlencode($matches[2])."/";
+                $openglUrl = Mesamatrix::$config->getValue("extension_links", "opengl_base_url").urlencode($matches[2])."/";
                 if ($matches[1] === "GLX") {
                     // Found a GLX_TYPE_Extension.
                     $openglUrl .= "GLX_";
@@ -591,7 +608,7 @@ class Parse extends Command
                 }
             }
             else if (preg_match("/VK_[^_]+_[a-zA-Z0-9_]+/", $ext->getName(), $matches) === 1) {
-                $vulkanUrl = \Mesamatrix::$config->getValue("extension_links", "vulkan_base_url").urlencode($matches[0]).".html";
+                $vulkanUrl = Mesamatrix::$config->getValue("extension_links", "vulkan_base_url").urlencode($matches[0]).".html";
 
                 if ($this->urlCache->isValid($vulkanUrl)) {
                     $linkNode = $xmlExt->addChild("link", $matches[0]);
@@ -639,16 +656,18 @@ class Parse extends Command
         }
     }
 
-    protected function loadUrlCache() {
+    protected function loadUrlCache()
+    {
         $this->urlCache = NULL;
-        if(\Mesamatrix::$config->getValue("extension_links", "enabled", false)) {
+        if(Mesamatrix::$config->getValue("extension_links", "enabled", false)) {
             // Load URL cache.
             $this->urlCache = new UrlCache();
             $this->urlCache->load();
         }
     }
 
-    protected function saveUrlCache() {
+    protected function saveUrlCache()
+    {
         if ($this->urlCache) {
             $this->urlCache->save();
         }

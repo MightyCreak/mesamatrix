@@ -20,17 +20,18 @@
 
 namespace Mesamatrix\Console;
 
-use \Symfony\Component\Console\Input\InputInterface;
-use \Symfony\Component\Console\Output\OutputInterface;
-use \Symfony\Component\Console\ConsoleEvents;
-use \Symfony\Component\EventDispatcher\EventDispatcher;
-use \Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Mesamatrix\Mesamatrix;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 class Application extends \Symfony\Component\Console\Application
 {
     public function __construct()
     {
-        parent::__construct('Mesamatrix CLI', \Mesamatrix::$config->getValue('info', 'version'));
+        parent::__construct('Mesamatrix CLI', Mesamatrix::$config->getValue('info', 'version'));
 
         $dispatcher = new EventDispatcher();
 
@@ -40,12 +41,12 @@ class Application extends \Symfony\Component\Console\Application
             {
                 $logger = new \Monolog\Logger(
                     'cli.'.$e->getCommand()->getName(),
-                    \Mesamatrix::$logger->getHandlers()
+                    Mesamatrix::$logger->getHandlers()
                 );
                 $logger->pushHandler(
                     new \Symfony\Bridge\Monolog\Handler\ConsoleHandler($e->getOutput())
                 );
-                \Mesamatrix::$logger = $logger;
+                Mesamatrix::$logger = $logger;
             }
         );
 

@@ -20,7 +20,9 @@
 
 namespace Mesamatrix\Controller;
 
-use \Mesamatrix\Parser\Constants;
+use Mesamatrix\Mesamatrix;
+use Mesamatrix\Parser\Constants;
+use Mesamatrix\Leaderboard\Leaderboard;
 
 class HomeController extends BaseController
 {
@@ -57,10 +59,10 @@ class HomeController extends BaseController
     }
 
     private function loadMesamatrixXml() {
-        $featuresXmlFilepath = \Mesamatrix::path(\Mesamatrix::$config->getValue('info', 'xml_file'));
+        $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'xml_file'));
         $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
-            \Mesamatrix::$logger->critical('Can\'t read '.$featuresXmlFilepath);
+            Mesamatrix::$logger->critical('Can\'t read '.$featuresXmlFilepath);
             exit();
         }
 
@@ -70,12 +72,12 @@ class HomeController extends BaseController
     private function createCommitsModel(\SimpleXMLElement $xml) {
         $this->commits = array();
 
-        $numCommits = \Mesamatrix::$config->getValue('info', 'commitlog_length', 10);
+        $numCommits = Mesamatrix::$config->getValue('info', 'commitlog_length', 10);
         $numCommits = min($numCommits, $xml->commits->commit->count());
         for ($i = 0; $i < $numCommits; ++$i) {
             $xmlCommit = $xml->commits->commit[$i];
             $this->commits[] = array(
-                'url' => \Mesamatrix::$config->getValue('git', 'mesa_commit_url').$xmlCommit['hash'],
+                'url' => Mesamatrix::$config->getValue('git', 'mesa_commit_url').$xmlCommit['hash'],
                 'timestamp' => (int) $xmlCommit['timestamp'],
                 'subject' => $xmlCommit['subject']
             );
@@ -83,14 +85,14 @@ class HomeController extends BaseController
     }
 
     private function createLeaderboard(\SimpleXMLElement $xml, array $apis) {
-        $leaderboard = new \Mesamatrix\Leaderboard\Leaderboard();
+        $leaderboard = new Leaderboard();
         $leaderboard->load($xml, $apis);
         return $leaderboard;
     }
 
     protected function writeHtmlPage() {
-        $mesaWeb = \Mesamatrix::$config->getValue('git', 'mesa_web');
-        $mesaBranch = \Mesamatrix::$config->getValue('git', 'branch');
+        $mesaWeb = Mesamatrix::$config->getValue('git', 'mesa_web');
+        $mesaBranch = Mesamatrix::$config->getValue('git', 'branch');
 ?>
     <p>
         This page is a graphical representation of the text file <a href="<?= "$mesaWeb/blob/$mesaBranch/docs/features.txt" ?>" target="_blank">docs/features.txt</a> from the Mesa repository.
@@ -99,7 +101,7 @@ class HomeController extends BaseController
         Although this text file is updated by the Mesa developers themselves, it might not contain an exhaustive list of all the drivers features and subtleties. So, for more information, it is advised to look at the <a href="<?= $mesaWeb ?>" target="_blank">source code</a>, or ask the developers on their <a href="https://mesa3d.org/lists.html" target="_blank">mailing-list</a>.
     </p>
     <p>
-        Feel free to open an issue or create a PR on <a href="<?= \Mesamatrix::$config->getValue('info', 'project_url') ?>" target="_blank">GitHub</a>, or join the Matrix room <a href="https://matrix.to/#/%23mesamatrix:matrix.org" target="_blank">#mesamatrix:matrix.org</a>.
+        Feel free to open an issue or create a PR on <a href="<?= Mesamatrix::$config->getValue('info', 'project_url') ?>" target="_blank">GitHub</a>, or join the Matrix room <a href="https://matrix.to/#/%23mesamatrix:matrix.org" target="_blank">#mesamatrix:matrix.org</a>.
     </p>
 
     <h1>Last commits</h1>
@@ -136,4 +138,4 @@ class HomeController extends BaseController
             $apiController->writeMatrix();
         }
     }
-};
+}

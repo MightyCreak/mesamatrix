@@ -28,6 +28,10 @@
         "suin/php-rss-writer": "*"
     },
 
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*"
+    },
+
     "autoload": {
         "psr-4": {
             "Mesamatrix\\": "lib/"
