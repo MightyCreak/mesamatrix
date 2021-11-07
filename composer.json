@@ -39,6 +39,6 @@
     },
 
     "scripts": {
-        "lint": "./vendor/bin/phpcs --standard=PSR12 --ignore='vendor/*,*.css,*.js' -n ."
+        "lint": "./vendor/bin/phpcs --standard=ruleset.xml --ignore='vendor/*,*.css,*.js' ."
     }
 }
