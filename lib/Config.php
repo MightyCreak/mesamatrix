@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -24,11 +25,12 @@ class Config
 {
     protected $cache = array();
 
-    public function __construct($configDir) {
-        $this->readData($configDir.'/config.default.php');
-        $this->readData($configDir.'/config.php');
+    public function __construct($configDir)
+    {
+        $this->readData($configDir . '/config.default.php');
+        $this->readData($configDir . '/config.php');
 
-        $extraConfigs = glob($configDir.'/*.config.php');
+        $extraConfigs = glob($configDir . '/*.config.php');
         if (is_array($extraConfigs)) {
             natsort($extraConfigs);
             foreach ($extraConfigs as $config) {
@@ -37,33 +39,33 @@ class Config
         }
     }
 
-    public function getValue($section, $key, $default = null) {
+    public function getValue($section, $key, $default = null)
+    {
         if (isset($this->cache[$section])) {
             if (isset($this->cache[$section][$key])) {
                 return $this->cache[$section][$key];
             }
         }
-        $logMsg = 'Unable to find config value for '.$section.'.'.$key;
+        $logMsg = 'Unable to find config value for ' . $section . '.' . $key;
         if (is_null($default)) {
             Mesamatrix::$logger->error($logMsg);
-        }
-        else {
-            Mesamatrix::$logger->info($logMsg.', using default '.$default);
+        } else {
+            Mesamatrix::$logger->info($logMsg . ', using default ' . $default);
         }
         return $default;
     }
 
-    public function readData($configFile) {
+    public function readData($configFile)
+    {
         if (file_exists($configFile)) {
-            Mesamatrix::$logger->info('Loading configuration file '.$configFile);
+            Mesamatrix::$logger->info('Loading configuration file ' . $configFile);
             @include $configFile;
             if (isset($CONFIG) && is_array($CONFIG)) {
                 foreach ($CONFIG as $section => $sectionConfig) {
                     if (array_key_exists($section, $this->cache)) {
                         $this->cache[$section] =
                           array_merge($this->cache[$section], $sectionConfig);
-                    }
-                    else {
+                    } else {
                         $this->cache[$section] = $sectionConfig;
                     }
                 }

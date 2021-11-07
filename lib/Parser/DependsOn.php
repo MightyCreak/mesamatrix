@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -23,7 +24,8 @@ namespace Mesamatrix\Parser;
 /**
  * Enum for the type of a dependency
  */
-abstract class DependsOn {
+abstract class DependsOn
+{
     const EXTENSION = 0;
     const GLES_VERSION = 1;
 }

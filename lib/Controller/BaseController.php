@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -33,8 +34,9 @@ abstract class BaseController
     private $cssScripts = [];
     private $jsScripts = [];
 
-    public function __construct() {
-        $this->addCssScript('css/style.css?v='.(Mesamatrix::$config->getValue("info", "version")));
+    public function __construct()
+    {
+        $this->addCssScript('css/style.css?v=' . (Mesamatrix::$config->getValue("info", "version")));
 
         $this->addJsScript('js/jquery-1.11.3.min.js');
     }
@@ -45,7 +47,8 @@ abstract class BaseController
      * The page must be one of the page in $this->pages.
      * @param string $page The name of the page.
      */
-    final protected function setPage($page) {
+    final protected function setPage($page)
+    {
         $this->pageIdx = array_search($page, array_keys($this->pages));
     }
 
@@ -53,7 +56,8 @@ abstract class BaseController
      * Add a CSS script to include in the HTML page header.
      * @param string $script The script path.
      */
-    final public function addCssScript($script) {
+    final public function addCssScript($script)
+    {
         $this->cssScripts[] = $script;
     }
 
@@ -61,14 +65,16 @@ abstract class BaseController
      * Add a JS script to include in the HTML page header.
      * @param string $script The script path.
      */
-    final public function addJsScript($script) {
+    final public function addJsScript($script)
+    {
         $this->jsScripts[] = $script;
     }
 
     /**
      * Write the HTML code.
      */
-    final public function writeHtml() {
+    final public function writeHtml()
+    {
         $this->computeRendering();
 
         $this->writeHtmlHeader();
@@ -89,8 +95,9 @@ abstract class BaseController
     /**
      * Write the HTML page header.
      */
-    final protected function writeHtmlHeader() {
-?>
+    final protected function writeHtmlHeader()
+    {
+        ?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -106,21 +113,21 @@ abstract class BaseController
         <link rel="shortcut icon" href="images/gears.png" />
         <link rel="alternate" type="application/rss+xml" title="rss feed" href="rss.php" />
 
-<?php
-        foreach ($this->cssScripts as $script):
-?>
+        <?php
+        foreach ($this->cssScripts as $script) :
+            ?>
         <link href="<?= $script ?>" rel="stylesheet" type="text/css" media="all" />
-<?php
+            <?php
         endforeach;
-?>
+        ?>
 
-<?php
-        foreach ($this->jsScripts as $script):
-?>
+        <?php
+        foreach ($this->jsScripts as $script) :
+            ?>
         <script src="<?= $script ?>"></script>
-<?php
+            <?php
         endforeach;
-?>
+        ?>
     </head>
     <body>
         <header>
@@ -128,35 +135,36 @@ abstract class BaseController
 
             <div class="menu">
                 <ul class="menu-list">
-<?php
+        <?php
         $i = 0;
-        foreach ($this->pages as $page => $link):
-            $item = "<a href=\"".$link."\">".$page."</a>";
-            if ($i === $this->pageIdx):
-?>
+        foreach ($this->pages as $page => $link) :
+            $item = "<a href=\"" . $link . "\">" . $page . "</a>";
+            if ($i === $this->pageIdx) :
+                ?>
                     <li class="menu-item menu-selected"><?= $item ?></li>
-<?php
-            else:
-?>
+                <?php
+            else :
+                ?>
                     <li class="menu-item"><a href="<?= $link ?>"><?= $page ?></a></li>
-<?php
+                <?php
             endif;
             ++$i;
         endforeach;
-?>
+        ?>
                     <li class="menu-item"><a href="rss.php" class="rss"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a></li>
                 </ul>
             </div>
         </header>
         <main>
-<?php
+        <?php
     }
 
     /**
      * Write the HTML page footer.
      */
-    final protected function writeHtmlFooter() {
-?>
+    final protected function writeHtmlFooter()
+    {
+        ?>
         </main>
         <footer>
             <a id="github-ribbon" href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
@@ -169,6 +177,6 @@ abstract class BaseController
         </footer>
     </body>
 </html>
-<?php
+        <?php
     }
 }

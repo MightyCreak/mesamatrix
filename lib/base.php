@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -22,6 +23,6 @@
 
 use Mesamatrix\Mesamatrix;
 
-require_once dirname(__DIR__).'/vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 Mesamatrix::init();

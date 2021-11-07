@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -36,11 +37,11 @@ class Application extends \Symfony\Component\Console\Application
         $dispatcher = new EventDispatcher();
 
         // Install CLI logger
-        $dispatcher->addListener(ConsoleEvents::COMMAND,
-            function (ConsoleCommandEvent $e)
-            {
+        $dispatcher->addListener(
+            ConsoleEvents::COMMAND,
+            function (ConsoleCommandEvent $e) {
                 $logger = new \Monolog\Logger(
-                    'cli.'.$e->getCommand()->getName(),
+                    'cli.' . $e->getCommand()->getName(),
                     Mesamatrix::$logger->getHandlers()
                 );
                 $logger->pushHandler(

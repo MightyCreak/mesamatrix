@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,12 +26,14 @@ class Matrix
     private array $apiVersions;
     private Hints $hints;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->apiVersions = array();
         $this->hints = new Hints();
     }
 
-    public function addApiVersion(ApiVersion $apiVersion) {
+    public function addApiVersion(ApiVersion $apiVersion)
+    {
         array_push($this->apiVersions, $apiVersion);
     }
 
@@ -39,7 +42,8 @@ class Matrix
      *
      * @return ApiVersion[] The API versions array.
      */
-    public function getApiVersions() {
+    public function getApiVersions()
+    {
         return $this->apiVersions;
     }
 
@@ -51,10 +55,13 @@ class Matrix
      *
      * @return ApiVersion The API version is found; NULL otherwise.
      */
-    public function getApiVersionByName($name, $version) {
+    public function getApiVersionByName($name, $version)
+    {
         foreach ($this->apiVersions as $apiVersion) {
-            if ($apiVersion->getName() === $name &&
-                $apiVersion->getVersion() === $version) {
+            if (
+                $apiVersion->getName() === $name &&
+                $apiVersion->getVersion() === $version
+            ) {
                 return $apiVersion;
             }
         }
@@ -68,15 +75,16 @@ class Matrix
      *
      * @return Extension The extension if found; NULL otherwise.
      */
-    public function getExtensionBySubstr($substr) {
+    public function getExtensionBySubstr($substr)
+    {
         foreach ($this->getApiVersions() as $apiVersion) {
             $ext = $apiVersion->getExtensionBySubstr($substr);
-            if ($ext !== NULL) {
+            if ($ext !== null) {
                 return $ext;
             }
         }
 
-        return NULL;
+        return null;
     }
 
     /**
@@ -87,20 +95,22 @@ class Matrix
      * @return string[] The list of drivers that supports
      *         the OpenGL ES; NULL otherwise.
      */
-    public function getDriversSupportingGlesVersion($version) {
+    public function getDriversSupportingGlesVersion($version)
+    {
         foreach ($this->getApiVersions() as $apiVersion) {
             if ($apiVersion->getName() === Constants::GLES_NAME && $apiVersion->getVersion() === $version) {
                 return $apiVersion->getSupportedDrivers();
             }
         }
 
-        return NULL;
+        return null;
     }
 
     /**
      * Parse all the API versions and solve their extensions.
      */
-    public function solveExtensionDependencies() {
+    public function solveExtensionDependencies()
+    {
         foreach ($this->getApiVersions() as $apiVersion) {
             $apiVersion->solveExtensionDependencies($this);
         }
@@ -111,13 +121,15 @@ class Matrix
      *
      * @param \SimpleXMLElement $mesa The root element of the XML file.
      */
-    public function loadXml(\SimpleXMLElement $mesa) {
+    public function loadXml(\SimpleXMLElement $mesa)
+    {
         foreach ($mesa->apis->api as $api) {
             $this->loadXmlApi($api);
         }
     }
 
-    private function loadXmlApi(\SimpleXMLElement $api) {
+    private function loadXmlApi(\SimpleXMLElement $api)
+    {
         $xmlSections = $api->versions->version;
 
         // Add new sections.
@@ -141,7 +153,8 @@ class Matrix
      *
      * @return Hints The hints.
      */
-    public function getHints() {
+    public function getHints()
+    {
         return $this->hints;
     }
 }

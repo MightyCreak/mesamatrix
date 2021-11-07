@@ -19,8 +19,7 @@ class RssController
         $mustGenerateRss = $this->rssGenerationNeeded($featuresXmlFilepath, $rssFilepath);
 
         $rssContents = null;
-        if ($mustGenerateRss)
-        {
+        if ($mustGenerateRss) {
             // Generate RSS.
             $rssContents = $this->generateRss($featuresXmlFilepath);
 
@@ -32,9 +31,7 @@ class RssController
             }
 
             Mesamatrix::$logger->info('RSS file generated.');
-        }
-        else
-        {
+        } else {
             // Read from file.
             $rssContents = file_get_contents($rssFilepath);
         }
@@ -52,12 +49,10 @@ class RssController
 
     private function rssGenerationNeeded(string $featuresXmlFilepath, string $rssFilepath): bool
     {
-        if (file_exists($featuresXmlFilepath) && file_exists($rssFilepath))
-        {
+        if (file_exists($featuresXmlFilepath) && file_exists($rssFilepath)) {
             $lastCommitFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
                 . '/last_commit_parsed';
-            if (file_exists($lastCommitFilepath))
-            {
+            if (file_exists($lastCommitFilepath)) {
                 // Generate RSS if file is older than last_commit_parsed modification time.
                 return filemtime($rssFilepath) < filemtime($lastCommitFilepath);
             }
@@ -70,7 +65,7 @@ class RssController
     {
         $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
-            Mesamatrix::$logger->critical("Can't read ".$featuresXmlFilepath);
+            Mesamatrix::$logger->critical("Can't read " . $featuresXmlFilepath);
             return null;
         }
 
@@ -97,8 +92,9 @@ class RssController
         //$commitWeb = Mesamatrix::$config->getValue("git", "mesa_commit_url");
 
         foreach ($xml->commits->commit as $commit) {
-            if ((int)$commit["timestamp"] < $minTime)
+            if ((int)$commit["timestamp"] < $minTime) {
                 continue;
+            }
 
             $description = (string)$commit;
             $description = str_replace('<pre>', '<pre style="white-space: pre-wrap;">', $description);

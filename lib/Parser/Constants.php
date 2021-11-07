@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -106,9 +107,9 @@ abstract class Constants
     // 0: regexp
     // 1: use hint?
     const RE_ALL_DRIVERS_HINTS = [
-        [ "/^all drivers$/i", FALSE ],
-        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", TRUE ],
-        [ "/^all - but needs GLX\/EGL extension to be useful$/i", TRUE ],
+        [ "/^all drivers$/i", false ],
+        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", true ],
+        [ "/^all - but needs GLX\/EGL extension to be useful$/i", true ],
     ];
 
     // Hints depending on another feature.
@@ -117,7 +118,7 @@ abstract class Constants
     // 2: dependency type
     // 3: dependency match index
     const RE_DEP_DRIVERS_HINTS = [
-        [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", TRUE, DependsOn::EXTENSION, 1 ],
-        [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", TRUE, DependsOn::GLES_VERSION, 1 ],
+        [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", true, DependsOn::EXTENSION, 1 ],
+        [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", true, DependsOn::GLES_VERSION, 1 ],
     ];
 }

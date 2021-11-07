@@ -4,6 +4,7 @@
 // Values can be overwritten in a user defined config/config.php file.
 
 use Monolog\Logger as Log;
+
 /* available log levels:
  * Log::EMERGENCY
  * Log::ALERT

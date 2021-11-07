@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -24,19 +25,22 @@ use Mesamatrix\Mesamatrix;
 
 class AboutController extends BaseController
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         $this->setPage('About');
     }
 
-    protected function computeRendering() {
+    protected function computeRendering()
+    {
     }
 
-    protected function writeHtmlPage() {
+    protected function writeHtmlPage()
+    {
         $mesaWeb = Mesamatrix::$config->getValue('git', 'mesa_web');
         $mesaBranch = Mesamatrix::$config->getValue('git', 'branch');
-?>
+        ?>
             <h1>About Mesamatrix</h1>
             <h2>How it works</h2>
             <p>The Mesa <a href="<?= $mesaWeb ?>" target="_blank">git repo</a> is frequently fetched and, if there is a new commit for the <a href="<?= "$mesaWeb/blob/$mesaBranch/docs/features.txt" ?>" target="_blank">features.txt</a> text file, a <abbr title="PHP: Hypertext Preprocessor">PHP</abbr> script will parse it and format it into <abbr title="Extensible Markup Language">XML</abbr>. Then another PHP script displays the data into the <abbr title="Hypertext Markup Language">HTML</abbr> you can see here.</p>
@@ -47,19 +51,19 @@ class AboutController extends BaseController
             <p>Feel free to join the Matrix room <a href="https://matrix.to/#/#mesamatrix:matrix.org" target="_blank">#mesamatrix:matrix.org</a> and discuss.</p>
             <h3>Authors</h3>
             <ul>
-<?php
-foreach (Mesamatrix::$config->getValue("info", "authors") as $k => $v):
-    if (is_string($k)):
-?>
+        <?php
+        foreach (Mesamatrix::$config->getValue("info", "authors") as $k => $v) :
+            if (is_string($k)) :
+                ?>
                 <li><a href="<?= $v ?>"><?= $k ?></a></li>
-<?php
-    else:
-?>
+                <?php
+            else :
+                ?>
                 <li><?= $v ?></li>
-<?php
-    endif;
-endforeach;
-?>
+                <?php
+            endif;
+        endforeach;
+        ?>
             </ul>
             <h2>See also</h2>
             <p>Here are few links to learn more about the Linux graphics drivers:</p>
@@ -71,6 +75,6 @@ endforeach;
                 <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Radeon" title="Radeon">Radeon</a></li>
                 <li>Wikipedia (en): <a href="https://en.wikipedia.org/wiki/Nouveau_%28software%29" title="Nouveau (software)">Nouveau (software)</a></li>
             </ul>
-<?php
+        <?php
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -24,10 +25,11 @@ use Mesamatrix\Mesamatrix;
 
 class Parser
 {
-    public function parse($filename) {
+    public function parse($filename)
+    {
         $handle = fopen($filename, "r");
-        if ($handle === FALSE) {
-            return NULL;
+        if ($handle === false) {
+            return null;
         }
 
         $matrix = $this->parseStream($handle);
@@ -35,7 +37,8 @@ class Parser
         return $matrix;
     }
 
-    public function parseContent($content) {
+    public function parseContent($content)
+    {
         $handle = fopen("php://memory", "r+");
         fwrite($handle, $content);
         rewind($handle);
@@ -50,7 +53,8 @@ class Parser
      * @param $handle The stream handle.
      * @return Matrix The matrix.
      */
-    public function parseStream($handle) {
+    public function parseStream($handle)
+    {
         $matrix = new Matrix();
 
         // Regexp patterns.
@@ -61,21 +65,21 @@ class Parser
 
         // Skip header lines.
         $line = fgets($handle);
-        while ($line !== FALSE && preg_match($reTableHeader, $line, $matches) !== 1) {
+        while ($line !== false && preg_match($reTableHeader, $line, $matches) !== 1) {
             $line = fgets($handle);
         }
 
         // Get extension line regexp.
-        if ($line !== FALSE) {
+        if ($line !== false) {
             // Remove 2 because of the first two spaces on each lines.
             $lineWidth = strlen($matches[1]) - 2;
-            $this->reExtension = "/^  (.{1,".$lineWidth."})[ ]+([^\(]+)(\((.*)\))?$/";
+            $this->reExtension = "/^  (.{1," . $lineWidth . "})[ ]+([^\(]+)(\((.*)\))?$/";
 
             // Go to next line and start parsing.
             $line = fgets($handle);
-            while ($line !== FALSE) {
+            while ($line !== false) {
                 // Find version line (i.e. "GL 3.0, GLSL 1.30 ...").
-                $apiVersion = NULL;
+                $apiVersion = null;
                 if (preg_match($reGlVersion, $line, $matches) === 1) {
                     // Get or create new OpenGL version.
                     $glName = $matches[1] === 'GL' ? Constants::GL_NAME : Constants::GLES_NAME;
@@ -84,56 +88,49 @@ class Parser
                         $apiVersion = new ApiVersion($glName, $matches[3], $matches[4], $matches[6], $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
-                }
-                else if($line === self::OTHER_OFFICIAL_GL_EXTENSIONS) {
+                } elseif ($line === self::OTHER_OFFICIAL_GL_EXTENSIONS) {
                     $glName = Constants::GL_OR_ES_EXTRA_NAME;
-                    $apiVersion = $matrix->getApiVersionByName($glName, NULL);
+                    $apiVersion = $matrix->getApiVersionByName($glName, null);
                     if (!$apiVersion) {
-                        $apiVersion = new ApiVersion($glName, NULL, NULL, NULL, $matrix->getHints());
+                        $apiVersion = new ApiVersion($glName, null, null, null, $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
-                }
-                else if (preg_match($reVkVersion, $line, $matches) === 1) {
+                } elseif (preg_match($reVkVersion, $line, $matches) === 1) {
                     $vkName = Constants::VK_NAME;
                     $apiVersion = $matrix->getApiVersionByName($vkName, $matches[1]);
                     if (!$apiVersion) {
-                        $apiVersion = new ApiVersion($vkName, $matches[1], NULL, NULL, $matrix->getHints());
+                        $apiVersion = new ApiVersion($vkName, $matches[1], null, null, $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
-                }
-                else if ($line === self::OTHER_OFFICIAL_VK_EXTENSIONS) {
+                } elseif ($line === self::OTHER_OFFICIAL_VK_EXTENSIONS) {
                     $vkName = Constants::VK_EXTRA_NAME;
-                    $apiVersion = $matrix->getApiVersionByName($vkName, NULL);
+                    $apiVersion = $matrix->getApiVersionByName($vkName, null);
                     if (!$apiVersion) {
-                        $apiVersion = new ApiVersion($vkName, NULL, NULL, NULL, $matrix->getHints());
+                        $apiVersion = new ApiVersion($vkName, null, null, null, $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
-                }
-                else if (preg_match($reOpenClVersion, $line, $matches) === 1) {
+                } elseif (preg_match($reOpenClVersion, $line, $matches) === 1) {
                     $openClName = Constants::OPENCL_NAME;
                     $apiVersion = $matrix->getApiVersionByName($openClName, $matches[1]);
                     if (!$apiVersion) {
-                        $apiVersion = new ApiVersion($openClName, $matches[1], NULL, NULL, $matrix->getHints());
+                        $apiVersion = new ApiVersion($openClName, $matches[1], null, null, $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
-                }
-                else if ($line === self::OTHER_OFFICIAL_OPENCL_EXTENSIONS) {
+                } elseif ($line === self::OTHER_OFFICIAL_OPENCL_EXTENSIONS) {
                     $openClName = Constants::OPENCL_EXTRA_NAME;
-                    $apiVersion = $matrix->getApiVersionByName($openClName, NULL);
+                    $apiVersion = $matrix->getApiVersionByName($openClName, null);
                     if (!$apiVersion) {
-                        $apiVersion = new ApiVersion($openClName, NULL, NULL, NULL, $matrix->getHints());
+                        $apiVersion = new ApiVersion($openClName, null, null, null, $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
-                }
-                else if ($line === self::OTHER_VENDOR_SPECIFIC_OPENCL_EXTENSIONS) {
+                } elseif ($line === self::OTHER_VENDOR_SPECIFIC_OPENCL_EXTENSIONS) {
                     $openClName = Constants::OPENCL_VENDOR_SPECIFIC_NAME;
-                    $apiVersion = $matrix->getApiVersionByName($openClName, NULL);
+                    $apiVersion = $matrix->getApiVersionByName($openClName, null);
                     if (!$apiVersion) {
-                        $apiVersion = new ApiVersion($openClName, NULL, NULL, NULL, $matrix->getHints());
+                        $apiVersion = new ApiVersion($openClName, null, null, null, $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
-                }
-                else {
+                } else {
                     //print("Unrecognized line: ".$line);
                     $line = fgets($handle);
                     continue;
@@ -175,10 +172,12 @@ class Parser
      *
      * @return The next line unparsed.
      */
-    private function parseSection(ApiVersion $apiVersion,
-                                  Matrix $matrix,
-                                  $handle,
-                                  $allSupportedDrivers = array()) {
+    private function parseSection(
+        ApiVersion $apiVersion,
+        Matrix $matrix,
+        $handle,
+        $allSupportedDrivers = array()
+    ) {
         $line = $this->skipEmptyLines(fgets($handle), $handle);
 
         // Verify the line is indented.
@@ -194,8 +193,8 @@ class Parser
 
         // Parse API version extensions.
         $lastExt = null;
-        $parentDrivers = NULL;
-        while ($line !== FALSE && $line !== "\n") {
+        $parentDrivers = null;
+        while ($line !== false && $line !== "\n") {
             if (preg_match($this->reExtension, $line, $matches) === 1) {
                 // $matches indices:
                 //   [1]: extension name
@@ -220,12 +219,10 @@ class Parser
                 if (strncmp($matches[2], "DONE", strlen("DONE")) === 0) {
                     $status = Constants::STATUS_DONE;
                     $preHint = substr($matches[2], strlen("DONE") + 1);
-                }
-                elseif (strncmp($matches[2], "not started", strlen("not started")) === 0) {
+                } elseif (strncmp($matches[2], "not started", strlen("not started")) === 0) {
                     $status = Constants::STATUS_NOT_STARTED;
                     $preHint = substr($matches[2], strlen("not started") + 1);
-                }
-                else {
+                } else {
                     $status = Constants::STATUS_IN_PROGRESS;
                     $preHint = $matches[2];
                 }
@@ -235,12 +232,11 @@ class Parser
                     if (!isset($matches[3])) {
                         // Done and nothing else precised, it's done for all drivers.
                         $this->mergeDrivers($supportedDrivers, $this->apiDrivers);
-                    }
-                    elseif (isset($matches[4])) {
+                    } elseif (isset($matches[4])) {
                         // Done but there are parenthesis after.
                         $useHint = null;
                         $hintDrivers = $this->getDriversFromHint($matches[4], $useHint);
-                        if ($hintDrivers !== NULL) {
+                        if ($hintDrivers !== null) {
                             $this->mergeDrivers($supportedDrivers, $hintDrivers);
                         }
 
@@ -248,15 +244,13 @@ class Parser
                             $inHint = $useHint;
                         }
                     }
-                }
-                elseif ($status === Constants::STATUS_IN_PROGRESS) {
+                } elseif ($status === Constants::STATUS_IN_PROGRESS) {
                     // In progress.
                     if (!empty($matches[4])) {
                         // There's something precised in the parenthesis.
                         $inHint = $matches[4];
                     }
-                }
-                else /*if ($status === Constants::STATUS_NOT_STARTED)*/ {
+                } else /*if ($status === Constants::STATUS_NOT_STARTED)*/ {
                     if (!empty($matches[4])) {
                         // Not done, but something is precised in the parenthesis.
                         $inHint = $matches[4];
@@ -265,12 +259,10 @@ class Parser
 
                 // Get hint.
                 if (!empty($preHint) && !empty($inHint)) {
-                    $hint = $preHint." (".$inHint.")";
-                }
-                elseif (!empty($preHint)) {
+                    $hint = $preHint . " (" . $inHint . ")";
+                } elseif (!empty($preHint)) {
                     $hint = $preHint;
-                }
-                else {
+                } else {
                     $hint = $inHint;
                 }
 
@@ -282,8 +274,7 @@ class Parser
                     $newExtension = new Extension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
                     $apiVersion->addExtension($newExtension);
                     $lastExt = $newExtension;
-                }
-                else {
+                } else {
                     // Add the sub-extension.
                     $newSubExtension = new Extension($matches[1], $status, $hint, $matrix->getHints(), $supportedDrivers, $this->apiDrivers);
                     $lastExt->addSubExtension($newSubExtension);
@@ -297,9 +288,9 @@ class Parser
         $line = $this->skipEmptyLines($line, $handle);
 
         // Parse notes (i.e. "(*) note").
-        while ($line !== FALSE && preg_match(self::RE_NOTE, $line, $matches) === 1) {
+        while ($line !== false && preg_match(self::RE_NOTE, $line, $matches) === 1) {
             $idx = array_search($matches[1], $matrix->getHints()->allHints);
-            if ($idx !== FALSE) {
+            if ($idx !== false) {
                 $matrix->getHints()->allHints[$idx] = $matches[2];
             }
 
@@ -310,25 +301,28 @@ class Parser
         return $line;
     }
 
-    private function skipEmptyLines($curLine, $handle) {
-        while ($curLine !== FALSE && $curLine === "\n") {
+    private function skipEmptyLines($curLine, $handle)
+    {
+        while ($curLine !== false && $curLine === "\n") {
             $curLine = fgets($handle);
         }
 
         return $curLine;
     }
 
-    private function isInDriversArray($name) {
+    private function isInDriversArray($name)
+    {
         foreach ($this->apiDrivers as $driverName) {
             if (strncmp($name, $driverName, strlen($driverName)) === 0) {
-                return TRUE;
+                return true;
             }
         }
 
-        return FALSE;
+        return false;
     }
 
-    private function getDriverName($name) {
+    private function getDriverName($name)
+    {
         foreach ($this->apiDrivers as $driver) {
             $driverLen = strlen($driver);
             if (strncmp($name, $driver, $driverLen) === 0) {
@@ -336,10 +330,11 @@ class Parser
             }
         }
 
-        return NULL;
+        return null;
     }
 
-    private function mergeDrivers(array &$dst, array $src) {
+    private function mergeDrivers(array &$dst, array $src)
+    {
         foreach ($src as $srcDriver) {
             $driverName = $this->getDriverName($srcDriver);
 
@@ -351,8 +346,7 @@ class Parser
 
             if ($i < $numDstDrivers) {
                 $dst[$i] = $srcDriver;
-            }
-            else {
+            } else {
                 $dst[] = $srcDriver;
             }
         }
@@ -368,7 +362,8 @@ class Parser
      *
      * @return array() The drivers list, or null.
      */
-    private function getDriversFromHint($hintStr, &$useHint) {
+    private function getDriversFromHint($hintStr, &$useHint)
+    {
         if (empty($hintStr)) {
             return null;
         }
@@ -392,8 +387,7 @@ class Parser
         foreach ($hintsList as $hintItem) {
             if ($this->isInDriversArray($hintItem)) {
                 $drivers[] = $hintItem;
-            }
-            else {
+            } else {
                 // Is the hint saying it depends on something else?
                 foreach (Constants::RE_DEP_DRIVERS_HINTS as $reDepDriversHint) {
                     if (preg_match($reDepDriversHint[0], $hintItem) === 1) {

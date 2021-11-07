@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -29,7 +30,8 @@ class HomeController extends BaseController
     private $commits = array();
     private $apiControllers = array();
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         $this->setPage('Home');
@@ -48,7 +50,8 @@ class HomeController extends BaseController
         $this->addJsScript('js/script.js');
     }
 
-    protected function computeRendering() {
+    protected function computeRendering()
+    {
         $xml = $this->loadMesamatrixXml();
 
         $this->createCommitsModel($xml);
@@ -58,18 +61,20 @@ class HomeController extends BaseController
         }
     }
 
-    private function loadMesamatrixXml() {
+    private function loadMesamatrixXml()
+    {
         $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'xml_file'));
         $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
-            Mesamatrix::$logger->critical('Can\'t read '.$featuresXmlFilepath);
+            Mesamatrix::$logger->critical('Can\'t read ' . $featuresXmlFilepath);
             exit();
         }
 
         return $xml;
     }
 
-    private function createCommitsModel(\SimpleXMLElement $xml) {
+    private function createCommitsModel(\SimpleXMLElement $xml)
+    {
         $this->commits = array();
 
         $numCommits = Mesamatrix::$config->getValue('info', 'commitlog_length', 10);
@@ -77,23 +82,25 @@ class HomeController extends BaseController
         for ($i = 0; $i < $numCommits; ++$i) {
             $xmlCommit = $xml->commits->commit[$i];
             $this->commits[] = array(
-                'url' => Mesamatrix::$config->getValue('git', 'mesa_commit_url').$xmlCommit['hash'],
+                'url' => Mesamatrix::$config->getValue('git', 'mesa_commit_url') . $xmlCommit['hash'],
                 'timestamp' => (int) $xmlCommit['timestamp'],
                 'subject' => $xmlCommit['subject']
             );
         }
     }
 
-    private function createLeaderboard(\SimpleXMLElement $xml, array $apis) {
+    private function createLeaderboard(\SimpleXMLElement $xml, array $apis)
+    {
         $leaderboard = new Leaderboard();
         $leaderboard->load($xml, $apis);
         return $leaderboard;
     }
 
-    protected function writeHtmlPage() {
+    protected function writeHtmlPage()
+    {
         $mesaWeb = Mesamatrix::$config->getValue('git', 'mesa_web');
         $mesaBranch = Mesamatrix::$config->getValue('git', 'branch');
-?>
+        ?>
     <p>
         This page is a graphical representation of the text file <a href="<?= "$mesaWeb/blob/$mesaBranch/docs/features.txt" ?>" target="_blank">docs/features.txt</a> from the Mesa repository.
     </p>
@@ -113,17 +120,17 @@ class HomeController extends BaseController
             </tr>
         </thead>
         <tbody>
-<?php
+        <?php
         // Commit list.
-        foreach ($this->commits as $commit):
-?>
+        foreach ($this->commits as $commit) :
+            ?>
             <tr>
                 <td class="commitsAge toRelativeDate" data-timestamp="<?= date(DATE_RFC2822, $commit['timestamp']) ?>"><?= date('Y-m-d H:i', $commit['timestamp']) ?></td>
                 <td><a href="<?= $commit['url'] ?>"><?= $commit['subject'] ?></a></td>
             </tr>
-<?php
+            <?php
         endforeach;
-?>
+        ?>
             <tr>
                 <td colspan="2">
                     <noscript>(Dates are UTC)<br/></noscript>
@@ -132,7 +139,7 @@ class HomeController extends BaseController
             </tr>
         </tbody>
     </table>
-<?php
+        <?php
         // APIs matrices.
         foreach ($this->apiControllers as $apiController) {
             $apiController->writeMatrix();
