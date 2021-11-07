@@ -25,7 +25,7 @@ use Mesamatrix\Mesamatrix;
 
 class UrlCache
 {
-    const EXPIRATIONDELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
+    private const EXPIRATION_DELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
 
     /**
      * Default constructor.
@@ -117,7 +117,7 @@ class UrlCache
 
         // Register URL's validity.
         $this->cachedUrls[$url] = array(
-            'expiration_date' => $this->instanceTime + self::EXPIRATIONDELAY,
+            'expiration_date' => $this->instanceTime + self::EXPIRATION_DELAY,
             'is_valid' => $isValid);
     }
 

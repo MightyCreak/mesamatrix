@@ -409,15 +409,15 @@ class Parser
     private $reExtension = "";
     private $apiDrivers = null;
 
-    const OTHER_OFFICIAL_GL_EXTENSIONS =
+    private const OTHER_OFFICIAL_GL_EXTENSIONS =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
-    const OTHER_OFFICIAL_VK_EXTENSIONS =
+    private const OTHER_OFFICIAL_VK_EXTENSIONS =
         "Khronos extensions that are not part of any Vulkan version:\n";
-    const OTHER_OFFICIAL_OPENCL_EXTENSIONS =
+    private const OTHER_OFFICIAL_OPENCL_EXTENSIONS =
         "Khronos, and EXT extensions that are not part of any OpenCL version:\n";
-    const OTHER_VENDOR_SPECIFIC_OPENCL_EXTENSIONS =
+    private const OTHER_VENDOR_SPECIFIC_OPENCL_EXTENSIONS =
         "Vendor specific extensions that are not part of any OpenCL version:\n";
 
-    const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
-    const RE_NOTE = "/^(\(.+\)) (.*)$/";
+    private const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
+    private const RE_NOTE = "/^(\(.+\)) (.*)$/";
 }

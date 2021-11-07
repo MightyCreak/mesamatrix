@@ -26,6 +26,6 @@ namespace Mesamatrix\Parser;
  */
 abstract class DependsOn
 {
-    const EXTENSION = 0;
-    const GLES_VERSION = 1;
+    public const EXTENSION = 0;
+    public const GLES_VERSION = 1;
 }
