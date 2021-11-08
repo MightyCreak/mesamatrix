@@ -19,22 +19,22 @@
     },
 
     "require": {
-        "monolog/monolog": "2.*",
-        "suin/php-rss-writer": "1.*",
-        "symfony/console": "5.*",
-        "symfony/debug": "4.*",
-        "symfony/http-kernel": "5.*",
-        "symfony/monolog-bridge": "5.*",
-        "symfony/process": "5.*"
+        "monolog/monolog": "^2",
+        "suin/php-rss-writer": "^1",
+        "symfony/console": "^5",
+        "symfony/debug": "^4",
+        "symfony/http-kernel": "^5",
+        "symfony/monolog-bridge": "^5",
+        "symfony/process": "^5"
     },
 
     "require-dev": {
-        "squizlabs/php_codesniffer": "*"
+        "squizlabs/php_codesniffer": "^3"
     },
 
     "autoload": {
         "psr-4": {
-            "Mesamatrix\\": "lib/"
+            "Mesamatrix\\": "src/"
         }
     },
 

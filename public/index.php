@@ -3,8 +3,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2020 Romain "Creak" Failliot.
- * Copyright (C) 2015 Robin McCorkell <rmccorkell@karoshi.org.uk>
+ * Copyright (C) 2014-2017 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once "../lib/base.php";
+require_once '../src/base.php';
 
-$rssGenerator = new Mesamatrix\Controller\RssController();
-$rssGenerator->run();
+$controller = new Mesamatrix\Controller\HomeController();
+$controller->writeHtml();
