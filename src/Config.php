@@ -29,14 +29,6 @@ class Config
     {
         $this->readData($configDir . '/config.default.php');
         $this->readData($configDir . '/config.php');
-
-        $extraConfigs = glob($configDir . '/*.config.php');
-        if (is_array($extraConfigs)) {
-            natsort($extraConfigs);
-            foreach ($extraConfigs as $config) {
-                $this->readData($config);
-            }
-        }
     }
 
     public function getValue($section, $key, $default = null)
