@@ -4,4 +4,8 @@
     <rule ref="PSR12">
         <exclude name="Generic.Files.LineLength"/>
     </rule>
+    <file>.</file>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>*.css</exclude-pattern>
+    <exclude-pattern>*.js</exclude-pattern>
 </ruleset>
