@@ -1,6 +1,6 @@
 # App files
 /config/config.php
-/http/features.xml
+/public/features.xml
 /private/
 
 # Composer files

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once '../lib/base.php';
+require_once "../src/base.php";
 
-$controller = new Mesamatrix\Controller\HomeController();
+$controller = new Mesamatrix\Controller\DriversController();
 $controller->writeHtml();

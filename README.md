@@ -84,13 +84,13 @@ As a developer, an easy way to spawn up a PHP server is by running this
 command:
 
 ```sh
-php -S 0.0.0.0:8080 -t http
+php -S 0.0.0.0:8080 -t public
 ```
 
 ### For deployment
 
 In order to deploy Mesamatrix on a server, the web server root must point to
-the `http` directory. Be aware not to give access to more than just this
+the `public` directory. Be aware not to give access to more than just this
 directory.
 
 At this point, you are done! Open your site in a web browser, and hopefully you
