@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -34,7 +35,8 @@ class Mesamatrix
     public static $logger; // Logger
     public static $request; // HTTP request object
 
-    public static function init() {
+    public static function init()
+    {
         date_default_timezone_set('UTC');
 
         self::$serverRoot = dirname(__DIR__);
@@ -57,16 +59,15 @@ class Mesamatrix
 
         // register the log file
         $logLevel = self::$config->getValue('info', 'log_level', Logger::WARNING);
-        $logPath = $privateDir.'/mesamatrix.log';
+        $logPath = $privateDir . '/mesamatrix.log';
         if (!file_exists($logPath) && is_dir($privateDir)) {
             touch($logPath);
         }
         if (is_writable($logPath)) {
             self::$logger->popHandler();
             self::$logger->pushHandler(new StreamHandler($logPath, $logLevel));
-        }
-        else {
-            self::$logger->error('Error log '.$logPath.' is not writable!');
+        } else {
+            self::$logger->error('Error log ' . $logPath . ' is not writable!');
         }
 
         if ($logLevel < Logger::INFO) {
@@ -85,12 +86,13 @@ class Mesamatrix
 
         self::$logger->debug('Base initialization complete');
 
-        self::$logger->debug('Log level: '.self::$logger->getLevelName($logLevel));
-        self::$logger->debug('PHP error_reporting: 0x'.dechex(ini_get('error_reporting')));
-        self::$logger->debug('PHP display_errors: '.ini_get('display_errors'));
+        self::$logger->debug('Log level: ' . self::$logger->getLevelName($logLevel));
+        self::$logger->debug('PHP error_reporting: 0x' . dechex(ini_get('error_reporting')));
+        self::$logger->debug('PHP display_errors: ' . ini_get('display_errors'));
     }
 
-    public static function path($path) {
-        return self::$serverRoot.'/'.$path;
+    public static function path($path)
+    {
+        return self::$serverRoot . '/' . $path;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -23,16 +24,16 @@ namespace Mesamatrix\Parser;
 abstract class Constants
 {
     // Extension statuses.
-    const STATUS_NOT_STARTED = "incomplete";
-    const STATUS_IN_PROGRESS = "started";
-    const STATUS_DONE = "complete";
+    public const STATUS_NOT_STARTED = "incomplete";
+    public const STATUS_IN_PROGRESS = "started";
+    public const STATUS_DONE = "complete";
 
     // OpenGL and OpenGL ES.
-    const GL_NAME = "OpenGL";
-    const GLES_NAME = "OpenGL ES";
-    const GL_OR_ES_EXTRA_NAME = "Extensions that are not part of any OpenGL or OpenGL ES version";
+    public const GL_NAME = "OpenGL";
+    public const GLES_NAME = "OpenGL ES";
+    public const GL_OR_ES_EXTRA_NAME = "Extensions that are not part of any OpenGL or OpenGL ES version";
 
-    const GL_ALL_DRIVERS = [
+    public const GL_ALL_DRIVERS = [
         "softpipe",
         "llvmpipe",
         "i965",
@@ -52,7 +53,7 @@ abstract class Constants
         "d3d12",
     ];
 
-    const GL_ALL_DRIVERS_VENDORS = [
+    public const GL_ALL_DRIVERS_VENDORS = [
         "Software"  => [ "llvmpipe", "softpipe", "swr" ],
         "Intel"     => [ "i965" ],
         "Nvidia"    => [ "nv50", "nvc0" ],
@@ -65,10 +66,10 @@ abstract class Constants
     ];
 
     // Vulkan.
-    const VK_NAME = "Vulkan";
-    const VK_EXTRA_NAME = "Extensions that are not part of any Vulkan version";
+    public const VK_NAME = "Vulkan";
+    public const VK_EXTRA_NAME = "Extensions that are not part of any Vulkan version";
 
-    const VK_ALL_DRIVERS = [
+    public const VK_ALL_DRIVERS = [
         "anv",
         "lvp",
         "radv",
@@ -77,7 +78,7 @@ abstract class Constants
         "vn",
     ];
 
-    const VK_ALL_DRIVERS_VENDORS = [
+    public const VK_ALL_DRIVERS_VENDORS = [
         "Intel"     => [ "anv" ],
         "Software"  => [ "lvp" ],
         "AMD"       => [ "radv" ],
@@ -87,17 +88,17 @@ abstract class Constants
     ];
 
     // OpenCL.
-    const OPENCL_NAME = "OpenCL";
-    const OPENCL_EXTRA_NAME = "Extensions that are not part of any OpenCL version";
-    const OPENCL_VENDOR_SPECIFIC_NAME = "Vendor-specific extensions that are not part of any OpenCL version";
+    public const OPENCL_NAME = "OpenCL";
+    public const OPENCL_EXTRA_NAME = "Extensions that are not part of any OpenCL version";
+    public const OPENCL_VENDOR_SPECIFIC_NAME = "Vendor-specific extensions that are not part of any OpenCL version";
 
-    const OPENCL_ALL_DRIVERS = [
+    public const OPENCL_ALL_DRIVERS = [
         "nvc0",
         "r600",
         "radeonsi",
     ];
 
-    const OPENCL_ALL_DRIVERS_VENDORS = [
+    public const OPENCL_ALL_DRIVERS_VENDORS = [
         "Nvidia"    => [ "nvc0" ],
         "AMD"       => [ "r600", "radeonsi" ],
     ];
@@ -105,10 +106,10 @@ abstract class Constants
     // Hints enabling for all drivers.
     // 0: regexp
     // 1: use hint?
-    const RE_ALL_DRIVERS_HINTS = [
-        [ "/^all drivers$/i", FALSE ],
-        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", TRUE ],
-        [ "/^all - but needs GLX\/EGL extension to be useful$/i", TRUE ],
+    public const RE_ALL_DRIVERS_HINTS = [
+        [ "/^all drivers$/i", false ],
+        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", true ],
+        [ "/^all - but needs GLX\/EGL extension to be useful$/i", true ],
     ];
 
     // Hints depending on another feature.
@@ -116,8 +117,8 @@ abstract class Constants
     // 1: use hint?
     // 2: dependency type
     // 3: dependency match index
-    const RE_DEP_DRIVERS_HINTS = [
-        [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", TRUE, DependsOn::EXTENSION, 1 ],
-        [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", TRUE, DependsOn::GLES_VERSION, 1 ],
+    public const RE_DEP_DRIVERS_HINTS = [
+        [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", true, DependsOn::EXTENSION, 1 ],
+        [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", true, DependsOn::GLES_VERSION, 1 ],
     ];
 }

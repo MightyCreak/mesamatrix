@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -22,11 +23,13 @@ namespace Mesamatrix\Leaderboard;
 
 use Mesamatrix\Parser\Constants;
 
-class Leaderboard {
+class Leaderboard
+{
     /**
      * Leaderboard default constructor.
      */
-    public function __construct(bool $useVersions) {
+    public function __construct(bool $useVersions)
+    {
         $this->apiVersions = array();
         $this->useVersions = $useVersions;
     }
@@ -36,25 +39,27 @@ class Leaderboard {
      *
      * @param SimpleXMLElement $xmlApi The XML element of the API.
      */
-    public function load(\SimpleXMLElement $xmlApi) {
+    public function load(\SimpleXMLElement $xmlApi)
+    {
         $this->loadApi($xmlApi);
 
         // Sort by API versions descending.
-        usort($this->apiVersions, function($a, $b) {
+        usort($this->apiVersions, function ($a, $b) {
             // Sort by API name, then API version descending.
             if ($a->getName() === $b->getName()) {
                 $diff = (float) $b->getVersion() - (float) $a->getVersion();
-                if ($diff === 0)
+                if ($diff === 0) {
                     return 0;
-                else
+                } else {
                     return $diff < 0 ? -1 : 1;
-            }
-            elseif ($a->getName() === Constants::GL_NAME ||
+                }
+            } elseif (
+                $a->getName() === Constants::GL_NAME ||
                 $a->getName() === Constants::VK_NAME ||
-                $a->getName() === Constants::OPENCL_NAME) {
+                $a->getName() === Constants::OPENCL_NAME
+            ) {
                 return -1;
-            }
-            else {
+            } else {
                 return 1;
             }
         });
@@ -65,8 +70,9 @@ class Leaderboard {
      *
      * @param SimpleXMLElement $xmlApi The XML tag for the wanted API.
      */
-    private function loadApi(\SimpleXMLElement $xmlApi) {
-        foreach($xmlApi->versions->version as $xmlVersion) {
+    private function loadApi(\SimpleXMLElement $xmlApi)
+    {
+        foreach ($xmlApi->versions->version as $xmlVersion) {
             // Count total extensions and sub-extensions.
             $numTotalExts = count($xmlVersion->extensions->extension);
             foreach ($xmlVersion->extensions->extension as $xmlExt) {
@@ -77,7 +83,8 @@ class Leaderboard {
             $lbApiVersion = $this->createApiVersion(
                 (string) $xmlVersion["name"],
                 (string) $xmlVersion["version"],
-                $numTotalExts);
+                $numTotalExts
+            );
 
             // Count done mesa extensions and sub-extensions.
             $numDoneExts = 0;
@@ -136,20 +143,22 @@ class Leaderboard {
      * @param string $id API ID (format example: OpenGL4.5, Vulkan1.1, ...).
      * @return LbApiVersion The leaderboard for the given API version.
      */
-    public function findApiVersion($id) {
+    public function findApiVersion($id)
+    {
         $i = 0;
         $numApiVersions = count($this->apiVersions);
         while ($i < $numApiVersions && $this->apiVersions[$i]->getId() !== $id) {
             $i++;
         }
 
-        return $i < $numApiVersions ? $this->apiVersions[$i] : NULL;
-     }
+        return $i < $numApiVersions ? $this->apiVersions[$i] : null;
+    }
 
     /**
      * Get the total number of extensions.
      */
-    public function getNumTotalExts() {
+    public function getNumTotalExts()
+    {
         $numExts = 0;
         foreach ($this->apiVersions as &$apiVersion) {
             $numExts += $apiVersion->getNumExts();
@@ -166,7 +175,8 @@ class Leaderboard {
      * @return LbDriverScore[] An associative array: the key is the driver name, the
      *                         value is an LbDriverScore.
      */
-    public function getDriversSortedByExtsDone(string $api) {
+    public function getDriversSortedByExtsDone(string $api)
+    {
         $sortedDriversScores = array();
         $numTotalExts = $this->getNumTotalExts();
         foreach ($this->apiVersions as &$apiVersion) {
@@ -190,7 +200,7 @@ class Leaderboard {
         }
 
         // Sort by number of extensions and then by API version.
-        uasort($sortedDriversScores, function($a, $b) {
+        uasort($sortedDriversScores, function ($a, $b) {
             $diff = $b->getNumExtensionsDone() - $a->getNumExtensionsDone();
             if ($diff === 0 && $this->useVersions) {
                 $versionDiff = $b->getApiVersion() - $a->getApiVersion();
@@ -212,8 +222,9 @@ class Leaderboard {
      * @param string $drivername Name of the driver (mesa, r600, ...).
      * @return string The API version string; NULL otherwise.
      */
-    public function getDriverApiVersion(string $api, string $drivername) {
-        $apiVersionNbr = NULL;
+    public function getDriverApiVersion(string $api, string $drivername)
+    {
+        $apiVersionNbr = null;
 
         // Parse from first to latest API version.
         // Continue as long as all the extensions are done for this driver in
@@ -241,7 +252,8 @@ class Leaderboard {
      * @param integer $numExts Total number of extensions.
      * @return LbApiVersion The new item.
      */
-    private function createApiVersion(string $name, string $version, int $numExts) {
+    private function createApiVersion(string $name, string $version, int $numExts)
+    {
         $apiVersion = new LbApiVersion($name, $version, $numExts);
         $this->apiVersions[] = $apiVersion;
         return $apiVersion;

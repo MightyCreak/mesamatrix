@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -31,20 +32,24 @@ class Commit
     private $subject;
     private $data;
 
-    public function getFilepath() {
+    public function getFilepath()
+    {
         return $this->filepath;
     }
 
-    public function setFilepath($filepath) {
+    public function setFilepath($filepath)
+    {
         $this->filepath = $filepath;
         return $this;
     }
 
-    public function getHash() {
+    public function getHash()
+    {
         return $this->hash;
     }
 
-    public function setHash($hash) {
+    public function setHash($hash)
+    {
         $this->hash = $hash;
         return $this;
     }
@@ -54,84 +59,94 @@ class Commit
      *
      * @return \DateTime The commit date.
      */
-    public function getDate() {
+    public function getDate()
+    {
         return $this->date;
     }
 
-    public function setDate($date) {
+    public function setDate($date)
+    {
         if (is_numeric($date)) {
-            $this->setDateString('@'.$date);
-        }
-        elseif (is_string($date)) {
+            $this->setDateString('@' . $date);
+        } elseif (is_string($date)) {
             $this->setDateString($date);
-        }
-        else {
+        } else {
             $this->date = $date;
         }
 
         return $this;
     }
 
-    public function setDateString($date, $timezone = null) {
+    public function setDateString($date, $timezone = null)
+    {
         $this->setDate(new \DateTime($date, $timezone));
         return $this;
     }
 
-    public function getAuthor() {
+    public function getAuthor()
+    {
         return $this->author;
     }
 
-    public function setAuthor($author) {
+    public function setAuthor($author)
+    {
         $this->author = $author;
         return $this;
     }
 
-    public function getCommitter() {
+    public function getCommitter()
+    {
         return $this->committer;
     }
 
-    public function setCommitter($committer) {
+    public function setCommitter($committer)
+    {
         $this->committer = $committer;
         return $this;
     }
 
-    public function getCommitterDate() {
+    public function getCommitterDate()
+    {
         return $this->committerDate;
     }
 
-    public function setCommitterDate($date) {
+    public function setCommitterDate($date)
+    {
         if (is_numeric($date)) {
-            $this->setCommitterDateString('@'.$date);
-        }
-        elseif (is_string($date)) {
+            $this->setCommitterDateString('@' . $date);
+        } elseif (is_string($date)) {
             $this->setCommitterDateString($date);
-        }
-        else {
+        } else {
             $this->committerDate = $date;
         }
 
         return $this;
     }
 
-    public function setCommitterDateString($date, $timezone = null) {
+    public function setCommitterDateString($date, $timezone = null)
+    {
         $this->setCommitterDate(new \DateTime($date, $timezone));
         return $this;
     }
 
-    public function getSubject() {
+    public function getSubject()
+    {
         return $this->subject;
     }
 
-    public function setSubject($subject) {
+    public function setSubject($subject)
+    {
         $this->subject = $subject;
         return $this;
     }
 
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 
-    public function setData($data) {
+    public function setData($data)
+    {
         $this->data = $data;
         return $this;
     }

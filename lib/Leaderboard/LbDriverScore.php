@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -20,7 +21,8 @@
 
 namespace Mesamatrix\Leaderboard;
 
-class LbDriverScore {
+class LbDriverScore
+{
     private $numExtsDone;
     private $numExts;
     private $apiVersion;
@@ -32,7 +34,8 @@ class LbDriverScore {
      * @param int $numExts Total number of extensions.
      * @param float $apiVersion API version (e.g. 3.1, 4.0).
      */
-    public function __construct(int $numExtsDone, int $numExts, float $apiVersion) {
+    public function __construct(int $numExtsDone, int $numExts, float $apiVersion)
+    {
         $this->setNumExtensionsDone($numExtsDone);
         $this->setNumExtensions($numExts);
         $this->setApiVersion($apiVersion);
@@ -41,49 +44,56 @@ class LbDriverScore {
     /**
      * Set the number of extensions done.
      */
-    function setNumExtensionsDone($num) {
+    public function setNumExtensionsDone($num)
+    {
         $this->numExtsDone = $num;
     }
 
     /**
      * Get the number of extensions done.
      */
-    function getNumExtensionsDone() {
+    public function getNumExtensionsDone()
+    {
         return $this->numExtsDone;
     }
 
     /**
      * Set the total number of extensions.
      */
-    function setNumExtensions($num) {
+    public function setNumExtensions($num)
+    {
         $this->numExts = $num;
     }
 
     /**
      * Get the total number of extensions.
      */
-    function getNumExtensions() {
+    public function getNumExtensions()
+    {
         return $this->numExts;
     }
 
     /**
      * Get the score.
      */
-    function getScore() {
+    public function getScore()
+    {
         return $this->numExts !== 0 ? $this->numExtsDone / $this->numExts : 0;
     }
 
     /**
      * Set the API version.
      */
-    function setApiVersion($apiVersion) {
+    public function setApiVersion($apiVersion)
+    {
         $this->apiVersion = $apiVersion;
     }
 
     /**
      * Get the API version.
      */
-    function getApiVersion() {
+    public function getApiVersion()
+    {
         return $this->apiVersion;
     }
 }

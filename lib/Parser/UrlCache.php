@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -24,12 +25,13 @@ use Mesamatrix\Mesamatrix;
 
 class UrlCache
 {
-    const EXPIRATIONDELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
+    private const EXPIRATION_DELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
 
     /**
      * Default constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->instanceTime = time();
         $this->cachedUrls = array();
     }
@@ -39,12 +41,13 @@ class UrlCache
      *
      * This file is encoded in JSON.
      */
-    public function load() {
+    public function load()
+    {
         $privateDir = Mesamatrix::$config->getValue("info", "private_dir");
-        $filepath = $privateDir.'/'.Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
-        if (file_exists($filepath) !== FALSE) {
+        $filepath = $privateDir . '/' . Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
+        if (file_exists($filepath) !== false) {
             $urlCacheContents = file_get_contents($filepath);
-            if ($urlCacheContents !== FALSE) {
+            if ($urlCacheContents !== false) {
                 $this->cachedUrls = json_decode($urlCacheContents, true);
                 Mesamatrix::$logger->info("URL cache file loaded.");
             }
@@ -56,16 +59,19 @@ class UrlCache
      *
      * This file is encoded in JSON.
      */
-    public function save() {
+    public function save()
+    {
         $privateDir = Mesamatrix::$config->getValue("info", "private_dir", "private");
-        if (file_exists($privateDir) === FALSE)
+        if (file_exists($privateDir) === false) {
             mkdir($privateDir, 0777, true);
-        $filepath = $privateDir.'/'.Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
+        }
+        $filepath = $privateDir . '/' . Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
         $res = file_put_contents($filepath, json_encode($this->cachedUrls));
-        if ($res !== FALSE)
-            Mesamatrix::$logger->info("URL cache file saved: ".$filepath.".");
-        else
-            Mesamatrix::$logger->error("Can't save URL cache file in \"".$filepath."\".");
+        if ($res !== false) {
+            Mesamatrix::$logger->info("URL cache file saved: " . $filepath . ".");
+        } else {
+            Mesamatrix::$logger->error("Can't save URL cache file in \"" . $filepath . "\".");
+        }
     }
 
     /**
@@ -75,9 +81,11 @@ class UrlCache
      *
      * @param string $url URL to test.
      */
-    public function isValid($url) {
-        if ($this->needCheck($url))
+    public function isValid($url)
+    {
+        if ($this->needCheck($url)) {
             $this->updateUrl($url);
+        }
         return $this->cachedUrls[$url]['is_valid'];
     }
 
@@ -87,7 +95,8 @@ class UrlCache
      * @param string $url URL to test.
      * @return boolean Whether or not the given URL need to be checked again.
      */
-    private function needCheck($url) {
+    private function needCheck($url)
+    {
         $urlKnown = array_key_exists($url, $this->cachedUrls);
         return !$urlKnown || $this->cachedUrls[$url]['expiration_date'] < $this->instanceTime;
     }
@@ -97,17 +106,18 @@ class UrlCache
      *
      * @param string $url URL to update.
      */
-    private function updateUrl($url) {
+    private function updateUrl($url)
+    {
         $urlHeader = get_headers($url);
-        $isValid = FALSE;
-        if ($urlHeader !== FALSE) {
-            Mesamatrix::$logger->info("Try URL \"".$url."\". Result: \"".$urlHeader[0]."\".");
+        $isValid = false;
+        if ($urlHeader !== false) {
+            Mesamatrix::$logger->info("Try URL \"" . $url . "\". Result: \"" . $urlHeader[0] . "\".");
             $isValid = $urlHeader[0] === "HTTP/1.1 200 OK";
         }
 
         // Register URL's validity.
         $this->cachedUrls[$url] = array(
-            'expiration_date' => $this->instanceTime + self::EXPIRATIONDELAY,
+            'expiration_date' => $this->instanceTime + self::EXPIRATION_DELAY,
             'is_valid' => $isValid);
     }
 

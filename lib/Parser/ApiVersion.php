@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,11 +26,12 @@ use Mesamatrix\Mesamatrix;
 class ApiVersion
 {
     public function __construct(
-            string $name,
-            ?string $version,
-            ?string $glslName,
-            ?string $glslVersion,
-            Hints $hints) {
+        string $name,
+        ?string $version,
+        ?string $glslName,
+        ?string $glslVersion,
+        Hints $hints
+    ) {
         $this->setName($name);
         $this->setVersion($version);
         $this->setGlslName($glslName);
@@ -39,34 +41,42 @@ class ApiVersion
     }
 
     // API name
-    public function setName(string $name) {
+    public function setName(string $name)
+    {
         $this->name = $name;
     }
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     // API version
-    public function setVersion(?string $version) {
+    public function setVersion(?string $version)
+    {
         $this->version = $version;
     }
-    public function getVersion() {
+    public function getVersion()
+    {
         return $this->version;
     }
 
     // GLSL name
-    public function setGlslName(?string $name) {
+    public function setGlslName(?string $name)
+    {
         $this->glslName = $name;
     }
-    public function getGlslName() {
+    public function getGlslName()
+    {
         return $this->glslName;
     }
 
     // GLSL version
-    public function setGlslVersion(?string $version) {
+    public function setGlslVersion(?string $version)
+    {
         $this->glslVersion = $version;
     }
-    public function getGlslVersion() {
+    public function getGlslVersion()
+    {
         return $this->glslVersion;
     }
 
@@ -75,7 +85,8 @@ class ApiVersion
      *
      * @param Extension $extension The extension to add.
      */
-    public function addExtension(Extension $extension) {
+    public function addExtension(Extension $extension)
+    {
         $this->extensions[] = $extension;
     }
 
@@ -84,22 +95,23 @@ class ApiVersion
      *
      * @return string[] The list of supported drivers names; null if API not recognized.
      */
-    public function getAllApiDrivers() {
+    public function getAllApiDrivers()
+    {
         $apiName = $this->getName();
         switch ($apiName) {
-        case Constants::GL_NAME:
-        case Constants::GLES_NAME:
-        case Constants::GL_OR_ES_EXTRA_NAME:
-            return Constants::GL_ALL_DRIVERS;
+            case Constants::GL_NAME:
+            case Constants::GLES_NAME:
+            case Constants::GL_OR_ES_EXTRA_NAME:
+                return Constants::GL_ALL_DRIVERS;
 
-        case Constants::VK_NAME:
-        case Constants::VK_EXTRA_NAME:
-            return Constants::VK_ALL_DRIVERS;
+            case Constants::VK_NAME:
+            case Constants::VK_EXTRA_NAME:
+                return Constants::VK_ALL_DRIVERS;
 
-        case Constants::OPENCL_NAME:
-        case Constants::OPENCL_EXTRA_NAME:
-        case Constants::OPENCL_VENDOR_SPECIFIC_NAME:
-            return Constants::OPENCL_ALL_DRIVERS;
+            case Constants::OPENCL_NAME:
+            case Constants::OPENCL_EXTRA_NAME:
+            case Constants::OPENCL_VENDOR_SPECIFIC_NAME:
+                return Constants::OPENCL_ALL_DRIVERS;
         }
 
         return null;
@@ -110,20 +122,21 @@ class ApiVersion
      *
      * @return string[] The list of supported drivers names.
      */
-    public function getSupportedDrivers() {
+    public function getSupportedDrivers()
+    {
         $supportedDrivers = [];
 
         $apiDrivers = $this->getAllApiDrivers();
         foreach ($apiDrivers as $driverName) {
-            $driver = NULL;
+            $driver = null;
             foreach ($this->getExtensions() as $ext) {
                 $driver = $ext->getSupportedDriverByName($driverName);
-                if ($driver === NULL) {
+                if ($driver === null) {
                     break;
                 }
             }
 
-            if ($driver !== NULL) {
+            if ($driver !== null) {
                 $supportedDrivers[] = $driverName;
             }
         }
@@ -136,13 +149,15 @@ class ApiVersion
      *
      * @param Matrix $matrix The entire matrix.
      */
-    public function solveExtensionDependencies($matrix) {
+    public function solveExtensionDependencies($matrix)
+    {
         foreach ($this->getExtensions() as $ext) {
             $ext->solveExtensionDependencies($matrix);
         }
     }
 
-    public function loadXml(\SimpleXMLElement $xmlSection) {
+    public function loadXml(\SimpleXMLElement $xmlSection)
+    {
         $xmlExts = $xmlSection->extensions->extension;
 
         // Add new extensions.
@@ -159,7 +174,7 @@ class ApiVersion
                 // Get driver name and verify it's valid.
                 $driverName = (string) $xmlSupportedDriver['name'];
                 if (!in_array($driverName, $apiDrivers)) {
-                    Mesamatrix::$logger->error('Unrecognized driver: '.$driverName);
+                    Mesamatrix::$logger->error('Unrecognized driver: ' . $driverName);
                     continue;
                 }
 
@@ -183,7 +198,8 @@ class ApiVersion
      *
      * @return Extension[] All the extensions.
      */
-    public function getExtensions() {
+    public function getExtensions()
+    {
         return $this->extensions;
     }
 
@@ -192,7 +208,8 @@ class ApiVersion
      *
      * @return int The number of extensions.
      */
-    public function getNumExtensions() {
+    public function getNumExtensions()
+    {
         return count($this->extensions);
     }
 
@@ -203,7 +220,8 @@ class ApiVersion
      *
      * @return Extension The extension or null if not found.
      */
-    public function getExtensionByName($name) {
+    public function getExtensionByName($name)
+    {
         foreach ($this->extensions as $extension) {
             if ($extension->getName() === $name) {
                 return $extension;
@@ -219,9 +237,10 @@ class ApiVersion
      *
      * @return Extension The extension or null if not found.
      */
-    public function getExtensionBySubstr($substr) {
+    public function getExtensionBySubstr($substr)
+    {
         foreach ($this->extensions as $extension) {
-            if (strstr($extension->getName(), $substr) !== FALSE) {
+            if (strstr($extension->getName(), $substr) !== false) {
                 return $extension;
             }
         }
