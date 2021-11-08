@@ -32,11 +32,11 @@ class AboutController extends BaseController
         $this->setPage('About');
     }
 
-    protected function computeRendering()
+    protected function computeRendering(): void
     {
     }
 
-    protected function writeHtmlPage()
+    protected function writeHtmlPage(): void
     {
         $mesaWeb = Mesamatrix::$config->getValue('git', 'mesa_web');
         $mesaBranch = Mesamatrix::$config->getValue('git', 'branch');

@@ -31,11 +31,11 @@ class DriversController extends BaseController
         $this->addJsScript('js/drivers.js');
     }
 
-    protected function computeRendering()
+    protected function computeRendering(): void
     {
     }
 
-    protected function writeHtmlPage()
+    protected function writeHtmlPage(): void
     {
         echo <<<'HTML'
             <h1>Easy decoder ring</h1>

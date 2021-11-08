@@ -47,7 +47,7 @@ abstract class BaseController
      * The page must be one of the page in $this->pages.
      * @param string $page The name of the page.
      */
-    final protected function setPage($page)
+    final protected function setPage($page): void
     {
         $this->pageIdx = array_search($page, array_keys($this->pages));
     }
@@ -56,7 +56,7 @@ abstract class BaseController
      * Add a CSS script to include in the HTML page header.
      * @param string $script The script path.
      */
-    final public function addCssScript($script)
+    final public function addCssScript($script): void
     {
         $this->cssScripts[] = $script;
     }
@@ -65,7 +65,7 @@ abstract class BaseController
      * Add a JS script to include in the HTML page header.
      * @param string $script The script path.
      */
-    final public function addJsScript($script)
+    final public function addJsScript($script): void
     {
         $this->jsScripts[] = $script;
     }
@@ -73,7 +73,7 @@ abstract class BaseController
     /**
      * Write the HTML code.
      */
-    final public function writeHtml()
+    final public function writeHtml(): void
     {
         $this->computeRendering();
 
@@ -85,17 +85,17 @@ abstract class BaseController
     /**
      * Compute the data needed for rendering.
      */
-    abstract protected function computeRendering();
+    abstract protected function computeRendering(): void;
 
     /**
      * Write the content of the HTML page.
      */
-    abstract protected function writeHtmlPage();
+    abstract protected function writeHtmlPage(): void;
 
     /**
      * Write the HTML page header.
      */
-    final protected function writeHtmlHeader()
+    final protected function writeHtmlHeader(): void
     {
         $projectTitle = Mesamatrix::$config->getValue("info", "title");
         $projectDescription = Mesamatrix::$config->getValue("info", "description");
@@ -165,7 +165,7 @@ HTML;
     /**
      * Write the HTML page footer.
      */
-    final protected function writeHtmlFooter()
+    final protected function writeHtmlFooter(): void
     {
         $projectUrl = Mesamatrix::$config->getValue("info", "project_url");
 

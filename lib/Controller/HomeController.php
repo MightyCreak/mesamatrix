@@ -36,14 +36,11 @@ class HomeController extends BaseController
         parent::__construct();
 
         $this->setPage('Home');
+        $this->apiControllers[] = new ApiSubController(Constants::VK_NAME, true);
         $this->apiControllers[] = new ApiSubController(Constants::GL_NAME, true);
         $this->apiControllers[] = new ApiSubController(Constants::GLES_NAME, true);
         $this->apiControllers[] = new ApiSubController(Constants::GL_OR_ES_EXTRA_NAME, false);
-        $this->apiControllers[] = new ApiSubController(Constants::VK_NAME, true);
-        $this->apiControllers[] = new ApiSubController(Constants::VK_EXTRA_NAME, false);
         $this->apiControllers[] = new ApiSubController(Constants::OPENCL_NAME, true);
-        $this->apiControllers[] = new ApiSubController(Constants::OPENCL_EXTRA_NAME, false);
-        $this->apiControllers[] = new ApiSubController(Constants::OPENCL_VENDOR_SPECIFIC_NAME, false);
 
         $this->addCssScript('css/tipsy.css');
 
@@ -51,7 +48,7 @@ class HomeController extends BaseController
         $this->addJsScript('js/script.js');
     }
 
-    protected function computeRendering()
+    protected function computeRendering(): void
     {
         $xml = $this->loadMesamatrixXml();
 
@@ -62,7 +59,7 @@ class HomeController extends BaseController
         }
     }
 
-    private function loadMesamatrixXml()
+    private function loadMesamatrixXml(): ?SimpleXMLElement
     {
         $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'xml_file'));
         $xml = simplexml_load_file($featuresXmlFilepath);
@@ -74,7 +71,7 @@ class HomeController extends BaseController
         return $xml;
     }
 
-    private function createCommitsModel(SimpleXMLElement $xml)
+    private function createCommitsModel(SimpleXMLElement $xml): void
     {
         $this->commits = array();
 
@@ -90,14 +87,14 @@ class HomeController extends BaseController
         }
     }
 
-    private function createLeaderboard(SimpleXMLElement $xml, array $apis)
+    private function createLeaderboard(SimpleXMLElement $xml, array $apis): Leaderboard
     {
         $leaderboard = new Leaderboard();
         $leaderboard->load($xml, $apis);
         return $leaderboard;
     }
 
-    protected function writeHtmlPage()
+    protected function writeHtmlPage(): void
     {
         $mesaWeb = Mesamatrix::$config->getValue('git', 'mesa_web');
         $mesaBranch = Mesamatrix::$config->getValue('git', 'branch');

@@ -46,9 +46,30 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Parse extends Command
 {
-    protected $output;
-    protected $statuses;
-    protected $urlCache;
+    private const API_INFOS = [
+        // OpenGL.
+        Constants::GL_NAME => [ Constants::GL_NAME ],
+
+        // OpenGL ES.
+        Constants::GLES_NAME => [ Constants::GLES_NAME ],
+
+        // OpenGL(ES) extra.
+        Constants::GL_OR_ES_EXTRA_NAME => [ Constants::GL_OR_ES_EXTRA_NAME ],
+
+        // Vulkan.
+        Constants::VK_NAME => [ Constants::VK_NAME, Constants::VK_EXTRA_NAME ],
+
+        // OpenCL.
+        Constants::OPENCL_NAME => [
+            Constants::OPENCL_NAME,
+            Constants::OPENCL_EXTRA_NAME,
+            Constants::OPENCL_VENDOR_SPECIFIC_NAME
+        ],
+    ];
+
+    protected OutputInterface $output;
+    protected array $statuses;
+    protected ?UrlCache $urlCache;
 
     protected function configure(): void
     {
@@ -184,7 +205,7 @@ class Parse extends Command
      * @param string[] $excludedCommits The commits to exclude from the list.
      * @return Commit[]|null Array of commits.
      */
-    protected function fetchCommits($filepath, array $excludedCommits)
+    protected function fetchCommits($filepath, array $excludedCommits): ?array
     {
         $branch = Mesamatrix::$config->getValue("git", "branch");
         $gitCommitGet = new Process(array(
@@ -249,7 +270,7 @@ class Parse extends Command
      *
      * @param Commit $commit The commit to parse.
      */
-    protected function parseCommit(Commit $commit)
+    protected function parseCommit(Commit $commit): void
     {
         // Show content for this commit.
         $filepath = $commit->getFilepath();
@@ -277,45 +298,9 @@ class Parse extends Command
         // Write APIs.
         $apis = $xml->addChild('apis');
 
-        // Write OpenGL API.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::GL_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::GL_NAME);
-
-        // Write OpenGL ES API.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::GLES_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::GLES_NAME);
-
-        // Write OpenGL(ES) extra API.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::GL_OR_ES_EXTRA_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::GL_OR_ES_EXTRA_NAME);
-
-        // Write Vulkan API.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::VK_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::VK_NAME);
-
-        // Write Vulkan extra API.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::VK_EXTRA_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::VK_EXTRA_NAME);
-
-        // Write OpenCL API.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::OPENCL_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::OPENCL_NAME);
-
-        // Write OpenCL extra API.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::OPENCL_EXTRA_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::OPENCL_EXTRA_NAME);
-
-        // Write OpenCL vendor-specific API.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::OPENCL_VENDOR_SPECIFIC_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
+        foreach ($this::API_INFOS as $apiName => $apiVersions) {
+            $this->addApi($matrix, $apis, $apiName, $apiVersions, false);
+        }
 
         // Write file.
         $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir'))
@@ -332,7 +317,7 @@ class Parse extends Command
      *
      * @param array Commit $commits The commits to merge.
      */
-    protected function generateMergedXml(array $commits)
+    protected function generateMergedXml(array $commits): void
     {
         if (count($commits) == 0) {
             Mesamatrix::$logger->error('No commits to merge.');
@@ -392,53 +377,9 @@ class Parse extends Command
         // Generate APIs.
         $apis = $xml->addChild('apis');
 
-        // Generate for OpenGL.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::GL_NAME);
-        $this->populateVendors($api, Constants::GL_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::GL_NAME);
-
-        // Generate for OpenGL ES.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::GLES_NAME);
-        $this->populateVendors($api, Constants::GLES_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::GLES_NAME);
-
-        // Generate for OpenGL/ES (extra).
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::GL_OR_ES_EXTRA_NAME);
-        $this->populateVendors($api, Constants::GL_OR_ES_EXTRA_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::GL_OR_ES_EXTRA_NAME);
-
-        // Generate for Vulkan.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::VK_NAME);
-        $this->populateVendors($api, Constants::VK_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::VK_NAME);
-
-        // Generate for Vulkan (extra).
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::VK_EXTRA_NAME);
-        $this->populateVendors($api, Constants::VK_EXTRA_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::VK_EXTRA_NAME);
-
-        // Generate for OpenCL.
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::OPENCL_NAME);
-        $this->populateVendors($api, Constants::OPENCL_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::OPENCL_NAME);
-
-        // Generate for OpenCL (extra).
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::OPENCL_EXTRA_NAME);
-        $this->populateVendors($api, Constants::OPENCL_EXTRA_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::OPENCL_EXTRA_NAME);
-
-        // Generate for OpenCL (vendor specific).
-        $api = $apis->addChild('api');
-        $api->addAttribute('name', Constants::OPENCL_VENDOR_SPECIFIC_NAME);
-        $this->populateVendors($api, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
-        $this->generateApiVersions($api, $matrix, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
+        foreach ($this::API_INFOS as $apiName => $apiVersions) {
+            $this->addApi($matrix, $apis, $apiName, $apiVersions, true);
+        }
 
         $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
 
@@ -462,7 +403,7 @@ class Parse extends Command
         Matrix $prevMatrix,
         Matrix $matrix,
         Commit $commit
-    ) {
+    ): void {
         foreach ($matrix->getApiVersions() as $apiVersion) {
             foreach ($apiVersion->getExtensions() as $ext) {
                 $prevExt = $prevMatrix->getExtensionBySubstr($ext->getName());
@@ -485,7 +426,7 @@ class Parse extends Command
         ?Extension $prevExt,
         Extension $ext,
         Commit $commit
-    ) {
+    ): void {
 
         if ($ext->getModifiedAt() === null) {
             if (
@@ -525,7 +466,7 @@ class Parse extends Command
         }
     }
 
-    protected function populateStatuses(SimpleXMLElement $xmlStatuses)
+    protected function populateStatuses(SimpleXMLElement $xmlStatuses): void
     {
         foreach ($this->statuses as $status => $match) {
             $xmlStatus = $xmlStatuses->addChild($status);
@@ -533,7 +474,7 @@ class Parse extends Command
         }
     }
 
-    protected function generateCommitsLog(SimpleXMLElement $xml, array $commits)
+    protected function generateCommitsLog(SimpleXMLElement $xml, array $commits): void
     {
         foreach (array_reverse($commits) as $commit) {
             $commitNode = $xml->addChild("commit", htmlspecialchars($commit->getData()));
@@ -543,7 +484,24 @@ class Parse extends Command
         }
     }
 
-    protected function populateVendors(SimpleXMLElement $xmlParent, string $apiName)
+    protected function addApi(
+        Matrix $matrix,
+        SimpleXMLElement $xmlParent,
+        string $apiName,
+        array $apiVersions,
+        bool $populateVendors
+    ): void {
+        $api = $xmlParent->addChild('api');
+        $api->addAttribute('name', $apiName);
+
+        if ($populateVendors) {
+            $this->populateVendors($api, $apiName);
+        }
+
+        $this->generateApiVersions($api, $matrix, $apiVersions);
+    }
+
+    protected function populateVendors(SimpleXMLElement $xmlParent, string $apiName): void
     {
         $vendors = null;
         switch ($apiName) {
@@ -569,7 +527,7 @@ class Parse extends Command
         $this->populateDrivers($xmlVendors, $vendors);
     }
 
-    protected function populateDrivers(SimpleXMLElement $xmlVendors, array $vendors)
+    protected function populateDrivers(SimpleXMLElement $xmlVendors, array $vendors): void
     {
         foreach ($vendors as $vendor => $drivers) {
             $xmlVendor = $xmlVendors->addChild("vendor");
@@ -582,18 +540,20 @@ class Parse extends Command
         }
     }
 
-    protected function generateApiVersions(SimpleXMLElement $api, Matrix $matrix, string $name)
+    protected function generateApiVersions(SimpleXMLElement $api, Matrix $matrix, array $names): void
     {
         $xmlVersions = $api->addChild("versions");
-        foreach ($matrix->getApiVersions() as $apiVersion) {
-            if ($apiVersion->getName() === $name) {
-                $xmlVersion = $xmlVersions->addChild('version');
-                $this->generateApiVersion($xmlVersion, $apiVersion, $matrix->getHints());
+        foreach ($names as $name) {
+            foreach ($matrix->getApiVersions() as $apiVersion) {
+                if ($apiVersion->getName() === $name) {
+                    $xmlVersion = $xmlVersions->addChild('version');
+                    $this->generateApiVersion($xmlVersion, $apiVersion, $matrix->getHints());
+                }
             }
         }
     }
 
-    protected function generateApiVersion(SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints)
+    protected function generateApiVersion(SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints): void
     {
         $xmlVersion->addAttribute("name", $apiVersion->getName());
         $xmlVersion->addAttribute("version", $apiVersion->getVersion());
@@ -609,7 +569,7 @@ class Parse extends Command
         }
     }
 
-    protected function generateExtension(SimpleXMLElement $xmlExt, Extension $ext, Hints $hints)
+    protected function generateExtension(SimpleXMLElement $xmlExt, Extension $ext, Hints $hints): void
     {
         $xmlExt->addAttribute("name", $ext->getName());
 
@@ -678,7 +638,7 @@ class Parse extends Command
         }
     }
 
-    protected function loadUrlCache()
+    protected function loadUrlCache(): void
     {
         $this->urlCache = null;
         if (Mesamatrix::$config->getValue("extension_links", "enabled", false)) {
@@ -688,7 +648,7 @@ class Parse extends Command
         }
     }
 
-    protected function saveUrlCache()
+    protected function saveUrlCache(): void
     {
         if ($this->urlCache) {
             $this->urlCache->save();
