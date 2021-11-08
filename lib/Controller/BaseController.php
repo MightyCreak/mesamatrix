@@ -97,37 +97,39 @@ abstract class BaseController
      */
     final protected function writeHtmlHeader()
     {
-        ?>
+        $projectTitle = Mesamatrix::$config->getValue("info", "title");
+        $projectDescription = Mesamatrix::$config->getValue("info", "description");
+
+        echo <<<HTML
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
-        <meta name="description" content="<?= Mesamatrix::$config->getValue("info", "description") ?>"/>
+        <meta name="description" content="{$projectDescription}"/>
 
-        <title><?= Mesamatrix::$config->getValue("info", "title") ?></title>
+        <title>{$projectTitle}</title>
 
-        <meta property="og:title" content="Mesamatrix: <?= Mesamatrix::$config->getValue("info", "title") ?>" />
+        <meta property="og:title" content="Mesamatrix: {$projectTitle}" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="//mesamatrix.net/images/mesamatrix-logo.png" />
 
         <link rel="shortcut icon" href="images/gears.png" />
         <link rel="alternate" type="application/rss+xml" title="rss feed" href="rss.php" />
+HTML;
 
-        <?php
         foreach ($this->cssScripts as $script) :
-            ?>
-        <link href="<?= $script ?>" rel="stylesheet" type="text/css" media="all" />
-            <?php
+            echo <<<HTML
+        <link href="{$script}" rel="stylesheet" type="text/css" media="all" />
+HTML;
         endforeach;
-        ?>
 
-        <?php
         foreach ($this->jsScripts as $script) :
-            ?>
-        <script src="<?= $script ?>"></script>
-            <?php
+            echo <<<HTML
+        <script src="{$script}"></script>
+HTML;
         endforeach;
-        ?>
+
+        echo <<<'HTML'
     </head>
     <body>
         <header>
@@ -135,28 +137,29 @@ abstract class BaseController
 
             <div class="menu">
                 <ul class="menu-list">
-        <?php
+HTML;
         $i = 0;
         foreach ($this->pages as $page => $link) :
             $item = "<a href=\"" . $link . "\">" . $page . "</a>";
             if ($i === $this->pageIdx) :
-                ?>
-                    <li class="menu-item menu-selected"><?= $item ?></li>
-                <?php
+                echo <<<HTML
+                    <li class="menu-item menu-selected">{$item}</li>
+HTML;
             else :
-                ?>
-                    <li class="menu-item"><a href="<?= $link ?>"><?= $page ?></a></li>
-                <?php
+                echo <<<HTML
+                    <li class="menu-item"><a href="{$link}">{$page}</a></li>
+HTML;
             endif;
             ++$i;
         endforeach;
-        ?>
+
+        echo <<<'HTML'
                     <li class="menu-item"><a href="rss.php" class="rss"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a></li>
                 </ul>
             </div>
         </header>
         <main>
-        <?php
+HTML;
     }
 
     /**
@@ -164,10 +167,14 @@ abstract class BaseController
      */
     final protected function writeHtmlFooter()
     {
-        ?>
+        $projectUrl = Mesamatrix::$config->getValue("info", "project_url");
+
+        echo <<<HTML
         </main>
         <footer>
-            <a id="github-ribbon" href="<?= Mesamatrix::$config->getValue("info", "project_url") ?>"><img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" /></a>
+            <a id="github-ribbon" href="{$projectUrl}">
+                <img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" />
+            </a>
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="checkbox">
                     <input type="checkbox" id="checkbox" />
@@ -177,6 +184,6 @@ abstract class BaseController
         </footer>
     </body>
 </html>
-        <?php
+HTML;
     }
 }

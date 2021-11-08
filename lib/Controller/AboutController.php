@@ -82,7 +82,7 @@ HTML;
             endif;
         endforeach;
 
-        echo <<<HTML
+        echo <<<'HTML'
 </ul>
 <h2>See also</h2>
 <p>Here are few links to learn more about the Linux graphics drivers:</p>

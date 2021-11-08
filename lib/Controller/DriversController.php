@@ -37,7 +37,7 @@ class DriversController extends BaseController
 
     protected function writeHtmlPage()
     {
-        ?>
+        echo <<<'HTML'
             <h1>Easy decoder ring</h1>
             <p>Note: this is a beta, it only works for AMD graphics cards (for now).</p>
             <p>Enter the commercial name of your <abbr title="Graphics Processing Unit">GPU</abbr> (e.g. HD 6870):</p>
@@ -50,6 +50,6 @@ class DriversController extends BaseController
                 All the data are from the
                 <a href="http://xorg.freedesktop.org/wiki/RadeonFeature/#index5h2">FreeDesktop decoder ring</a>.
             </p>
-        <?php
+HTML;
     }
 }

@@ -97,7 +97,7 @@ class ApiSubController
 
         $columnIdx = 0;
 
-        // Add "extension" columon.
+        // Add "extension" column.
         $matrix['column_groups'][] = array(
             'name' => '',
             'vendor_class' => 'default',
@@ -319,109 +319,126 @@ class ApiSubController
         foreach ($this->matrix['sections'] as $section) :
             $sectionName = (string)$section['name'];
             $sectionId = (string)$section['target'];
-            ?>
-    <h1 id="<?= $sectionId ?>"><?= $sectionName ?><a href="#<?= $sectionId ?>" class="permalink">&para;</a></h1>
-            <?php
+
+            echo <<<HTML
+    <h1 id="{$sectionId}">{$sectionName}<a href="#{$sectionId}" class="permalink">&para;</a></h1>
+HTML;
+
             $this->writeLeaderboard();
-            ?>
+
+            echo <<<'HTML'
     <details>
         <summary>Drivers details</summary>
         <table class="matrix">
-            <?php
+HTML;
+
             // Colgroups.
             foreach ($this->matrix['column_groups'] as $colgroup) :
                 foreach ($colgroup['columns'] as $colIdx) :
                     $col = $this->matrix['columns'][$colIdx];
                     if ($col['type'] === 'driver') :
-                        ?>
+                        echo <<<'HTML'
             <colgroup class="hl">
-                        <?php
+HTML;
                     else :
-                        ?>
+                        echo <<<'HTML'
             <colgroup>
-                        <?php
+HTML;
                     endif;
                 endforeach;
             endforeach;
 
-    // Sub-sections.
+            // Sub-sections.
+            $numColumns = count($this->matrix['columns']);
             foreach ($section['subsections'] as $subsection) :
                 $subsectionName = (string)$subsection['name'];
                 $subsectionId = (string)$subsection['target'];
 
                 if (!empty($subsectionName)) :
-                    ?>
+                    echo <<<HTML
             <tr>
-                <td colspan="<?= count($this->matrix['columns']) ?>">
-                    <h2 id="<?= $subsectionId ?>"><?= $subsectionName ?><a href="#<?= $subsectionId ?>" class="permalink">&para;</a></h2>
+                <td colspan="{$numColumns}">
+                    <h2 id="{$subsectionId}">{$subsectionName}<a href="#{$subsectionId}" class="permalink">&para;</a></h2>
                 </td>
             </tr>
-                    <?php
+HTML;
                 endif;
-                ?>
+
+                echo <<<'HTML'
             <tr>
-                <?php
+HTML;
+
                 // Header (vendors).
                 foreach ($this->matrix['column_groups'] as $colgroup) :
                     if (empty($colgroup['name'])) :
-                        ?>
+                        echo <<<'HTML'
                 <td></td>
-                        <?php
+HTML;
                     else :
-                        ?>
-                <td colspan="<?= count($colgroup['columns']) ?>" class="hCellHeader hCellVendor-<?= $colgroup['vendor_class'] ?>"><?= $colgroup['name'] ?></td>
-                        <?php
+                        $colspan = count($colgroup['columns']);
+                        $colgroupName = $colgroup['name'];
+                        $vendorClass = "hCellVendor-" . $colgroup['vendor_class'];
+
+                        echo <<<HTML
+                <td colspan="{$colspan}" class="hCellHeader hCellVendor-{$vendorClass}">{$colgroupName}</td>
+HTML;
                     endif;
                 endforeach;
-                ?>
+
+                echo <<<'HTML'
             </tr>
             <tr>
-                <?php
+HTML;
+
                 // Header (drivers).
                 foreach ($this->matrix['columns'] as $col) :
                     if ($col['type'] === 'extension') :
-                        ?>
-                <td class="hCellHeader hCellVendor-default"><?= $col['name'] ?></td>
-                        <?php
+                        echo <<<HTML
+                <td class="hCellHeader hCellVendor-default">{$col['name']}</td>
+HTML;
                     elseif ($col['type'] === 'driver') :
-                        ?>
-                <td class="hCellHeader hCellVendor-<?= $col['vendor_class'] ?>"><?= $col['name'] ?></td>
-                        <?php
+                        echo <<<HTML
+                <td class="hCellHeader hCellVendor-{$col['vendor_class']}">{$col['name']}</td>
+HTML;
                     elseif ($col['type'] === 'separator') :
-                        ?>
+                        echo <<<'HTML'
                 <td class="hCellSep"></td>
-                        <?php
+HTML;
                     else :
-                        ?>
-                <td><?= $col['name'] ?></td>
-                        <?php
+                        echo <<<HTML
+                <td>{$col['name']}</td>
+HTML;
                     endif;
                 endforeach;
-                ?>
+
+                echo <<<'HTML'
             </tr>
             <tr>
-                <?php
+HTML;
+
                 // Scores.
                 foreach ($this->matrix['columns'] as $col) :
                     if ($col['type'] === 'driver') :
                         $scoreStr = sprintf('%.1f', $subsection['scores'][$col['name']] * 100);
-                        ?>
-                <td class="hCellHeader hCellDriverScore" data-score="<?= $scoreStr ?>"><?= $scoreStr ?>%</td>
-                        <?php
+                        echo <<<HTML
+                <td class="hCellHeader hCellDriverScore" data-score="{$scoreStr}">{$scoreStr}%</td>
+HTML;
                     else :
-                        ?>
+                        echo <<<'HTML'
                 <td></td>
-                        <?php
+HTML;
                     endif;
                 endforeach;
-                ?>
+
+                echo <<<'HTML'
             </tr>
-                <?php
+HTML;
+
                 // Extensions.
                 foreach ($subsection['extensions'] as $extension) :
-                    ?>
+                    echo <<<'HTML'
             <tr class="extension">
-                    <?php
+HTML;
                     foreach ($this->matrix['columns'] as $col) :
                         if ($col['type'] === 'extension') :
                             $extNameText = $extension['name'];
@@ -432,11 +449,11 @@ class ApiSubController
                             if ($extension['is_subext']) :
                                 $cssClass = ' class="extension-child"';
                             endif;
-                            ?>
-                <td id="<?= $extension['target'] ?>"<?= $cssClass ?>>
-                            <?= $extNameText ?><a href="#<?= $extension['target'] ?>" class="permalink">&para;</a>
+                            echo <<<HTML
+                <td id="{$extension['target']}"{$cssClass}>
+                    {$extNameText}<a href="#{$extension['target']}" class="permalink">&para;</a>
                 </td>
-                            <?php
+HTML;
                         elseif ($col['type'] === 'driver') :
                             $driverTask = $extension['tasks'][$col['name']];
                             $cssClasses = array('task', $driverTask['class']);
@@ -445,33 +462,36 @@ class ApiSubController
                                 $cssClasses[] = 'footnote';
                                 $title = ' title="' . $driverTask['hint'] . '"';
                             endif;
-                            ?>
-                <td class="<?= join(' ', $cssClasses) ?>"<?= $title ?>>
-                            <?php
+
+                            $cssClassesStr = join(' ', $cssClasses);
+                            echo <<<HTML
+                <td class="{$cssClassesStr}"{$title}>
+HTML;
                             if (isset($driverTask['timestamp'])) :
-                                ?>
-                    <span data-timestamp="<?= $driverTask['timestamp'] ?>"><?= date('Y-m-d', $driverTask['timestamp']) ?></span>
-                                <?php
+                                $date = date('Y-m-d', $driverTask['timestamp']);
+                                echo <<<HTML
+                    <span data-timestamp="{$driverTask['timestamp']}">{$date}</span>
+HTML;
                             endif;
-                            ?>
+                            echo <<<'HTML'
                 </td>
-                            <?php
+HTML;
                         else :
-                            ?>
+                            echo <<<'HTML'
                 <td></td>
-                            <?php
+HTML;
                         endif;
                     endforeach;
-                    ?>
+                    echo <<<'HTML'
             </tr>
-                    <?php
+HTML;
                 endforeach;
             endforeach;
         endforeach;
-        ?>
+        echo <<<'HTML'
         </table>
     </details>
-        <?php
+HTML;
     }
 
     private function writeLeaderboard(): void
@@ -482,23 +502,29 @@ class ApiSubController
         if ($this->showLbVersion) {
             $colNames[] = 'Version';
         }
-        ?>
-    <p>There is a total of <strong><?= $numTotalExts ?></strong> extensions to implement.
-    The ranking is based on the number of extensions done by driver. </p>
+
+        echo <<<HTML
+    <p>
+        There is a total of <strong>{$numTotalExts}</strong> extensions to implement.
+        The ranking is based on the number of extensions done by driver.
+    </p>
     <table class="lb">
         <thead>
             <tr>
-        <?php
+HTML;
+
         foreach ($colNames as $name) :
-            ?>
-                <th><?= $name ?></th>
-            <?php
+            echo <<<HTML
+                <th>{$name}</th>
+HTML;
         endforeach;
-        ?>
+
+        echo <<<'HTML'
             </tr>
         </thead>
         <tbody>
-        <?php
+HTML;
+
         $index = 1;
         $rank = 1;
         $prevNumExtsDone = -1;
@@ -536,26 +562,30 @@ class ApiSubController
                     $apiVersion = "N/A";
                 }
             }
-            ?>
-            <tr class="<?= $rankRowClass ?>">
-                <th class="<?= join(" ", $rankCellClasses) ?>"><?= $rank ?></th>
-                <td class="lbCol-driver"><?= $driverName ?></td>
-                <td class="lbCol-score"><span class="lbCol-pctScore">(<?= $pctScore ?>)</span> <?= $numExtsDone ?></td>
-            <?php
+
+            $cssClassesStr = join(' ', $rankCellClasses);
+            echo <<<HTML
+            <tr class="{$rankRowClass}">
+                <th class="{$cssClassesStr}">{$rank}</th>
+                <td class="lbCol-driver">{$driverName}</td>
+                <td class="lbCol-score"><span class="lbCol-pctScore">({$pctScore})</span> {$numExtsDone}</td>
+HTML;
             if ($this->showLbVersion) :
-                ?>
-                <td class="lbCol-version"><?= $apiVersion ?></td>
-                <?php
+                echo <<<HTML
+                <td class="lbCol-version">{$apiVersion}</td>
+HTML;
             endif;
-            ?>
+
+            echo <<<'HTML'
             </tr>
-            <?php
+HTML;
             $prevNumExtsDone = $numExtsDone;
             $index++;
         }
-        ?>
+
+        echo <<<'HTML'
         </tbody>
     </table>
-        <?php
+HTML;
     }
 }
