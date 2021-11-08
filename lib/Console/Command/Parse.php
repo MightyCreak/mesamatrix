@@ -32,6 +32,7 @@ use Mesamatrix\Parser\ApiVersion;
 use Mesamatrix\Parser\Extension;
 use Mesamatrix\Parser\UrlCache;
 use Mesamatrix\Parser\Hints;
+use SimpleXMLElement;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -262,7 +263,7 @@ class Parse extends Command
         $matrix = $parser->parseContent($cat->getOutput());
 
         // Create the XML.
-        $xml = new \SimpleXMLElement("<mesa></mesa>");
+        $xml = new SimpleXMLElement("<mesa></mesa>");
 
         // Write commit info.
         $xmlCommit = $xml->addChild('commit');
@@ -369,7 +370,7 @@ class Parse extends Command
         }
 
         Mesamatrix::$logger->info('Generating XML file');
-        $xml = new \SimpleXMLElement("<mesa></mesa>");
+        $xml = new SimpleXMLElement("<mesa></mesa>");
 
         // Get time of last fetch.
         $gitDir = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir')) . '/';
@@ -394,49 +395,49 @@ class Parse extends Command
         // Generate for OpenGL.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::GL_NAME);
-        $this->populateGlVendors($api);
+        $this->populateVendors($api, Constants::GL_NAME);
         $this->generateApiVersions($api, $matrix, Constants::GL_NAME);
 
         // Generate for OpenGL ES.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::GLES_NAME);
-        $this->populateGlVendors($api); // Uses the same drivers as OpenGL.
+        $this->populateVendors($api, Constants::GLES_NAME);
         $this->generateApiVersions($api, $matrix, Constants::GLES_NAME);
 
         // Generate for OpenGL/ES (extra).
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::GL_OR_ES_EXTRA_NAME);
-        $this->populateGlVendors($api); // Uses the same drivers as OpenGL.
+        $this->populateVendors($api, Constants::GL_OR_ES_EXTRA_NAME);
         $this->generateApiVersions($api, $matrix, Constants::GL_OR_ES_EXTRA_NAME);
 
         // Generate for Vulkan.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::VK_NAME);
-        $this->populateVulkanVendors($api);
+        $this->populateVendors($api, Constants::VK_NAME);
         $this->generateApiVersions($api, $matrix, Constants::VK_NAME);
 
         // Generate for Vulkan (extra).
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::VK_EXTRA_NAME);
-        $this->populateVulkanVendors($api);
+        $this->populateVendors($api, Constants::VK_EXTRA_NAME);
         $this->generateApiVersions($api, $matrix, Constants::VK_EXTRA_NAME);
 
         // Generate for OpenCL.
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::OPENCL_NAME);
-        $this->populateOpenClVendors($api);
+        $this->populateVendors($api, Constants::OPENCL_NAME);
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_NAME);
 
         // Generate for OpenCL (extra).
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::OPENCL_EXTRA_NAME);
-        $this->populateOpenClVendors($api);
+        $this->populateVendors($api, Constants::OPENCL_EXTRA_NAME);
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_EXTRA_NAME);
 
         // Generate for OpenCL (vendor specific).
         $api = $apis->addChild('api');
         $api->addAttribute('name', Constants::OPENCL_VENDOR_SPECIFIC_NAME);
-        $this->populateOpenClVendors($api);
+        $this->populateVendors($api, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
         $this->generateApiVersions($api, $matrix, Constants::OPENCL_VENDOR_SPECIFIC_NAME);
 
         $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
@@ -524,7 +525,7 @@ class Parse extends Command
         }
     }
 
-    protected function populateStatuses(\SimpleXMLElement $xmlStatuses)
+    protected function populateStatuses(SimpleXMLElement $xmlStatuses)
     {
         foreach ($this->statuses as $status => $match) {
             $xmlStatus = $xmlStatuses->addChild($status);
@@ -532,7 +533,7 @@ class Parse extends Command
         }
     }
 
-    protected function generateCommitsLog(\SimpleXMLElement $xml, array $commits)
+    protected function generateCommitsLog(SimpleXMLElement $xml, array $commits)
     {
         foreach (array_reverse($commits) as $commit) {
             $commitNode = $xml->addChild("commit", htmlspecialchars($commit->getData()));
@@ -542,25 +543,33 @@ class Parse extends Command
         }
     }
 
-    protected function populateGlVendors(\SimpleXMLElement $xmlParent)
+    protected function populateVendors(SimpleXMLElement $xmlParent, string $apiName)
     {
+        $vendors = null;
+        switch ($apiName) {
+            case Constants::GL_NAME:
+            case Constants::GLES_NAME:
+            case Constants::GL_OR_ES_EXTRA_NAME:
+                $vendors = Constants::GL_ALL_DRIVERS_VENDORS;
+                break;
+
+            case Constants::VK_NAME:
+            case Constants::VK_EXTRA_NAME:
+                $vendors = Constants::VK_ALL_DRIVERS_VENDORS;
+                break;
+
+            case Constants::OPENCL_NAME:
+            case Constants::OPENCL_EXTRA_NAME:
+            case Constants::OPENCL_VENDOR_SPECIFIC_NAME:
+                $vendors = Constants::OPENCL_ALL_DRIVERS_VENDORS;
+                break;
+        }
+
         $xmlVendors = $xmlParent->addChild("vendors");
-        $this->populateDrivers($xmlVendors, Constants::GL_ALL_DRIVERS_VENDORS);
+        $this->populateDrivers($xmlVendors, $vendors);
     }
 
-    protected function populateVulkanVendors(\SimpleXMLElement $xmlParent)
-    {
-        $xmlVendors = $xmlParent->addChild("vendors");
-        $this->populateDrivers($xmlVendors, Constants::VK_ALL_DRIVERS_VENDORS);
-    }
-
-    protected function populateOpenClVendors(\SimpleXMLElement $xmlParent)
-    {
-        $xmlVendors = $xmlParent->addChild("vendors");
-        $this->populateDrivers($xmlVendors, Constants::OPENCL_ALL_DRIVERS_VENDORS);
-    }
-
-    protected function populateDrivers(\SimpleXMLElement $xmlVendors, array $vendors)
+    protected function populateDrivers(SimpleXMLElement $xmlVendors, array $vendors)
     {
         foreach ($vendors as $vendor => $drivers) {
             $xmlVendor = $xmlVendors->addChild("vendor");
@@ -573,7 +582,7 @@ class Parse extends Command
         }
     }
 
-    protected function generateApiVersions(\SimpleXMLElement $api, Matrix $matrix, $name)
+    protected function generateApiVersions(SimpleXMLElement $api, Matrix $matrix, string $name)
     {
         $xmlVersions = $api->addChild("versions");
         foreach ($matrix->getApiVersions() as $apiVersion) {
@@ -584,7 +593,7 @@ class Parse extends Command
         }
     }
 
-    protected function generateApiVersion(\SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints)
+    protected function generateApiVersion(SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints)
     {
         $xmlVersion->addAttribute("name", $apiVersion->getName());
         $xmlVersion->addAttribute("version", $apiVersion->getVersion());
@@ -600,7 +609,7 @@ class Parse extends Command
         }
     }
 
-    protected function generateExtension(\SimpleXMLElement $xmlExt, Extension $ext, Hints $hints)
+    protected function generateExtension(SimpleXMLElement $xmlExt, Extension $ext, Hints $hints)
     {
         $xmlExt->addAttribute("name", $ext->getName());
 

@@ -24,6 +24,7 @@ namespace Mesamatrix\Controller;
 use Mesamatrix\Mesamatrix;
 use Mesamatrix\Parser\Constants;
 use Mesamatrix\Leaderboard\Leaderboard;
+use SimpleXMLElement;
 
 class HomeController extends BaseController
 {
@@ -73,7 +74,7 @@ class HomeController extends BaseController
         return $xml;
     }
 
-    private function createCommitsModel(\SimpleXMLElement $xml)
+    private function createCommitsModel(SimpleXMLElement $xml)
     {
         $this->commits = array();
 
@@ -89,7 +90,7 @@ class HomeController extends BaseController
         }
     }
 
-    private function createLeaderboard(\SimpleXMLElement $xml, array $apis)
+    private function createLeaderboard(SimpleXMLElement $xml, array $apis)
     {
         $leaderboard = new Leaderboard();
         $leaderboard->load($xml, $apis);
