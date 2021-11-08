@@ -28,7 +28,7 @@ use SimpleXMLElement;
 
 class ApiSubController
 {
-    private string $api = "";
+    private string $api;
     private bool $showLbVersion;
     private ?SimpleXMLElement $xml = null;
     private ?Leaderboard $leaderboard = null;
@@ -171,7 +171,7 @@ class ApiSubController
         }
     }
 
-    private function addApiSection(array &$matrix, \SimpleXmlElement $xmlApi): void
+    private function addApiSection(array &$matrix, SimpleXMLElement $xmlApi): void
     {
         $xmlVersions = array();
         foreach ($xmlApi->versions->version as $xmlVersion) {
@@ -207,16 +207,14 @@ class ApiSubController
 
     private function addSection(array &$section, SimpleXMLElement $xmlVersion, SimpleXMLElement $vendors): void
     {
-        $name = "";
-        if (!empty($xmlVersion['version'])) {
-            $name = $xmlVersion['name'];
-            if (!empty((string) $xmlVersion['version'])) {
-                $name .= ' ' . $xmlVersion['version'];
-            }
-            $xmlShaderVersion = $xmlVersion->{'shader-version'};
-            if (!empty((string) $xmlShaderVersion['name'])) {
-                $name .= ' - ' . $xmlShaderVersion['name'] . ' ' . $xmlShaderVersion['version'];
-            }
+        $name = $xmlVersion['name'];
+        if (!empty((string) $xmlVersion['version'])) {
+            $name .= ' ' . $xmlVersion['version'];
+        }
+
+        $xmlShaderVersion = $xmlVersion->{'shader-version'};
+        if (!empty((string) $xmlShaderVersion['name'])) {
+            $name .= ' - ' . $xmlShaderVersion['name'] . ' ' . $xmlShaderVersion['version'];
         }
 
         $target = $xmlVersion['name'];

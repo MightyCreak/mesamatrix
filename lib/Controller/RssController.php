@@ -10,7 +10,7 @@ use Suin\RSSWriter\Item as RSSItem;
 
 class RssController
 {
-    public function run()
+    public function run(): void
     {
         $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
         $rssFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir', 'private'))
@@ -61,7 +61,7 @@ class RssController
         return true;
     }
 
-    private function generateRss(string $featuresXmlFilepath)
+    private function generateRss(string $featuresXmlFilepath): string
     {
         $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
