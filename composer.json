@@ -40,6 +40,7 @@
     },
 
     "scripts": {
-        "lint": "./vendor/bin/phpcs --standard=ruleset.xml"
+        "lint": "./vendor/bin/phpcs --standard=ruleset.xml",
+        "tests": "./vendor/bin/phpunit tests"
     }
 }
