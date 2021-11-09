@@ -28,7 +28,7 @@ class Hints
         $this->list = array();
     }
 
-    public function findHint($hint)
+    public function findHint(string $hint): int
     {
         $idx = -1;
         if (!empty($hint)) {
@@ -41,7 +41,7 @@ class Hints
         return $idx;
     }
 
-    public function addHint($hint)
+    public function addHint(string $hint): int
     {
         $idx = -1;
         if (!empty($hint)) {
@@ -55,12 +55,12 @@ class Hints
         return $idx;
     }
 
-    public function getNumHints()
+    public function getNumHints(): int
     {
         return count($this->list);
     }
 
-    public function getHint($idx)
+    public function getHint(int $idx): string
     {
         return $this->list[$idx];
     }

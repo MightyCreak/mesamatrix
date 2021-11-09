@@ -21,6 +21,8 @@
 
 namespace Mesamatrix\Parser;
 
+use SimpleXMLElement;
+
 class Matrix
 {
     private array $apiVersions;
@@ -32,7 +34,7 @@ class Matrix
         $this->hints = new Hints();
     }
 
-    public function addApiVersion(ApiVersion $apiVersion)
+    public function addApiVersion(ApiVersion $apiVersion): void
     {
         array_push($this->apiVersions, $apiVersion);
     }
@@ -42,7 +44,7 @@ class Matrix
      *
      * @return ApiVersion[] The API versions array.
      */
-    public function getApiVersions()
+    public function getApiVersions(): array
     {
         return $this->apiVersions;
     }
@@ -51,11 +53,11 @@ class Matrix
      * Get the API version based on its name.
      *
      * @param string $name The API name.
-     * @param string $version The API version.
+     * @param string|null $version The API version.
      *
      * @return ApiVersion The API version is found; NULL otherwise.
      */
-    public function getApiVersionByName($name, $version)
+    public function getApiVersionByName(string $name, ?string $version): ?ApiVersion
     {
         foreach ($this->apiVersions as $apiVersion) {
             if (
@@ -75,7 +77,7 @@ class Matrix
      *
      * @return Extension The extension if found; NULL otherwise.
      */
-    public function getExtensionBySubstr($substr)
+    public function getExtensionBySubstr(string $substr): ?Extension
     {
         foreach ($this->getApiVersions() as $apiVersion) {
             $ext = $apiVersion->getExtensionBySubstr($substr);
@@ -90,12 +92,12 @@ class Matrix
     /**
      * Get the list of drivers supporting a specific version of OpenGL ES.
      *
-     * @param int $version The GL ES version to look for.
+     * @param string $version The GL ES version to look for.
      *
      * @return string[] The list of drivers that supports
      *         the OpenGL ES; NULL otherwise.
      */
-    public function getDriversSupportingGlesVersion($version)
+    public function getDriversSupportingGlesVersion(string $version): ?array
     {
         foreach ($this->getApiVersions() as $apiVersion) {
             if ($apiVersion->getName() === Constants::GLES_NAME && $apiVersion->getVersion() === $version) {
@@ -109,7 +111,7 @@ class Matrix
     /**
      * Parse all the API versions and solve their extensions.
      */
-    public function solveExtensionDependencies()
+    public function solveExtensionDependencies(): void
     {
         foreach ($this->getApiVersions() as $apiVersion) {
             $apiVersion->solveExtensionDependencies($this);
@@ -119,16 +121,16 @@ class Matrix
     /**
      * Load an XML formatted commit.
      *
-     * @param \SimpleXMLElement $mesa The root element of the XML file.
+     * @param SimpleXMLElement $mesa The root element of the XML file.
      */
-    public function loadXml(\SimpleXMLElement $mesa)
+    public function loadXml(SimpleXMLElement $mesa): void
     {
         foreach ($mesa->apis->api as $api) {
             $this->loadXmlApi($api);
         }
     }
 
-    private function loadXmlApi(\SimpleXMLElement $api)
+    private function loadXmlApi(SimpleXMLElement $api): void
     {
         $xmlSections = $api->versions->version;
 
@@ -153,7 +155,7 @@ class Matrix
      *
      * @return Hints The hints.
      */
-    public function getHints()
+    public function getHints(): Hints
     {
         return $this->hints;
     }

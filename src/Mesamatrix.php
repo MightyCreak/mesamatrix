@@ -93,6 +93,6 @@ class Mesamatrix
 
     public static function path($path)
     {
-        return self::$serverRoot . '/' . $path;
+        return self::$serverRoot . DIRECTORY_SEPARATOR . $path;
     }
 }

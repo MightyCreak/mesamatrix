@@ -25,7 +25,7 @@ class Config
 {
     protected $cache = array();
 
-    public function __construct($configDir)
+    public function __construct(string $configDir)
     {
         $this->readData($configDir . '/config.default.php');
         $this->readData($configDir . '/config.php');
@@ -39,7 +39,7 @@ class Config
         }
     }
 
-    public function getValue($section, $key, $default = null)
+    public function getValue(string $section, string $key, string $default = null)
     {
         if (isset($this->cache[$section])) {
             if (isset($this->cache[$section][$key])) {
@@ -55,7 +55,7 @@ class Config
         return $default;
     }
 
-    public function readData($configFile)
+    private function readData(string $configFile)
     {
         if (file_exists($configFile)) {
             Mesamatrix::$logger->info('Loading configuration file ' . $configFile);
