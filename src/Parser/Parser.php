@@ -25,7 +25,7 @@ use Mesamatrix\Mesamatrix;
 
 class Parser
 {
-    public function parse($filename)
+    public function parseFile($filename): Matrix
     {
         $handle = fopen($filename, "r");
         if ($handle === false) {
@@ -34,16 +34,18 @@ class Parser
 
         $matrix = $this->parseStream($handle);
         fclose($handle);
+
         return $matrix;
     }
 
-    public function parseContent($content)
+    public function parseContent(string $content): Matrix
     {
         $handle = fopen("php://memory", "r+");
         fwrite($handle, $content);
         rewind($handle);
         $matrix = $this->parseStream($handle);
         fclose($handle);
+
         return $matrix;
     }
 
@@ -53,7 +55,7 @@ class Parser
      * @param $handle The stream handle.
      * @return Matrix The matrix.
      */
-    public function parseStream($handle)
+    public function parseStream($handle): Matrix
     {
         $matrix = new Matrix();
 
@@ -310,7 +312,7 @@ class Parser
         return $curLine;
     }
 
-    private function isInDriversArray($name)
+    private function isInDriversArray(string $name): bool
     {
         foreach ($this->apiDrivers as $driverName) {
             if (strncmp($name, $driverName, strlen($driverName)) === 0) {
@@ -321,7 +323,7 @@ class Parser
         return false;
     }
 
-    private function getDriverName($name)
+    private function getDriverName(string $name): string
     {
         foreach ($this->apiDrivers as $driver) {
             $driverLen = strlen($driver);
@@ -333,7 +335,7 @@ class Parser
         return null;
     }
 
-    private function mergeDrivers(array &$dst, array $src)
+    private function mergeDrivers(array &$dst, array $src): array
     {
         foreach ($src as $srcDriver) {
             $driverName = $this->getDriverName($srcDriver);
@@ -360,9 +362,9 @@ class Parser
      * @param string $hint The hint to test.
      * @param string $useHint[out] Hint to use; null otherwise.
      *
-     * @return array() The drivers list, or null.
+     * @return array|null The drivers list, or null.
      */
-    private function getDriversFromHint($hintStr, &$useHint)
+    private function getDriversFromHint($hintStr, &$useHint): ?array
     {
         if (empty($hintStr)) {
             return null;
