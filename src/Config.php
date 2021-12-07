@@ -31,7 +31,7 @@ class Config
         $this->readData($configDir . '/config.php');
     }
 
-    public function getValue(string $section, string $key, string $default = null)
+    public function getValue(string $section, string $key, $default = null)
     {
         if (isset($this->cache[$section])) {
             if (isset($this->cache[$section][$key])) {
@@ -41,9 +41,8 @@ class Config
         $logMsg = 'Unable to find config value for ' . $section . '.' . $key;
         if (is_null($default)) {
             Mesamatrix::$logger->error($logMsg);
-        } else {
-            Mesamatrix::$logger->info($logMsg . ', using default ' . $default);
         }
+
         return $default;
     }
 

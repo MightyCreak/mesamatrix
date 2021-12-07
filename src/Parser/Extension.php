@@ -55,7 +55,8 @@ class Extension
         foreach ($supportedDrivers as $driverNameAndHint) {
             list($driverName, $driverHint) = self::splitDriverNameAndHint($driverNameAndHint, $apiDrivers);
             if ($driverName === null) {
-                Mesamatrix::$logger->error("Unrecognized driver: '$driverNameAndHint'");
+                // Driver unknown (may have been removed from mesa).
+                continue;
             }
 
             $supportedDriver = new SupportedDriver($driverName, $this->hints);

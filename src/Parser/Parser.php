@@ -323,7 +323,7 @@ class Parser
         return false;
     }
 
-    private function getDriverName(string $name): string
+    private function getDriverName(string $name): ?string
     {
         foreach ($this->apiDrivers as $driver) {
             $driverLen = strlen($driver);
