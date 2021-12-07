@@ -171,10 +171,10 @@ class ApiVersion
 
             $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver");
             foreach ($xmlSupportedDrivers as $xmlSupportedDriver) {
-                // Get driver name and verify it's valid.
+                // Get driver name.
                 $driverName = (string) $xmlSupportedDriver['name'];
                 if (!in_array($driverName, $apiDrivers)) {
-                    Mesamatrix::$logger->error('Unrecognized driver: ' . $driverName);
+                    // Driver unknown (may have been removed from mesa).
                     continue;
                 }
 
