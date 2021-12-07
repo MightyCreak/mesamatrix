@@ -41,7 +41,6 @@ abstract class Constants
         "nvc0",
         "r600",
         "radeonsi",
-        "swr",
         "freedreno",
         "virgl",
         "etnaviv",
@@ -54,7 +53,7 @@ abstract class Constants
     ];
 
     public const GL_ALL_DRIVERS_VENDORS = [
-        "Software"  => [ "llvmpipe", "softpipe", "swr" ],
+        "Software"  => [ "llvmpipe", "softpipe" ],
         "Intel"     => [ "i965" ],
         "Nvidia"    => [ "nv50", "nvc0" ],
         "AMD"       => [ "r600", "radeonsi" ],
