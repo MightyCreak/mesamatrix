@@ -46,7 +46,7 @@ final class ConfigTest extends TestCase
      */
     public function testCanGetDefaultValue(Config $config): void
     {
-        $this->assertEquals('test_value', $config->getValue('test_section', 'key1'));
+        $this->assertEquals('test_value', $config->getValue('test_section1', 'key1'));
     }
 
     /**
@@ -54,7 +54,7 @@ final class ConfigTest extends TestCase
      */
     public function testCanGetOverriddenValue(Config $config): void
     {
-        $this->assertEquals('overridden_value', $config->getValue('test_section', 'key2'));
+        $this->assertEquals('overridden_value', $config->getValue('test_section1', 'key2'));
     }
 
     /**
@@ -62,7 +62,7 @@ final class ConfigTest extends TestCase
      */
     public function testCanReturnValueForUnknownKeyWithDefaultValue(Config $config): void
     {
-        $this->assertEquals('not_found', $config->getValue('test_section', 'key_unknown', 'not_found'));
+        $this->assertEquals('not_found', $config->getValue('test_section1', 'key_unknown', 'not_found'));
     }
 
     /**
@@ -70,6 +70,39 @@ final class ConfigTest extends TestCase
      */
     public function testCanReturnNullForUnknownKeyWithoutDefaultValue(Config $config): void
     {
-        $this->assertNull($config->getValue('test_section', 'key_unknown'));
+        $this->assertNull($config->getValue('test_section1', 'key_unknown'));
+    }
+
+    /**
+     * @depends testCanInstantiate
+     */
+    public function testCanReturnArray(Config $config): void
+    {
+        $expected = [ 'item1', 'item2' ];
+
+        $result = $config->getValue('test_section2', 'key1');
+        $this->assertEquals($expected, $config->getValue('test_section2', 'key1'));
+
+        $this->assertIsArray($result);
+        $this->assertEquals(count($expected), count($result));
+        for ($i = 0; $i < count($expected); ++$i) {
+            $this->assertEquals($expected[$i], $result[$i]);
+        }
+    }
+
+    /**
+     * @depends testCanInstantiate
+     */
+    public function testCanReturnArrayWithUnknownKeyAndDefaultValue(Config $config): void
+    {
+        $expected = [ 'item1', 'item2' ];
+
+        $result = $config->getValue('test_section2', 'key_unknown', $expected);
+
+        $this->assertIsArray($result);
+        $this->assertEquals(count($expected), count($result));
+        for ($i = 0; $i < count($expected); ++$i) {
+            $this->assertEquals($expected[$i], $result[$i]);
+        }
     }
 }
