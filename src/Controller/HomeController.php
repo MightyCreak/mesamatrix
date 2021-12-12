@@ -45,7 +45,6 @@ class HomeController extends BaseController
         $this->addCssScript('css/tipsy.css');
 
         $this->addJsScript('js/jquery.tipsy.js');
-        $this->addJsScript('js/script.js');
     }
 
     protected function computeRendering(): void
