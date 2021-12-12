@@ -51,6 +51,9 @@ class HomeController extends BaseController
     protected function computeRendering(): void
     {
         $xml = $this->loadMesamatrixXml();
+        if ($xml == null) {
+            return;
+        }
 
         $this->createCommitsModel($xml);
 
@@ -62,6 +65,11 @@ class HomeController extends BaseController
     private function loadMesamatrixXml(): ?SimpleXMLElement
     {
         $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'xml_file'));
+        if (!file_exists($featuresXmlFilepath)) {
+            Mesamatrix::$logger->critical("The file doesn't exist: \"$featuresXmlFilepath\"");
+            return null;
+        }
+
         $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
             Mesamatrix::$logger->critical('Can\'t read ' . $featuresXmlFilepath);
