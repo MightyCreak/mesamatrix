@@ -39,6 +39,7 @@ abstract class BaseController
         $this->addCssScript('css/style.css?v=' . (Mesamatrix::$config->getValue("info", "version")));
 
         $this->addJsScript('js/jquery-1.11.3.min.js');
+        $this->addJsScript('js/script.js');
     }
 
     /**
