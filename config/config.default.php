@@ -16,8 +16,8 @@ use Monolog\Logger as Log;
  * Log::DEBUG
  */
 
-$CONFIG = array(
-    "info" => array(
+$CONFIG = [
+    "info" => [
         "log_level" => Log::WARNING,
         "version" => "3.0",
         "title" => "The Mesa drivers matrix",
@@ -32,16 +32,16 @@ $CONFIG = array(
             "Robin McCorkell",
         ),
         "private_dir" => "private",
-    ),
+    ],
 
-    "extension_links" => array(
+    "extension_links" => [
         "enabled" => true,
         "cache_file" => "urlcache.json",
         "opengl_base_url" => "https://www.khronos.org/registry/OpenGL/extensions/",
         "vulkan_base_url" => "https://khronos.org/registry/vulkan/specs/1.2-extensions/man/html/",
-    ),
+    ],
 
-    "git" => array(
+    "git" => [
         "mesa_web" => "https://gitlab.freedesktop.org/mesa/mesa",
         "mesa_url" => "https://gitlab.freedesktop.org/mesa/mesa.git",
         "mesa_commit_url" => "https://gitlab.freedesktop.org/mesa/mesa/commit/",
@@ -58,5 +58,5 @@ $CONFIG = array(
                 "excluded_commits" => []
             ]
         ],
-    ),
-);
+    ],
+];

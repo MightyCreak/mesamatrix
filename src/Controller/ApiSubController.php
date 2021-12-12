@@ -32,7 +32,7 @@ class ApiSubController
     private bool $showLbVersion;
     private ?SimpleXMLElement $xml = null;
     private ?Leaderboard $leaderboard = null;
-    private array $matrix;
+    private array $matrix = array();
 
     public function __construct(string $api, bool $showLbVersion)
     {
@@ -76,7 +76,6 @@ class ApiSubController
 
     public function createMatrixModel(SimpleXMLElement $xmlApi): void
     {
-        $this->matrix = array();
         $this->createColumns($this->matrix, $xmlApi);
 
         $this->matrix['sections'] = array();
@@ -313,6 +312,10 @@ class ApiSubController
 
     public function writeMatrix(): void
     {
+        if (array_key_exists('sections', $this->matrix) == 0) {
+            return;
+        }
+
         // Sections.
         foreach ($this->matrix['sections'] as $section) :
             $sectionName = (string)$section['name'];
