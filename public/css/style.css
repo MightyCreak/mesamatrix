@@ -1,7 +1,7 @@
 /*
  * This file is part of mesamatrix.
  *
- * Copyright (C) 2014-2020 Romain "Creak" Failliot.
+ * Copyright (C) 2014-2022 Romain "Creak" Failliot.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -47,6 +47,10 @@ body {
     --matrix-ext-arm-color: #7acde8;
     --matrix-ext-emulation-color:  #ffd6fc;
     --matrix-ext-hover-color: #ededed;
+
+    /* donation */
+    --donate-text-color: #333;
+    --donate-bg-color: rgb(209, 218, 255);
 }
 
 /* Dark theme OS override */
@@ -74,6 +78,10 @@ body.dark-theme {
     --matrix-ext-arm-color: #497b8b;
     --matrix-ext-emulation-color:  #8f778d;
     --matrix-ext-hover-color: #535353;
+
+    /* donation */
+    --donate-text-color: #dddddd;
+    --donate-bg-color: rgb(83, 89, 115);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -101,6 +109,10 @@ body.dark-theme {
         --matrix-ext-arm-color: #497b8b;
         --matrix-ext-emulation-color:  #8f778d;
         --matrix-ext-hover-color: #535353;
+
+        /* donation */
+        --donate-text-color: #dddddd;
+        --donate-bg-color: rgb(83, 89, 115);
     }
 
     /* Light theme OS override */
@@ -128,7 +140,11 @@ body.dark-theme {
         --matrix-ext-arm-color: #7acde8;
         --matrix-ext-emulation-color:  #ffd6fc;
         --matrix-ext-hover-color: #ededed;
-    }
+
+        /* donation */
+        --donate-text-color: #333;
+        --donate-bg-color: rgb(209, 218, 255);
+        }
 }
 
 body {
@@ -407,4 +423,97 @@ input:checked + .slider::before {
     #github-ribbon {
         display: none;
     }
+}
+
+/**
+ * CSS for the donation page.
+ */
+
+/* Highlight in yellow the Donate menu */
+.menu-list li:nth-child(4) > a {
+    border-radius: 5px;
+    color: var(--donate-text-color);
+    background-color: var(--donate-bg-color);
+}
+
+.contributor-container {
+    display: flex;
+    margin: 0 -1rem;
+}
+.contributor-item {
+    flex: 1 1 50%;
+    padding: 0 1rem;
+}
+
+.contributor-list > h2 .subtitle {
+    font-size: 0.8em;
+    font-weight: normal;
+}
+.contributor-list > h3 {
+    margin: 0.5em 0 0.5em 0;
+}
+.contributor-list > table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+.contributor-list > table .contributor-rank {
+    width: 1.5em;
+    text-align: left;
+}
+.contributor-list > table .contributor-name {
+    text-align: left;
+}
+.contributor-list > table .contributor-date,
+.contributor-list > table .contributor-total {
+    width: 7em;
+    text-align: right;
+}
+.contributor-list > table .contributor-donation,
+.contributor-list > table .contributor-total-donation {
+    width: 7em;
+    text-align: right;
+}
+.contributor-list > table .contributor-total-donation {
+    font-weight: bold;
+}
+
+.contributor-list > table .contributor-total-label {
+    font-weight: bold;
+    text-align: right;
+}
+
+.donate {
+    border-radius: 0.7em;
+    background-color: var(--donate-bg-color);
+    color: var(--donate-text-color);
+    padding: 1.17em;
+}
+
+.donate :first-child {
+    margin-top: 0;
+}
+
+.donate :last-child {
+    margin-bottom: 0;
+}
+
+.donate > form {
+    margin: 2em;
+    max-width: 400px;
+}
+
+.donate > form .input-row {
+    margin: 0.6em 0 0.2em 0;
+}
+
+.donate > form .input-row input[type=text] {
+    display: block;
+    width: 100%;
+    margin: 0.2em 0;
+}
+
+.donate > form .submit {
+    margin-top: 1em;
+    text-align: right;
 }
