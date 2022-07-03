@@ -27,7 +27,6 @@ abstract class BaseController
 {
     public $pages = array(
         "Home" => ".",
-        "Drivers decoder ring" => "drivers.php",
         "About" => "about.php",
         "Donate?" => "donate.php");
 
@@ -145,18 +144,18 @@ HTML;
             $item = "<a href=\"" . $link . "\">" . $page . "</a>";
             if ($i === $this->pageIdx) :
                 echo <<<HTML
-                    <li class="menu-item menu-selected">{$item}</li>
+                    <li class="menu-selected">{$item}</li>
 HTML;
             else :
                 echo <<<HTML
-                    <li class="menu-item"><a href="{$link}">{$page}</a></li>
+                    <li><a href="{$link}">{$page}</a></li>
 HTML;
             endif;
             ++$i;
         endforeach;
 
         echo <<<'HTML'
-                    <li class="menu-item"><a href="rss.php" class="rss"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a></li>
+                    <li><a href="rss.php" class="rss"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a></li>
                 </ul>
             </div>
 
