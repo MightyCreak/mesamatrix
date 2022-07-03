@@ -312,46 +312,56 @@ details > summary {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.menu-list, .menu-item {
+.menu > ul,
+.menu > ul > li {
     position: relative;
 }
-.menu-list {
+.menu > ul {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
 }
-.menu-item {
+.menu > ul > li {
     margin: 0 0.3em 0 0;
     padding: 0;
     align-self: center;
 }
-.menu-item > a {
+.menu > ul > li > a {
     display: inline-block;
     padding: 0.5em 1em;
     text-decoration: none;
     color: #777;
 }
-.menu-item > a:hover, .menu-item > a:focus {
+.menu > ul > li > a:hover,
+.menu > ul > li > a:focus {
     background-color: #eee;
 }
-.menu-selected > a {
+.menu > ul .menu-selected > a {
     background-color: #ddd;
 }
-.menu-selected > a, .menu-selected > a:visited {
+.menu > ul .menu-selected > a,
+.menu > ul .menu-selected > a:visited {
     color: #333;
 }
-.menu-item > .rss {
+.menu > ul > li > .rss {
     margin: 0;
     padding: 0 0.5em;
 }
-.menu-item > a:hover.rss {
+.menu > ul > li > a:hover.rss {
     background-color: transparent;
 }
-.menu-item > .rss > img {
+.menu > ul > li > .rss > img {
     vertical-align: middle;
     width: 32px;
     height: 32px;
+}
+
+/* Highlight the donation page in the menu */
+.menu > ul > li:nth-child(3) > a {
+    border-radius: 5px;
+    color: var(--donate-text-color);
+    background-color: var(--donate-bg-color);
 }
 
 #github-ribbon > img {
@@ -428,13 +438,6 @@ input:checked + .slider::before {
 /**
  * CSS for the donation page.
  */
-
-/* Highlight in yellow the Donate menu */
-.menu-list li:nth-child(4) > a {
-    border-radius: 5px;
-    color: var(--donate-text-color);
-    background-color: var(--donate-bg-color);
-}
 
 .contributor-container {
     display: flex;
