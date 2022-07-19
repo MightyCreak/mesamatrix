@@ -37,7 +37,7 @@ $CONFIG = [
     "extension_links" => [
         "enabled" => true,
         "cache_file" => "urlcache.json",
-        "opengl_base_url" => "https://www.khronos.org/registry/OpenGL/extensions/",
+        "opengl_base_url" => "https://registry.khronos.org/OpenGL/extensions/",
         "vulkan_base_url" => "https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/",
     ],
 
