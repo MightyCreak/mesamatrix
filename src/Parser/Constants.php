@@ -70,6 +70,7 @@ abstract class Constants
 
     public const VK_ALL_DRIVERS = [
         "anv",
+        "dzn",
         "lvp",
         "panvk",
         "pvr",
@@ -87,7 +88,7 @@ abstract class Constants
         "Broadcom"  => [ "v3dv" ],
         "Arm"       => [ "panvk" ],
         "PowerVR"   => [ "pvr" ],
-        "Emulation" => [ "vn" ],
+        "Emulation" => [ "dzn", "vn" ],
     ];
 
     // OpenCL.
