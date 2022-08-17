@@ -53,15 +53,15 @@ abstract class Constants
     ];
 
     public const GL_ALL_DRIVERS_VENDORS = [
-        "Software"  => [ "llvmpipe", "softpipe" ],
-        "Intel"     => [ "i965" ],
-        "Nvidia"    => [ "nv50", "nvc0" ],
-        "AMD"       => [ "r600", "radeonsi" ],
-        "Qualcomm"  => [ "freedreno" ],
-        "Vivante"   => [ "etnaviv" ],
-        "Broadcom"  => [ "vc4", "v3d" ],
-        "Arm"       => [ "lima", "panfrost" ],
-        "Emulation" => [ "d3d12", "virgl", "zink" ],
+        "Software"      => [ "llvmpipe", "softpipe" ],
+        "Intel"         => [ "i965" ],
+        "Nvidia"        => [ "nv50", "nvc0" ],
+        "AMD"           => [ "r600", "radeonsi" ],
+        "Qualcomm"      => [ "freedreno" ],
+        "Vivante"       => [ "etnaviv" ],
+        "Broadcom"      => [ "vc4", "v3d" ],
+        "Arm"           => [ "lima", "panfrost" ],
+        "Translation"   => [ "d3d12", "virgl", "zink" ],
     ];
 
     // Vulkan.
@@ -81,14 +81,14 @@ abstract class Constants
     ];
 
     public const VK_ALL_DRIVERS_VENDORS = [
-        "Intel"     => [ "anv" ],
-        "Software"  => [ "lvp" ],
-        "AMD"       => [ "radv" ],
-        "Qualcomm"  => [ "tu" ],
-        "Broadcom"  => [ "v3dv" ],
-        "Arm"       => [ "panvk" ],
-        "PowerVR"   => [ "pvr" ],
-        "Emulation" => [ "dzn", "vn" ],
+        "Intel"         => [ "anv" ],
+        "Software"      => [ "lvp" ],
+        "AMD"           => [ "radv" ],
+        "Qualcomm"      => [ "tu" ],
+        "Broadcom"      => [ "v3dv" ],
+        "Arm"           => [ "panvk" ],
+        "PowerVR"       => [ "pvr" ],
+        "Translation"   => [ "dzn", "vn" ],
     ];
 
     // OpenCL.
