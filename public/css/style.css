@@ -37,16 +37,18 @@ body {
     --lb-pct-score-color: rgb(120, 120, 120);
 
     --matrix-ext-default-color: var(--lb-bkg-color);
-    --matrix-ext-software-color: #d1b4ce;
+    --matrix-ext-hover-color: #ededed;
+
+    --matrix-ext-amd-color: #f7b5b2;
+    --matrix-ext-arm-color: #7acde8;
+    --matrix-ext-broadcom-color: #ff8e8e;
     --matrix-ext-intel-color: #b9cee4;
     --matrix-ext-nvidia-color: #d5f796;
-    --matrix-ext-amd-color: #f7b5b2;
+    --matrix-ext-powervr-color: #c48dd1;
     --matrix-ext-qualcomm-color: #c7dce8;
+    --matrix-ext-software-color: #d1b4ce;
+    --matrix-ext-translation-color: #ffd6fc;
     --matrix-ext-vivante-color: #a6d87a;
-    --matrix-ext-broadcom-color: #ff8e8e;
-    --matrix-ext-arm-color: #7acde8;
-    --matrix-ext-emulation-color:  #ffd6fc;
-    --matrix-ext-hover-color: #ededed;
 
     /* donation */
     --donate-text-color: #333;
@@ -68,16 +70,18 @@ body.dark-theme {
     --lb-pct-score-color: rgb(163, 163, 163);
 
     --matrix-ext-default-color: var(--lb-bkg-color);
-    --matrix-ext-software-color: #726170;
+    --matrix-ext-hover-color: #535353;
+
+    --matrix-ext-amd-color: #9e7371;
+    --matrix-ext-arm-color: #497b8b;
+    --matrix-ext-broadcom-color: #a15959;
     --matrix-ext-intel-color: #667280;
     --matrix-ext-nvidia-color: #798f52;
-    --matrix-ext-amd-color: #9e7371;
+    --matrix-ext-powervr-color: #8f4e9e;
     --matrix-ext-qualcomm-color: #77848b;
+    --matrix-ext-software-color: #726170;
     --matrix-ext-vivante-color: #638148;
-    --matrix-ext-broadcom-color: #a15959;
-    --matrix-ext-arm-color: #497b8b;
-    --matrix-ext-emulation-color:  #8f778d;
-    --matrix-ext-hover-color: #535353;
+    --matrix-ext-translation-color: #8f778d;
 
     /* donation */
     --donate-text-color: #dddddd;
@@ -99,16 +103,18 @@ body.dark-theme {
         --lb-pct-score-color: rgb(163, 163, 163);
 
         --matrix-ext-default-color: var(--lb-bkg-color);
-        --matrix-ext-software-color: #726170;
+        --matrix-ext-hover-color: #535353;
+
+        --matrix-ext-amd-color: #9e7371;
+        --matrix-ext-arm-color: #497b8b;
+        --matrix-ext-broadcom-color: #a15959;
         --matrix-ext-intel-color: #667280;
         --matrix-ext-nvidia-color: #798f52;
-        --matrix-ext-amd-color: #9e7371;
+        --matrix-ext-powervr-color: #8f4e9e;
         --matrix-ext-qualcomm-color: #77848b;
+        --matrix-ext-software-color: #726170;
+        --matrix-ext-translation-color: #8f778d;
         --matrix-ext-vivante-color: #638148;
-        --matrix-ext-broadcom-color: #a15959;
-        --matrix-ext-arm-color: #497b8b;
-        --matrix-ext-emulation-color:  #8f778d;
-        --matrix-ext-hover-color: #535353;
 
         /* donation */
         --donate-text-color: #dddddd;
@@ -130,21 +136,23 @@ body.dark-theme {
         --lb-pct-score-color: rgb(120, 120, 120);
 
         --matrix-ext-default-color: var(--lb-bkg-color);
-        --matrix-ext-software-color: #d1b4ce;
+        --matrix-ext-hover-color: #ededed;
+
+        --matrix-ext-amd-color: #f7b5b2;
+        --matrix-ext-arm-color: #7acde8;
+        --matrix-ext-broadcom-color: #ff8e8e;
         --matrix-ext-intel-color: #b9cee4;
         --matrix-ext-nvidia-color: #d5f796;
-        --matrix-ext-amd-color: #f7b5b2;
+        --matrix-ext-powervr-color: #c48dd1;
         --matrix-ext-qualcomm-color: #c7dce8;
+        --matrix-ext-software-color: #d1b4ce;
+        --matrix-ext-translation-color: #ffd6fc;
         --matrix-ext-vivante-color: #a6d87a;
-        --matrix-ext-broadcom-color: #ff8e8e;
-        --matrix-ext-arm-color: #7acde8;
-        --matrix-ext-emulation-color:  #ffd6fc;
-        --matrix-ext-hover-color: #ededed;
 
         /* donation */
         --donate-text-color: #333;
         --donate-bg-color: rgb(209, 218, 255);
-        }
+    }
 }
 
 body {
@@ -234,16 +242,17 @@ details > summary {
 .hCellDriverScore-almost { color: #E1A25E; }
 .hCellDriverScore-notyet { color: #B94B3D; }
 
-.hCellVendor-default    { background-color: var(--matrix-ext-default-color); }
-.hCellVendor-software   { background-color: var(--matrix-ext-software-color); }
-.hCellVendor-intel      { background-color: var(--matrix-ext-intel-color); }
-.hCellVendor-nvidia     { background-color: var(--matrix-ext-nvidia-color); }
-.hCellVendor-amd        { background-color: var(--matrix-ext-amd-color); }
-.hCellVendor-qualcomm   { background-color: var(--matrix-ext-qualcomm-color); }
-.hCellVendor-vivante    { background-color: var(--matrix-ext-vivante-color); }
-.hCellVendor-broadcom   { background-color: var(--matrix-ext-broadcom-color); }
-.hCellVendor-arm        { background-color: var(--matrix-ext-arm-color); }
-.hCellVendor-emulation  { background-color: var(--matrix-ext-emulation-color); }
+.hCellVendor-default        { background-color: var(--matrix-ext-default-color); }
+.hCellVendor-amd            { background-color: var(--matrix-ext-amd-color); }
+.hCellVendor-arm            { background-color: var(--matrix-ext-arm-color); }
+.hCellVendor-broadcom       { background-color: var(--matrix-ext-broadcom-color); }
+.hCellVendor-intel          { background-color: var(--matrix-ext-intel-color); }
+.hCellVendor-nvidia         { background-color: var(--matrix-ext-nvidia-color); }
+.hCellVendor-powervr        { background-color: var(--matrix-ext-powervr-color); }
+.hCellVendor-qualcomm       { background-color: var(--matrix-ext-qualcomm-color); }
+.hCellVendor-software       { background-color: var(--matrix-ext-software-color); }
+.hCellVendor-translation    { background-color: var(--matrix-ext-translation-color); }
+.hCellVendor-vivante        { background-color: var(--matrix-ext-vivante-color); }
 
 .hCellSep       { width: 0px; }
 

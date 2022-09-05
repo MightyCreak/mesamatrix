@@ -81,8 +81,8 @@ abstract class Constants
     ];
 
     public const VK_ALL_DRIVERS_VENDORS = [
-        "Intel"         => [ "anv" ],
         "Software"      => [ "lvp" ],
+        "Intel"         => [ "anv" ],
         "AMD"           => [ "radv" ],
         "Qualcomm"      => [ "tu" ],
         "Broadcom"      => [ "v3dv" ],
