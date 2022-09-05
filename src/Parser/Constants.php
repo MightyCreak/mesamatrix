@@ -71,6 +71,7 @@ abstract class Constants
     public const VK_ALL_DRIVERS = [
         "anv",
         "lvp",
+        "panvk",
         "radv",
         "tu",
         "v3dv",
@@ -83,6 +84,7 @@ abstract class Constants
         "AMD"       => [ "radv" ],
         "Qualcomm"  => [ "tu" ],
         "Broadcom"  => [ "v3dv" ],
+        "Arm"       => [ "panvk" ],
         "Emulation" => [ "vn" ],
     ];
 
