@@ -72,6 +72,7 @@ abstract class Constants
         "anv",
         "lvp",
         "panvk",
+        "pvr",
         "radv",
         "tu",
         "v3dv",
@@ -85,6 +86,7 @@ abstract class Constants
         "Qualcomm"  => [ "tu" ],
         "Broadcom"  => [ "v3dv" ],
         "Arm"       => [ "panvk" ],
+        "PowerVR"   => [ "pvr" ],
         "Emulation" => [ "vn" ],
     ];
 
