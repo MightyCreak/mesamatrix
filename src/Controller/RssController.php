@@ -89,20 +89,20 @@ class RssController
             ->url($baseUrl)
             ->appendTo($rss);
 
-        //$commitWeb = Mesamatrix::$config->getValue("git", "mesa_commit_url");
-
         foreach ($xml->commits->commit as $commit) {
             if ((int)$commit["timestamp"] < $minTime) {
                 continue;
             }
 
+            $commitUrl = $baseUrl . '?commit=' . $commit["hash"];
+
             $item = new RSSItem();
             $item
                 ->title((string)$commit["subject"])
                 ->description((string)$commit)
-                //->url($commitWeb . $commit["hash"])
-                ->url($baseUrl . '?commit=' . $commit["hash"])
+                ->url($commitUrl)
                 ->pubDate((int)$commit["timestamp"])
+                ->guid($commitUrl)
                 ->preferCdata(true)
                 ->appendTo($channel);
         }
