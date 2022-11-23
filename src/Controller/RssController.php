@@ -69,12 +69,12 @@ class RssController
             return null;
         }
 
-        // Get the time of the last commit and subtract a year.
+        // Get the time of the last commit and subtract 90 days.
         $minTime = 0;
         foreach ($xml->commits->commit as $commit) {
             $minTime = max($minTime, (int)$commit["timestamp"]);
         }
-        $minTime = $minTime - (60 * 60 * 24 * 365);
+        $minTime = $minTime - (60 * 60 * 24 * 90);
 
         // prepare RSS
         $rss = new RSSFeed();
