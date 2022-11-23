@@ -69,12 +69,12 @@ class RssController
             return null;
         }
 
-        // Get the time of the last commit and subtract a year.
+        // Get the time of the last commit and subtract 90 days.
         $minTime = 0;
         foreach ($xml->commits->commit as $commit) {
             $minTime = max($minTime, (int)$commit["timestamp"]);
         }
-        $minTime = $minTime - (60 * 60 * 24 * 365);
+        $minTime = $minTime - (60 * 60 * 24 * 90);
 
         // prepare RSS
         $rss = new RSSFeed();
@@ -89,28 +89,21 @@ class RssController
             ->url($baseUrl)
             ->appendTo($rss);
 
-        //$commitWeb = Mesamatrix::$config->getValue("git", "mesa_commit_url");
-
         foreach ($xml->commits->commit as $commit) {
             if ((int)$commit["timestamp"] < $minTime) {
                 continue;
             }
 
-            $description = (string)$commit;
-            $description = str_replace('<pre>', '<pre style="white-space: pre-wrap;">', $description);
-            $lines = explode("\n", $description);
-            $lines = preg_replace('/^\+.*$/', '<span style="color: green">$0</span>', $lines);
-            $lines = preg_replace('/^-.*$/', '<span style="color: red">$0</span>', $lines);
-            $description = implode("\n", $lines);
+            $commitUrl = $baseUrl . '?commit=' . $commit["hash"];
 
             $item = new RSSItem();
             $item
-                ->preferCdata(true)
                 ->title((string)$commit["subject"])
-                ->description($description)
-                //->url($commitWeb . $commit["hash"])
-                ->url($baseUrl . '?commit=' . $commit["hash"])
+                ->description((string)$commit)
+                ->url($commitUrl)
                 ->pubDate((int)$commit["timestamp"])
+                ->guid($commitUrl)
+                ->preferCdata(true)
                 ->appendTo($channel);
         }
 

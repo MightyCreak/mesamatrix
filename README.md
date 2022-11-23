@@ -6,19 +6,19 @@ and formats it in HTML.
 
 Official website: https://mesamatrix.net/
 
-# Installation
+## Installation
 
-## Prerequisites
+### Prerequisites
 
 Mesamatrix requires the following software:
 
-  * [Composer](https://getcomposer.org/)
-  * [Git](https://git-scm.com)
-  * [PHP](https://www.php.net/) 7.4 or higher, with these packages:
-    * [php-json](https://www.php.net/manual/book.json.php)
-    * [php-xml](https://www.php.net/manual/book.simplexml.php)
+* [Composer](https://getcomposer.org/)
+* [Git](https://git-scm.com)
+* [PHP](https://www.php.net/) 7.4 or higher, with these packages:
+  * [php-json](https://www.php.net/manual/book.json.php)
+  * [php-xml](https://www.php.net/manual/book.simplexml.php)
 
-## Install steps
+### Install steps
 
 Clone the Mesamatrix repository:
 
@@ -33,7 +33,7 @@ cd mesamatrix
 composer install
 ```
 
-## Configuration (optional)
+### Configuration (optional)
 
 There is a default config file in [`config/config.default.php`](./config/config.default.php).
 It provides default values for the application, but is overridden by the
@@ -54,7 +54,7 @@ $CONFIG = array(
 );
 ```
 
-## Initial setup
+### Initial setup
 
 For the initial setup, run the `mesamatrixctl` tool to clone the Mesa Git
 repository and generate the XML file:
@@ -63,7 +63,7 @@ repository and generate the XML file:
 ./mesamatrixctl setup
 ```
 
-## Update Mesa information
+### Update Mesa information
 
 Once setup is done, you can run the two commands that are needed to get the
 latest information from Mesa:
@@ -76,9 +76,9 @@ latest information from Mesa:
 These commands can be put into a crontab or similar scheduling facility, for
 automated operation of your Mesamatrix installation.
 
-## Set up the web server
+### Set up the web server
 
-### For developers
+#### For developers
 
 As a developer, an easy way to spawn up a PHP server is by running this
 command:
@@ -87,7 +87,7 @@ command:
 php -S 0.0.0.0:8080 -t public
 ```
 
-### For deployment
+#### For deployment
 
 In order to deploy Mesamatrix on a server, the web server root must point to
 the `public` directory. Be aware not to give access to more than just this
@@ -96,7 +96,7 @@ directory.
 At this point, you are done! Open your site in a web browser, and hopefully you
 will see the matrix of Mesa features!
 
-# CLI tool
+## CLI tool
 
 The `mesamatrixctl` tool can be used to administer your Mesamatrix
 installation. It outputs very little by default, but can become more verbose
@@ -106,7 +106,7 @@ output respectively.
 Run `./mesamatrixctl list` to see the available commands, or
 `./mesamatrixctl help` for more detailed help.
 
-# License
+## License
 
 Mesamatrix is available under the AGPLv3, a copy of which is available in the
 [`LICENSE`](./LICENSE) file.
@@ -114,12 +114,9 @@ Mesamatrix is available under the AGPLv3, a copy of which is available in the
 ### Third-party code libraries
 
 * [jQuery](https://jquery.com/) is available under the MIT License.
-
 * [jQuery Tipsy](http://onehackoranother.com/projects/jquery/tipsy/) is
   available under the MIT License.
-
 * PSR Log is available under the MIT License.
-
 * [Symfony](https://symfony.com/) is available under the MIT License.
 
 ### Media files
