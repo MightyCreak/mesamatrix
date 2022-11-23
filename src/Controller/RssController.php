@@ -96,21 +96,14 @@ class RssController
                 continue;
             }
 
-            $description = (string)$commit;
-            $description = str_replace('<pre>', '<pre style="white-space: pre-wrap;">', $description);
-            $lines = explode("\n", $description);
-            $lines = preg_replace('/^\+.*$/', '<span style="color: green">$0</span>', $lines);
-            $lines = preg_replace('/^-.*$/', '<span style="color: red">$0</span>', $lines);
-            $description = implode("\n", $lines);
-
             $item = new RSSItem();
             $item
-                ->preferCdata(true)
                 ->title((string)$commit["subject"])
-                ->description($description)
+                ->description((string)$commit)
                 //->url($commitWeb . $commit["hash"])
                 ->url($baseUrl . '?commit=' . $commit["hash"])
                 ->pubDate((int)$commit["timestamp"])
+                ->preferCdata(true)
                 ->appendTo($channel);
         }
 
