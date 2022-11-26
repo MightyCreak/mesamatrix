@@ -48,6 +48,7 @@ abstract class Constants
         "v3d",
         "zink",
         "lima",
+        "asahi",
         "panfrost",
         "d3d12",
     ];
@@ -60,7 +61,7 @@ abstract class Constants
         "Qualcomm"      => [ "freedreno" ],
         "Vivante"       => [ "etnaviv" ],
         "Broadcom"      => [ "vc4", "v3d" ],
-        "Arm"           => [ "lima", "panfrost" ],
+        "Arm"           => [ "lima", "panfrost", "asahi" ],
         "Translation"   => [ "d3d12", "virgl", "zink" ],
     ];
 
