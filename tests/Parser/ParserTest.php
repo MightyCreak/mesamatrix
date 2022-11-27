@@ -88,6 +88,6 @@ final class ParserTest extends TestCase
         $this->assertEquals(11, $api->getNumExtensions());
 
         $api = $matrix->getApiVersionByName(Constants::GL_OR_ES_EXTRA_NAME, null);
-        $this->assertInstanceOf('Mesamatrix\\Parser\\ApiVersion', $api);
+        $this->assertInstanceOf('Mesamatrix\Parser\ApiVersion', $api);
     }
 }

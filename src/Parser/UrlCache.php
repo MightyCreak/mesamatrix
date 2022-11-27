@@ -26,6 +26,7 @@ use Mesamatrix\Mesamatrix;
 class UrlCache
 {
     private const EXPIRATION_DELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
+    private const RE_VALID_HTTP_RESPONSE = '/^HTTP\/[^ ]+? 2[0-9]{2}/';
 
     /**
      * Default constructor.
@@ -41,7 +42,7 @@ class UrlCache
      *
      * This file is encoded in JSON.
      */
-    public function load()
+    public function load(): void
     {
         $privateDir = Mesamatrix::$config->getValue("info", "private_dir");
         $filepath = $privateDir . '/' . Mesamatrix::$config->getValue("extension_links", "cache_file", "urlcache.json");
@@ -59,7 +60,7 @@ class UrlCache
      *
      * This file is encoded in JSON.
      */
-    public function save()
+    public function save(): void
     {
         $privateDir = Mesamatrix::$config->getValue("info", "private_dir", "private");
         if (file_exists($privateDir) === false) {
@@ -75,13 +76,13 @@ class UrlCache
     }
 
     /**
-     * Return if the URL is valid or not.
+     * Test the URL and returns if it is valid or not.
      *
      * Also update the URL in the database if needed.
      *
      * @param string $url URL to test.
      */
-    public function isValid($url)
+    public function testUrl(string $url): bool
     {
         if ($this->needCheck($url)) {
             $this->updateUrl($url);
@@ -95,7 +96,7 @@ class UrlCache
      * @param string $url URL to test.
      * @return boolean Whether or not the given URL need to be checked again.
      */
-    private function needCheck($url)
+    private function needCheck(string $url): bool
     {
         $urlKnown = array_key_exists($url, $this->cachedUrls);
         return !$urlKnown || $this->cachedUrls[$url]['expiration_date'] < $this->instanceTime;
@@ -106,19 +107,30 @@ class UrlCache
      *
      * @param string $url URL to update.
      */
-    private function updateUrl($url)
+    private function updateUrl(string $url): void
     {
         $urlHeader = get_headers($url);
-        $isValid = false;
+        $valid = false;
         if ($urlHeader !== false) {
-            Mesamatrix::$logger->info("Try URL \"" . $url . "\". Result: \"" . $urlHeader[0] . "\".");
-            $isValid = $urlHeader[0] === "HTTP/1.1 200 OK";
+            $response = $urlHeader[0];
+            $valid = $this->isValidResponse($response);
+            Mesamatrix::$logger->info("Try URL \"${url}\": " . ($valid ? "valid" : "invalid") . " (\"${response}\")");
         }
 
         // Register URL's validity.
         $this->cachedUrls[$url] = array(
             'expiration_date' => $this->instanceTime + self::EXPIRATION_DELAY,
-            'is_valid' => $isValid);
+            'is_valid' => $valid);
+    }
+
+    /**
+     * Get if the HTTP response is valid or not.
+     *
+     * @param string $response HTTP response.
+     */
+    public function isValidResponse(string $response): bool
+    {
+        return preg_match(self::RE_VALID_HTTP_RESPONSE, $response) !== 0;
     }
 
     private $instanceTime;
