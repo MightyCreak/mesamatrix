@@ -368,18 +368,19 @@ class Parse extends Command
         $updated = filemtime($fetchHeadPath);
         $xml->addAttribute('updated', $updated);
 
+        // Generate statuses.
         $statuses = $xml->addChild("statuses");
         $this->populateStatuses($statuses);
 
-        $xmlCommits = $xml->addChild('commits');
-        $this->generateCommitsLog($xmlCommits, $commits);
-
         // Generate APIs.
         $apis = $xml->addChild('apis');
-
         foreach ($this::API_INFOS as $apiName => $apiVersions) {
             $this->addApi($matrix, $apis, $apiName, $apiVersions, true);
         }
+
+        // Generate commits.
+        $xmlCommits = $xml->addChild('commits');
+        $this->generateCommitsLog($xmlCommits, $commits);
 
         $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
 
