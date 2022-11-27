@@ -49,11 +49,6 @@ $CONFIG = [
         "branch" => "main",
         "filepaths" => [
             [
-                "name" => "docs/GL3.txt",
-                // Rename from GL3.txt to features.txt
-                "excluded_commits" => [ "f926cf5bd0ade3273b320ca4483d826fcfe20bbb" ]
-            ],
-            [
                 "name" => "docs/features.txt",
                 "excluded_commits" => []
             ]
