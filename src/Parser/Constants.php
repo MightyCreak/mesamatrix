@@ -61,7 +61,8 @@ abstract class Constants
         'Qualcomm'      => [ 'freedreno' ],
         'Vivante'       => [ 'etnaviv' ],
         'Broadcom'      => [ 'vc4', 'v3d' ],
-        'Arm'           => [ 'lima', 'panfrost', 'asahi' ],
+        'Apple'         => [ 'asahi' ],
+        'Arm'           => [ 'lima', 'panfrost' ],
         'Translation'   => [ 'd3d12', 'virgl', 'zink' ],
     ];
 

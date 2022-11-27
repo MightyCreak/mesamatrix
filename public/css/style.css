@@ -40,13 +40,14 @@ body {
     --matrix-ext-hover-color: #ededed;
 
     --matrix-ext-amd-color: #f7b5b2;
+    --matrix-ext-apple-color: #a2a2a2;
     --matrix-ext-arm-color: #7acde8;
     --matrix-ext-broadcom-color: #ff8e8e;
     --matrix-ext-intel-color: #b9cee4;
     --matrix-ext-nvidia-color: #d5f796;
     --matrix-ext-powervr-color: #c48dd1;
     --matrix-ext-qualcomm-color: #c7dce8;
-    --matrix-ext-software-color: #d1b4ce;
+    --matrix-ext-software-color: var(--matrix-ext-default-color);
     --matrix-ext-translation-color: #ffd6fc;
     --matrix-ext-vivante-color: #a6d87a;
 
@@ -73,13 +74,14 @@ body.dark-theme {
     --matrix-ext-hover-color: #535353;
 
     --matrix-ext-amd-color: #9e7371;
+    --matrix-ext-apple-color: #8a8a8a;
     --matrix-ext-arm-color: #497b8b;
     --matrix-ext-broadcom-color: #a15959;
     --matrix-ext-intel-color: #667280;
     --matrix-ext-nvidia-color: #798f52;
     --matrix-ext-powervr-color: #8f4e9e;
     --matrix-ext-qualcomm-color: #77848b;
-    --matrix-ext-software-color: #726170;
+    --matrix-ext-software-color: var(--matrix-ext-default-color);
     --matrix-ext-vivante-color: #638148;
     --matrix-ext-translation-color: #8f778d;
 
@@ -106,13 +108,14 @@ body.dark-theme {
         --matrix-ext-hover-color: #535353;
 
         --matrix-ext-amd-color: #9e7371;
+        --matrix-ext-apple-color: #8a8a8a;
         --matrix-ext-arm-color: #497b8b;
         --matrix-ext-broadcom-color: #a15959;
         --matrix-ext-intel-color: #667280;
         --matrix-ext-nvidia-color: #798f52;
         --matrix-ext-powervr-color: #8f4e9e;
         --matrix-ext-qualcomm-color: #77848b;
-        --matrix-ext-software-color: #726170;
+        --matrix-ext-software-color: var(--matrix-ext-default-color);
         --matrix-ext-translation-color: #8f778d;
         --matrix-ext-vivante-color: #638148;
 
@@ -139,13 +142,14 @@ body.dark-theme {
         --matrix-ext-hover-color: #ededed;
 
         --matrix-ext-amd-color: #f7b5b2;
+        --matrix-ext-apple-color: #a2a2a2;
         --matrix-ext-arm-color: #7acde8;
         --matrix-ext-broadcom-color: #ff8e8e;
         --matrix-ext-intel-color: #b9cee4;
         --matrix-ext-nvidia-color: #d5f796;
         --matrix-ext-powervr-color: #c48dd1;
         --matrix-ext-qualcomm-color: #c7dce8;
-        --matrix-ext-software-color: #d1b4ce;
+        --matrix-ext-software-color: var(--matrix-ext-default-color);
         --matrix-ext-translation-color: #ffd6fc;
         --matrix-ext-vivante-color: #a6d87a;
 
@@ -244,6 +248,7 @@ details > summary {
 
 .hCellVendor-default        { background-color: var(--matrix-ext-default-color); }
 .hCellVendor-amd            { background-color: var(--matrix-ext-amd-color); }
+.hCellVendor-apple          { background-color: var(--matrix-ext-apple-color); }
 .hCellVendor-arm            { background-color: var(--matrix-ext-arm-color); }
 .hCellVendor-broadcom       { background-color: var(--matrix-ext-broadcom-color); }
 .hCellVendor-intel          { background-color: var(--matrix-ext-intel-color); }
