@@ -35,7 +35,7 @@ final class ParserTest extends TestCase
     {
         $parser = new Parser();
 
-        $this->assertInstanceOf('Mesamatrix\\Parser\\Parser', $parser);
+        $this->assertInstanceOf('Mesamatrix\Parser\Parser', $parser);
 
         return $parser;
     }
@@ -46,19 +46,14 @@ final class ParserTest extends TestCase
     public function testCanParseContent(Parser $parser): void
     {
         Mesamatrix::init();
-        $commitFilePath = Mesamatrix::path(join(DIRECTORY_SEPARATOR, [
-            "tests",
-            "resources",
-            "commits",
-            "features.txt"
-        ]));
+        $commitFilePath = Mesamatrix::path('tests/resources/commits/features.txt');
 
         $contents = file_get_contents($commitFilePath);
         $this->assertNotFalse($contents);
 
         $matrix = $parser->parseContent($contents);
 
-        $this->assertInstanceOf('Mesamatrix\\Parser\\Matrix', $matrix);
+        $this->assertInstanceOf('Mesamatrix\Parser\Matrix', $matrix);
     }
 
     /**
@@ -67,16 +62,11 @@ final class ParserTest extends TestCase
     public function testCanParseFile(Parser $parser): Matrix
     {
         Mesamatrix::init();
-        $commitFilePath = Mesamatrix::path(join(DIRECTORY_SEPARATOR, [
-            "tests",
-            "resources",
-            "commits",
-            "features.txt"
-        ]));
+        $commitFilePath = Mesamatrix::path('tests/resources/commits/features.txt');
 
         $matrix = $parser->parseFile($commitFilePath);
 
-        $this->assertInstanceOf('Mesamatrix\\Parser\\Matrix', $matrix);
+        $this->assertInstanceOf('Mesamatrix\Parser\Matrix', $matrix);
 
         return $matrix;
     }
@@ -89,7 +79,7 @@ final class ParserTest extends TestCase
         $this->assertCount(27, $matrix->getApiVersions());
 
         $api = $matrix->getApiVersionByName(Constants::GL_NAME, '4.6');
-        $this->assertInstanceOf('Mesamatrix\\Parser\\ApiVersion', $api);
+        $this->assertInstanceOf('Mesamatrix\Parser\ApiVersion', $api);
 
         $this->assertEquals(Constants::GL_NAME, $api->getName());
         $this->assertEquals('4.6', $api->getVersion());

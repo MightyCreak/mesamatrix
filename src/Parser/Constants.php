@@ -24,96 +24,97 @@ namespace Mesamatrix\Parser;
 abstract class Constants
 {
     // Extension statuses.
-    public const STATUS_NOT_STARTED = "incomplete";
-    public const STATUS_IN_PROGRESS = "started";
-    public const STATUS_DONE = "complete";
+    public const STATUS_NOT_STARTED = 'incomplete';
+    public const STATUS_IN_PROGRESS = 'started';
+    public const STATUS_DONE = 'complete';
 
     // OpenGL and OpenGL ES.
-    public const GL_NAME = "OpenGL";
-    public const GLES_NAME = "OpenGL ES";
-    public const GL_OR_ES_EXTRA_NAME = "Extensions that are not part of any OpenGL or OpenGL ES version";
+    public const GL_NAME = 'OpenGL';
+    public const GLES_NAME = 'OpenGL ES';
+    public const GL_OR_ES_EXTRA_NAME = 'Extensions that are not part of any OpenGL or OpenGL ES version';
 
     public const GL_ALL_DRIVERS = [
-        "softpipe",
-        "llvmpipe",
-        "i965",
-        "nv50",
-        "nvc0",
-        "r600",
-        "radeonsi",
-        "freedreno",
-        "virgl",
-        "etnaviv",
-        "vc4",
-        "v3d",
-        "zink",
-        "lima",
-        "panfrost",
-        "d3d12",
+        'softpipe',
+        'llvmpipe',
+        'i965',
+        'nv50',
+        'nvc0',
+        'r600',
+        'radeonsi',
+        'freedreno',
+        'virgl',
+        'etnaviv',
+        'vc4',
+        'v3d',
+        'zink',
+        'lima',
+        'asahi',
+        'panfrost',
+        'd3d12',
     ];
 
     public const GL_ALL_DRIVERS_VENDORS = [
-        "Software"      => [ "llvmpipe", "softpipe" ],
-        "Intel"         => [ "i965" ],
-        "Nvidia"        => [ "nv50", "nvc0" ],
-        "AMD"           => [ "r600", "radeonsi" ],
-        "Qualcomm"      => [ "freedreno" ],
-        "Vivante"       => [ "etnaviv" ],
-        "Broadcom"      => [ "vc4", "v3d" ],
-        "Arm"           => [ "lima", "panfrost" ],
-        "Translation"   => [ "d3d12", "virgl", "zink" ],
+        'Software'      => [ 'llvmpipe', 'softpipe' ],
+        'Intel'         => [ 'i965' ],
+        'Nvidia'        => [ 'nv50', 'nvc0' ],
+        'AMD'           => [ 'r600', 'radeonsi' ],
+        'Qualcomm'      => [ 'freedreno' ],
+        'Vivante'       => [ 'etnaviv' ],
+        'Broadcom'      => [ 'vc4', 'v3d' ],
+        'Arm'           => [ 'lima', 'panfrost', 'asahi' ],
+        'Translation'   => [ 'd3d12', 'virgl', 'zink' ],
     ];
 
     // Vulkan.
-    public const VK_NAME = "Vulkan";
-    public const VK_EXTRA_NAME = "Extensions that are not part of any Vulkan version";
+    public const VK_NAME = 'Vulkan';
+    public const VK_EXTRA_NAME = 'Extensions that are not part of any Vulkan version';
 
     public const VK_ALL_DRIVERS = [
-        "anv",
-        "dzn",
-        "lvp",
-        "panvk",
-        "pvr",
-        "radv",
-        "tu",
-        "v3dv",
-        "vn",
+        'anv',
+        'dzn',
+        'lvp',
+        'panvk',
+        'pvr',
+        'radv',
+        'tu',
+        'v3dv',
+        'vn',
     ];
 
     public const VK_ALL_DRIVERS_VENDORS = [
-        "Software"      => [ "lvp" ],
-        "Intel"         => [ "anv" ],
-        "AMD"           => [ "radv" ],
-        "Qualcomm"      => [ "tu" ],
-        "Broadcom"      => [ "v3dv" ],
-        "Arm"           => [ "panvk" ],
-        "PowerVR"       => [ "pvr" ],
-        "Translation"   => [ "dzn", "vn" ],
+        'Software'      => [ 'lvp' ],
+        'Intel'         => [ 'anv' ],
+        'AMD'           => [ 'radv' ],
+        'Qualcomm'      => [ 'tu' ],
+        'Broadcom'      => [ 'v3dv' ],
+        'Arm'           => [ 'panvk' ],
+        'PowerVR'       => [ 'pvr' ],
+        'Translation'   => [ 'dzn', 'vn' ],
     ];
 
     // OpenCL.
-    public const OPENCL_NAME = "OpenCL";
-    public const OPENCL_EXTRA_NAME = "Extensions that are not part of any OpenCL version";
-    public const OPENCL_VENDOR_SPECIFIC_NAME = "Vendor-specific extensions that are not part of any OpenCL version";
+    public const OPENCL_NAME = 'OpenCL';
+    public const OPENCL_EXTRA_NAME = 'Extensions that are not part of any OpenCL version';
+    public const OPENCL_VENDOR_SPECIFIC_NAME = 'Vendor-specific extensions that are not part of any OpenCL version';
 
     public const OPENCL_ALL_DRIVERS = [
-        "nvc0",
-        "r600",
-        "radeonsi",
+        'nvc0',
+        'r600',
+        'radeonsi',
     ];
 
     public const OPENCL_ALL_DRIVERS_VENDORS = [
-        "Nvidia"    => [ "nvc0" ],
-        "AMD"       => [ "r600", "radeonsi" ],
+        'Nvidia'    => [ 'nvc0' ],
+        'AMD'       => [ 'r600', 'radeonsi' ],
     ];
 
     // Hints enabling for all drivers.
     // 0: regexp
     // 1: use hint?
     public const RE_ALL_DRIVERS_HINTS = [
-        [ "/^all drivers$/i", false ],
-        [ "/^all drivers that support GLSL( \d+\.\d+\+?)?$/i", true ],
-        [ "/^all - but needs GLX\/EGL extension to be useful$/i", true ],
+        [ '/^all drivers$/i', false ],
+        [ '/^all drivers that support GLSL( \d+\.\d+\+?)?$/i', true ],
+        [ '/^all - but needs GLX\/EGL extension to be useful$/i', true ],
     ];
 
     // Hints depending on another feature.
@@ -122,7 +123,7 @@ abstract class Constants
     // 2: dependency type
     // 3: dependency match index
     public const RE_DEP_DRIVERS_HINTS = [
-        [ "/^all drivers that support (GL_[_[:alnum:]]+)$/i", true, DependsOn::EXTENSION, 1 ],
-        [ "/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i", true, DependsOn::GLES_VERSION, 1 ],
+        [ '/^all drivers that support (GL_[_[:alnum:]]+)$/i', true, DependsOn::EXTENSION, 1 ],
+        [ '/^all drivers that support GLES ?(\d+\.\d+\+?)?$/i', true, DependsOn::GLES_VERSION, 1 ],
     ];
 }

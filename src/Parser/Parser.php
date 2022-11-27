@@ -339,6 +339,9 @@ class Parser
     {
         foreach ($src as $srcDriver) {
             $driverName = $this->getDriverName($srcDriver);
+            if ($driverName === null) {
+                continue;
+            }
 
             $i = 0;
             $numDstDrivers = count($dst);

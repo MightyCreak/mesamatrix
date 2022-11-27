@@ -368,18 +368,19 @@ class Parse extends Command
         $updated = filemtime($fetchHeadPath);
         $xml->addAttribute('updated', $updated);
 
+        // Generate statuses.
         $statuses = $xml->addChild("statuses");
         $this->populateStatuses($statuses);
 
-        $xmlCommits = $xml->addChild('commits');
-        $this->generateCommitsLog($xmlCommits, $commits);
-
         // Generate APIs.
         $apis = $xml->addChild('apis');
-
         foreach ($this::API_INFOS as $apiName => $apiVersions) {
             $this->addApi($matrix, $apis, $apiName, $apiVersions, true);
         }
+
+        // Generate commits.
+        $xmlCommits = $xml->addChild('commits');
+        $this->generateCommitsLog($xmlCommits, $commits);
 
         $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
 
@@ -556,11 +557,23 @@ class Parse extends Command
     protected function generateApiVersion(SimpleXMLElement $xmlVersion, ApiVersion $apiVersion, Hints $hints): void
     {
         $xmlVersion->addAttribute("name", $apiVersion->getName());
-        $xmlVersion->addAttribute("version", $apiVersion->getVersion());
+        $version = $apiVersion->getVersion();
+        if ($version !== null) {
+            $xmlVersion->addAttribute("version", $apiVersion->getVersion());
+        }
 
-        $shaderVersion = $xmlVersion->addChild("shader-version");
-        $shaderVersion->addAttribute("name", $apiVersion->getGlslName());
-        $shaderVersion->addAttribute("version", $apiVersion->getGlslVersion());
+        $glslName = $apiVersion->getGlslName();
+        $glslVersion = $apiVersion->getGlslVersion();
+        if ($glslName !== null || $glslVersion !== null) {
+            $shaderVersion = $xmlVersion->addChild("shader-version");
+            if ($glslName !== null) {
+                $shaderVersion->addAttribute("name", $apiVersion->getGlslName());
+            }
+
+            if ($glslVersion !== null) {
+                $shaderVersion->addAttribute("version", $apiVersion->getGlslVersion());
+            }
+        }
 
         $extensions = $xmlVersion->addChild("extensions");
         foreach ($apiVersion->getExtensions() as $ext) {
