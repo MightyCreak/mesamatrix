@@ -597,7 +597,7 @@ class Parse extends Command
 
                 $openglUrl .= urlencode($matches[2] . "_" . $matches[3]) . ".txt";
 
-                if ($this->urlCache->isValid($openglUrl)) {
+                if ($this->urlCache->testUrl($openglUrl)) {
                     $linkNode = $xmlExt->addChild("link", $matches[0]);
                     $linkNode->addAttribute("href", $openglUrl);
                 }
@@ -605,7 +605,7 @@ class Parse extends Command
                 $vulkanUrl = Mesamatrix::$config->getValue("extension_links", "vulkan_base_url") .
                     urlencode($matches[0]) . ".html";
 
-                if ($this->urlCache->isValid($vulkanUrl)) {
+                if ($this->urlCache->testUrl($vulkanUrl)) {
                     $linkNode = $xmlExt->addChild("link", $matches[0]);
                     $linkNode->addAttribute("href", $vulkanUrl);
                 }
