@@ -219,6 +219,7 @@ details {
 details > summary {
     font-size: x-large;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .matrix {
