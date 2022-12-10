@@ -63,11 +63,11 @@ body.dark-theme {
     --anchor-color: #809fff;
     --visited-anchor-color: #8282d2;
 
-    --lb-bkg-color: #6f726d;
+    --lb-bkg-color: #2f2f2f;
     --lb-same-rank-color: #9e9e9e;
-    --lb-1st-color: rgb(90, 122, 68);
-    --lb-2nd-color: rgba(90, 122, 68, 0.67);
-    --lb-3rd-color: rgba(90, 122, 68, 0.33);
+    --lb-1st-color: rgb(90, 133, 55);
+    --lb-2nd-color: rgba(90, 133, 55, 0.67);
+    --lb-3rd-color: rgba(90, 133, 55, 0.33);
     --lb-pct-score-color: rgb(163, 163, 163);
 
     --matrix-ext-default-color: var(--lb-bkg-color);
@@ -97,11 +97,11 @@ body.dark-theme {
         --anchor-color: #809fff;
         --visited-anchor-color: #8282d2;
 
-        --lb-bkg-color: #6f726d;
+        --lb-bkg-color: #2f2f2f;
         --lb-same-rank-color: #9e9e9e;
-        --lb-1st-color: rgb(90, 122, 68);
-        --lb-2nd-color: rgba(90, 122, 68, 0.67);
-        --lb-3rd-color: rgba(90, 122, 68, 0.33);
+        --lb-1st-color: rgb(90, 133, 55);
+        --lb-2nd-color: rgba(90, 133, 55, 0.67);
+        --lb-3rd-color: rgba(90, 133, 55, 0.33);
         --lb-pct-score-color: rgb(163, 163, 163);
 
         --matrix-ext-default-color: var(--lb-bkg-color);
