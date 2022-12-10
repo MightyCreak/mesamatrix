@@ -212,6 +212,7 @@ main p {
  */
 
 details {
+    display: inline;
     padding-top: 1em;
     padding-bottom: 1em;
 }
