@@ -218,6 +218,7 @@ details {
 }
 
 details > summary {
+    margin-left: 0.3em;
     font-size: x-large;
     font-weight: bold;
     cursor: pointer;
