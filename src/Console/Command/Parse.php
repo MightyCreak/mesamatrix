@@ -60,10 +60,16 @@ class Parse extends Command
         Constants::VK_NAME => [ Constants::VK_NAME, Constants::VK_EXTRA_NAME ],
 
         // OpenCL.
-        Constants::OPENCL_NAME => [
-            Constants::OPENCL_NAME,
-            Constants::OPENCL_EXTRA_NAME,
-            Constants::OPENCL_VENDOR_SPECIFIC_NAME
+        // Clover
+        Constants::CLOVER_OPENCL_NAME => [
+            Constants::CLOVER_OPENCL_NAME,
+            Constants::CLOVER_OPENCL_EXTRA_NAME,
+        ],
+
+        // Rusticl
+        Constants::RUSTICL_OPENCL_NAME => [
+            Constants::RUSTICL_OPENCL_NAME,
+            Constants::RUSTICL_OPENCL_EXTRA_NAME,
         ],
     ];
 
@@ -517,10 +523,14 @@ class Parse extends Command
                 $vendors = Constants::VK_ALL_DRIVERS_VENDORS;
                 break;
 
-            case Constants::OPENCL_NAME:
-            case Constants::OPENCL_EXTRA_NAME:
-            case Constants::OPENCL_VENDOR_SPECIFIC_NAME:
-                $vendors = Constants::OPENCL_ALL_DRIVERS_VENDORS;
+            case Constants::CLOVER_OPENCL_NAME:
+            case Constants::CLOVER_OPENCL_EXTRA_NAME:
+                $vendors = Constants::CLOVER_OPENCL_ALL_DRIVERS_VENDORS;
+                break;
+
+            case Constants::RUSTICL_OPENCL_NAME:
+            case Constants::RUSTICL_OPENCL_EXTRA_NAME:
+                $vendors = Constants::RUSTICL_OPENCL_ALL_DRIVERS_VENDORS;
                 break;
         }
 
