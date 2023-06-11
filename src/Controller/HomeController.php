@@ -40,7 +40,8 @@ class HomeController extends BaseController
         $this->apiControllers[] = new ApiSubController(Constants::GL_NAME, true);
         $this->apiControllers[] = new ApiSubController(Constants::GLES_NAME, true);
         $this->apiControllers[] = new ApiSubController(Constants::GL_OR_ES_EXTRA_NAME, false);
-        $this->apiControllers[] = new ApiSubController(Constants::OPENCL_NAME, true);
+        $this->apiControllers[] = new ApiSubController(Constants::RUSTICL_OPENCL_NAME, true);
+        $this->apiControllers[] = new ApiSubController(Constants::CLOVER_OPENCL_NAME, true);
 
         $this->addCssScript('css/tipsy.css');
 
