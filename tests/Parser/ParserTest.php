@@ -76,7 +76,11 @@ final class ParserTest extends TestCase
      */
     public function testCanSuccessfullyParseFeaturesFile(Matrix $matrix): void
     {
-        $this->assertCount(27, $matrix->getApiVersions());
+        // All Vulkan, OpenGL, OpenGL ES, Rusticl and Clover versions.
+        // This can change (but rarely) depending on the contents of features.txt.
+        $numApiVersions = 35;
+
+        $this->assertCount($numApiVersions, $matrix->getApiVersions());
 
         $api = $matrix->getApiVersionByName(Constants::GL_NAME, '4.6');
         $this->assertInstanceOf('Mesamatrix\Parser\ApiVersion', $api);

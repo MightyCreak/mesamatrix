@@ -94,19 +94,35 @@ abstract class Constants
     ];
 
     // OpenCL.
-    public const OPENCL_NAME = 'OpenCL';
-    public const OPENCL_EXTRA_NAME = 'Extensions that are not part of any OpenCL version';
-    public const OPENCL_VENDOR_SPECIFIC_NAME = 'Vendor-specific extensions that are not part of any OpenCL version';
+    public const CLOVER_OPENCL_NAME = 'Clover OpenCL';
+    public const CLOVER_OPENCL_EXTRA_NAME = 'Clover Extensions that are not part of any OpenCL version';
 
-    public const OPENCL_ALL_DRIVERS = [
+    public const CLOVER_OPENCL_ALL_DRIVERS = [
         'nvc0',
         'r600',
         'radeonsi',
     ];
 
-    public const OPENCL_ALL_DRIVERS_VENDORS = [
-        'Nvidia'    => [ 'nvc0' ],
+    public const CLOVER_OPENCL_ALL_DRIVERS_VENDORS = [
         'AMD'       => [ 'r600', 'radeonsi' ],
+        'Nvidia'    => [ 'nvc0' ],
+    ];
+
+    public const RUSTICL_OPENCL_NAME = 'Rusticl OpenCL';
+    public const RUSTICL_OPENCL_EXTRA_NAME = 'Rusticl Extensions that are not part of any OpenCL version';
+    public const RUSTICL_OPENCL_ALL_DRIVERS = [
+        'iris',
+        'llvmpipe',
+        'nvc0',
+        'panfrost',
+        'radeonsi',
+    ];
+    public const RUSTICL_OPENCL_ALL_DRIVERS_VENDORS = [
+        'AMD'       => [ 'radeonsi' ],
+        'Arm'       => [ 'panfrost' ],
+        'Intel'     => [ 'iris' ],
+        'Nvidia'    => [ 'nvc0' ],
+        'Software'  => [ 'llvmpipe' ],
     ];
 
     // Hints enabling for all drivers.

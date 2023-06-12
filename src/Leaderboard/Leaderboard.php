@@ -56,7 +56,8 @@ class Leaderboard
             } elseif (
                 $a->getName() === Constants::GL_NAME ||
                 $a->getName() === Constants::VK_NAME ||
-                $a->getName() === Constants::OPENCL_NAME
+                $a->getName() === Constants::CLOVER_OPENCL_NAME ||
+                $a->getName() === Constants::RUSTICL_OPENCL_NAME
             ) {
                 return -1;
             } else {
