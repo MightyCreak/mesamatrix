@@ -506,8 +506,8 @@ HTML;
 
         echo <<<HTML
     <p>
-        There is a total of <strong>{$numTotalExts}</strong> extensions to implement.
-        The ranking is based on the number of extensions done by driver.
+        There are a total of <strong>{$numTotalExts}</strong> extensions to implement.
+        The ranking is based on the current number of extensions implemented per driver.
     </p>
     <table class="lb">
         <thead>
