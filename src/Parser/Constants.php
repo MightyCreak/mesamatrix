@@ -36,7 +36,8 @@ abstract class Constants
     public const GL_ALL_DRIVERS = [
         'softpipe',
         'llvmpipe',
-        'i965',
+        'iris',
+        'crocus',
         'nv50',
         'nvc0',
         'r600',
@@ -55,7 +56,7 @@ abstract class Constants
 
     public const GL_ALL_DRIVERS_VENDORS = [
         'Software'      => [ 'llvmpipe', 'softpipe' ],
-        'Intel'         => [ 'i965' ],
+        'Intel'         => [ 'iris', 'crocus' ],
         'Nvidia'        => [ 'nv50', 'nvc0' ],
         'AMD'           => [ 'r600', 'radeonsi' ],
         'Qualcomm'      => [ 'freedreno' ],
