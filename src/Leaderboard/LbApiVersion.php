@@ -23,6 +23,13 @@ namespace Mesamatrix\Leaderboard;
 
 class LbApiVersion
 {
+    private string $id;
+    private string $name;
+    private string $version;
+    private int $numExts;
+    private array $drivers;
+    private array $driverScores;
+
     /**
      * LbApiVersion constructor.
      *
@@ -119,10 +126,4 @@ class LbApiVersion
     {
         return $this->driverScores;
     }
-
-    private string $id;
-    private string $name;
-    private string $version;
-    private int $numExts;
-    private array $driverScores;
 }

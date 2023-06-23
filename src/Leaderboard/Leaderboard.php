@@ -25,6 +25,9 @@ use Mesamatrix\Parser\Constants;
 
 class Leaderboard
 {
+    private array $apiVersions;
+    private bool $useVersions;
+
     /**
      * Leaderboard default constructor.
      */
@@ -259,7 +262,4 @@ class Leaderboard
         $this->apiVersions[] = $apiVersion;
         return $apiVersion;
     }
-
-    private array $apiVersions;
-    private bool $useVersions;
 }
