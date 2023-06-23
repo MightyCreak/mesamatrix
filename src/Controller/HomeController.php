@@ -43,9 +43,9 @@ class HomeController extends BaseController
         $this->apiControllers[] = new ApiSubController(Constants::RUSTICL_OPENCL_NAME, true);
         $this->apiControllers[] = new ApiSubController(Constants::CLOVER_OPENCL_NAME, true);
 
-        $this->addCssScript('css/tipsy.css');
+        $this->addCssScript('css/jquery.tipsy.css');
 
-        $this->addJsScript('js/jquery.tipsy.js');
+        $this->addJsScript('js/jquery.tipsy.min.js');
     }
 
     protected function computeRendering(): void
