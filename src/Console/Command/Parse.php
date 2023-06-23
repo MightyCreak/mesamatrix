@@ -147,8 +147,8 @@ class Parse extends Command
         $lastCommitFetched = $commits[$numCommits - 1]->getHash();
 
         // Compare last parsed and fetched commits.
-        Mesamatrix::$logger->debug("Last commit fetched: ${lastCommitFetched}");
-        Mesamatrix::$logger->debug("Last commit parsed:  ${lastCommitParsed}");
+        Mesamatrix::$logger->debug("Last commit fetched: {$lastCommitFetched}");
+        Mesamatrix::$logger->debug("Last commit parsed:  {$lastCommitParsed}");
         if ($lastCommitFetched === $lastCommitParsed) {
             Mesamatrix::$logger->info("No new commit, no need to parse.");
             if (!$regenXml) {

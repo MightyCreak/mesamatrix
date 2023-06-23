@@ -114,7 +114,7 @@ class UrlCache
         if ($urlHeader !== false) {
             $response = $urlHeader[0];
             $valid = $this->isValidResponse($response);
-            Mesamatrix::$logger->info("Try URL \"${url}\": " . ($valid ? "valid" : "invalid") . " (\"${response}\")");
+            Mesamatrix::$logger->info("Try URL \"{$url}\": " . ($valid ? "valid" : "invalid") . " (\"{$response}\")");
         }
 
         // Register URL's validity.
