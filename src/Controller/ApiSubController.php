@@ -292,7 +292,7 @@ class ApiSubController
                 $driverName = (string) $driver['name'];
 
                 $extTask = array();
-                $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver[@name='${driverName}']");
+                $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver[@name='{$driverName}']");
                 $xmlSupportedDriver = !empty($xmlSupportedDrivers) ? $xmlSupportedDrivers[0] : null;
                 if ($xmlSupportedDriver) {
                     $extTask['class'] = 'isDone';
