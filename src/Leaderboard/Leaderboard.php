@@ -25,6 +25,9 @@ use Mesamatrix\Parser\Constants;
 
 class Leaderboard
 {
+    private array $apiVersions;
+    private bool $useVersions;
+
     /**
      * Leaderboard default constructor.
      */
@@ -115,7 +118,7 @@ class Leaderboard
                     $numDoneExts = 0;
                     foreach ($xmlVersion->extensions->extension as $xmlExt) {
                         // Extension.
-                        $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver[@name='${driverName}']");
+                        $xmlSupportedDrivers = $xmlExt->xpath("./supported-drivers/driver[@name='{$driverName}']");
                         $xmlSupportedDriver = !empty($xmlSupportedDrivers) ? $xmlSupportedDrivers[0] : null;
                         if ($xmlSupportedDriver) {
                             $numDoneExts += 1;
@@ -124,7 +127,7 @@ class Leaderboard
                         // Sub-extensions.
                         $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
                         foreach ($xmlSubExts as $xmlSubExt) {
-                            $xmlSupportedDrivers = $xmlSubExt->xpath("./supported-drivers/driver[@name='${driverName}']");
+                            $xmlSupportedDrivers = $xmlSubExt->xpath("./supported-drivers/driver[@name='{$driverName}']");
                             $xmlSupportedDriver = !empty($xmlSupportedDrivers) ? $xmlSupportedDrivers[0] : null;
                             if ($xmlSupportedDriver) {
                                 $numDoneExts += 1;
@@ -259,7 +262,4 @@ class Leaderboard
         $this->apiVersions[] = $apiVersion;
         return $apiVersion;
     }
-
-    private array $apiVersions;
-    private bool $useVersions;
 }

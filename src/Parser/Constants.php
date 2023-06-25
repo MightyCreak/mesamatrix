@@ -34,37 +34,37 @@ abstract class Constants
     public const GL_OR_ES_EXTRA_NAME = 'Extensions that are not part of any OpenGL or OpenGL ES version';
 
     public const GL_ALL_DRIVERS = [
-        'softpipe',
-        'llvmpipe',
-        'iris',
+        'asahi',
         'crocus',
+        'd3d12',
+        'etnaviv',
+        'freedreno',
+        'iris',
+        'lima',
+        'llvmpipe',
         'nv50',
         'nvc0',
+        'panfrost',
         'r600',
         'radeonsi',
-        'freedreno',
-        'virgl',
-        'etnaviv',
-        'vc4',
+        'softpipe',
         'v3d',
+        'vc4',
+        'virgl',
         'zink',
-        'lima',
-        'asahi',
-        'panfrost',
-        'd3d12',
     ];
 
     public const GL_ALL_DRIVERS_VENDORS = [
-        'Software'      => [ 'llvmpipe', 'softpipe' ],
-        'Intel'         => [ 'iris', 'crocus' ],
-        'Nvidia'        => [ 'nv50', 'nvc0' ],
         'AMD'           => [ 'r600', 'radeonsi' ],
-        'Qualcomm'      => [ 'freedreno' ],
-        'Vivante'       => [ 'etnaviv' ],
-        'Broadcom'      => [ 'vc4', 'v3d' ],
         'Apple'         => [ 'asahi' ],
         'Arm'           => [ 'lima', 'panfrost' ],
+        'Broadcom'      => [ 'v3d', 'vc4' ],
+        'Intel'         => [ 'iris', 'crocus' ],
+        'Nvidia'        => [ 'nv50', 'nvc0' ],
+        'Qualcomm'      => [ 'freedreno' ],
+        'Software'      => [ 'llvmpipe', 'softpipe' ],
         'Translation'   => [ 'd3d12', 'virgl', 'zink' ],
+        'Vivante'       => [ 'etnaviv' ],
     ];
 
     // Vulkan.
@@ -84,13 +84,13 @@ abstract class Constants
     ];
 
     public const VK_ALL_DRIVERS_VENDORS = [
-        'Software'      => [ 'lvp' ],
-        'Intel'         => [ 'anv' ],
         'AMD'           => [ 'radv' ],
-        'Qualcomm'      => [ 'tu' ],
-        'Broadcom'      => [ 'v3dv' ],
         'Arm'           => [ 'panvk' ],
+        'Broadcom'      => [ 'v3dv' ],
+        'Intel'         => [ 'anv' ],
         'PowerVR'       => [ 'pvr' ],
+        'Qualcomm'      => [ 'tu' ],
+        'Software'      => [ 'lvp' ],
         'Translation'   => [ 'dzn', 'vn' ],
     ];
 
