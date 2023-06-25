@@ -35,10 +35,11 @@ abstract class Constants
 
     public const GL_ALL_DRIVERS = [
         'asahi',
+        'crocus',
         'd3d12',
         'etnaviv',
         'freedreno',
-        'i965',
+        'iris',
         'lima',
         'llvmpipe',
         'nv50',
@@ -58,7 +59,7 @@ abstract class Constants
         'Apple'         => [ 'asahi' ],
         'Arm'           => [ 'lima', 'panfrost' ],
         'Broadcom'      => [ 'v3d', 'vc4' ],
-        'Intel'         => [ 'i965' ],
+        'Intel'         => [ 'iris', 'crocus' ],
         'Nvidia'        => [ 'nv50', 'nvc0' ],
         'Qualcomm'      => [ 'freedreno' ],
         'Software'      => [ 'llvmpipe', 'softpipe' ],
