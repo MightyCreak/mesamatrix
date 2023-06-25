@@ -116,7 +116,7 @@ class HomeController extends BaseController
     </p>
     <p>
         Although this text file is updated by the Mesa developers themselves, it might not contain an exhaustive list
-        of each drivers' features and subtleties. For more information, it is advised to look at the
+        of each drivers features and subtleties. For more information, it is advised to look at the
         <a href="{$mesaWeb}" target="_blank">source code</a> or ask the developers on their
         <a href="https://mesa3d.org/lists.html" target="_blank">mailing list</a>.
     </p>
