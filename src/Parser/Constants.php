@@ -88,7 +88,7 @@ abstract class Constants
         'AMD'           => [ 'radv' ],
         'Arm'           => [ 'panvk' ],
         'Broadcom'      => [ 'v3dv' ],
-        'Intel'         => [ 'hasvk', 'anv' ],
+        'Intel'         => [ 'anv', 'hasvk' ],
         'PowerVR'       => [ 'pvr' ],
         'Qualcomm'      => [ 'tu' ],
         'Software'      => [ 'lvp' ],
