@@ -74,6 +74,7 @@ abstract class Constants
     public const VK_ALL_DRIVERS = [
         'anv',
         'dzn',
+        'hasvk',
         'lvp',
         'panvk',
         'pvr',
@@ -87,7 +88,7 @@ abstract class Constants
         'AMD'           => [ 'radv' ],
         'Arm'           => [ 'panvk' ],
         'Broadcom'      => [ 'v3dv' ],
-        'Intel'         => [ 'anv' ],
+        'Intel'         => [ 'hasvk', 'anv' ],
         'PowerVR'       => [ 'pvr' ],
         'Qualcomm'      => [ 'tu' ],
         'Software'      => [ 'lvp' ],
