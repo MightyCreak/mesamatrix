@@ -115,6 +115,7 @@ abstract class Constants
     public const RUSTICL_OPENCL_NAME = 'Rusticl OpenCL';
     public const RUSTICL_OPENCL_EXTRA_NAME = 'Rusticl Extensions that are not part of any OpenCL version';
     public const RUSTICL_OPENCL_ALL_DRIVERS = [
+        'asahi',
         'iris',
         'llvmpipe',
         'nvc0',
