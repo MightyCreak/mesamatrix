@@ -124,6 +124,7 @@ abstract class Constants
     ];
     public const RUSTICL_OPENCL_ALL_DRIVERS_VENDORS = [
         'AMD'       => [ 'radeonsi' ],
+        'Apple'     => [ 'asahi' ],
         'Arm'       => [ 'panfrost' ],
         'Intel'     => [ 'iris' ],
         'Nvidia'    => [ 'nvc0' ],
