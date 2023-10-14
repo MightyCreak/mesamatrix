@@ -121,14 +121,16 @@ abstract class Constants
         'nvc0',
         'panfrost',
         'radeonsi',
+        'zink',
     ];
     public const RUSTICL_OPENCL_ALL_DRIVERS_VENDORS = [
-        'AMD'       => [ 'radeonsi' ],
-        'Apple'     => [ 'asahi' ],
-        'Arm'       => [ 'panfrost' ],
-        'Intel'     => [ 'iris' ],
-        'Nvidia'    => [ 'nvc0' ],
-        'Software'  => [ 'llvmpipe' ],
+        'AMD'         => [ 'radeonsi' ],
+        'Apple'       => [ 'asahi' ],
+        'Arm'         => [ 'panfrost' ],
+        'Intel'       => [ 'iris' ],
+        'Nvidia'      => [ 'nvc0' ],
+        'Software'    => [ 'llvmpipe' ],
+        'Translation' => [ 'zink' ],
     ];
 
     // Hints enabling for all drivers.
