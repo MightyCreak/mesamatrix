@@ -412,8 +412,9 @@ class Parse extends Command
         Commit $commit
     ): void {
         foreach ($matrix->getApiVersions() as $apiVersion) {
+            $prevApiVersion = $prevMatrix->getApiVersionByName($apiVersion->getName(), $apiVersion->getVersion());
             foreach ($apiVersion->getExtensions() as $ext) {
-                $prevExt = $prevMatrix->getExtensionBySubstr($ext->getName());
+                $prevExt = $prevApiVersion !== null ? $prevApiVersion->getExtensionBySubstr($ext->getName()) : null;
 
                 $this->compareExtensionsAndSetModificationCommit($prevExt, $ext, $commit);
             }
