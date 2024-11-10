@@ -116,6 +116,7 @@ abstract class Constants
     public const RUSTICL_OPENCL_EXTRA_NAME = 'Rusticl Extensions that are not part of any OpenCL version';
     public const RUSTICL_OPENCL_ALL_DRIVERS = [
         'asahi',
+        'freedreno',
         'iris',
         'llvmpipe',
         'nvc0',
@@ -129,6 +130,7 @@ abstract class Constants
         'Arm'         => [ 'panfrost' ],
         'Intel'       => [ 'iris' ],
         'Nvidia'      => [ 'nvc0' ],
+        'Qualcomm'    => [ 'freedreno' ],
         'Software'    => [ 'llvmpipe' ],
         'Translation' => [ 'zink' ],
     ];
