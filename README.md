@@ -4,7 +4,7 @@ Mesamatrix is a PHP application that parses information from a text file in the
 Mesa Git repository ([features.txt](https://gitlab.freedesktop.org/mesa/mesa/blob/main/docs/features.txt))
 and formats it in HTML.
 
-Official website: https://mesamatrix.net/
+Official website: <https://mesamatrix.net/>
 
 ## Installation
 
@@ -126,6 +126,6 @@ under the Creative Commons Attribution-ShareAlike 4.0 International license.
 Go tweak it, and send us your improvements!
 
 The RSS feed icon is freely available from the Mozilla Foundation at
-http://www.feedicons.com/
+<http://www.feedicons.com/>.
 
 The GitHub 'Fork me' ribbon is available under the MIT license.
