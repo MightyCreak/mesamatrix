@@ -122,12 +122,14 @@ abstract class Constants
         'nvc0',
         'panfrost',
         'radeonsi',
+        'v3d',
         'zink',
     ];
     public const RUSTICL_OPENCL_ALL_DRIVERS_VENDORS = [
         'AMD'         => [ 'radeonsi' ],
         'Apple'       => [ 'asahi' ],
         'Arm'         => [ 'panfrost' ],
+        'Broadcom'    => [ 'v3d' ],
         'Intel'       => [ 'iris' ],
         'Nvidia'      => [ 'nvc0' ],
         'Qualcomm'    => [ 'freedreno' ],
