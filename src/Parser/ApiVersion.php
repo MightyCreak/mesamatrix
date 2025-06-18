@@ -114,6 +114,7 @@ class ApiVersion
 
             case Constants::RUSTICL_OPENCL_NAME:
             case Constants::RUSTICL_OPENCL_OPTIONAL_NAME:
+            case Constants::RUSTICL_OPENCL_CL2_OPTIONAL_NAME:
             case Constants::RUSTICL_OPENCL_EXTRA_NAME:
                 return Constants::RUSTICL_OPENCL_ALL_DRIVERS;
         }
