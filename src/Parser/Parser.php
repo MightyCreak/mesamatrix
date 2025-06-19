@@ -133,6 +133,20 @@ class Parser
                         $apiVersion = new ApiVersion($openClName, $matches[1], null, null, $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
+                } elseif ($line === self::RUSTICL_OPENCL_CORE_OPTIONAL) {
+                    $openClName = Constants::RUSTICL_OPENCL_OPTIONAL_NAME;
+                    $apiVersion = $matrix->getApiVersionByName($openClName, null);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($openClName, null, null, null, $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
+                    }
+                } elseif ($line === self::RUSTICL_OPENCL_CL2_OPTIONAL) {
+                    $openClName = Constants::RUSTICL_OPENCL_CL2_OPTIONAL_NAME;
+                    $apiVersion = $matrix->getApiVersionByName($openClName, null);
+                    if (!$apiVersion) {
+                        $apiVersion = new ApiVersion($openClName, null, null, null, $matrix->getHints());
+                        $matrix->addApiVersion($apiVersion);
+                    }
                 } elseif ($line === self::RUSTICL_OPENCL_EXTENSIONS) {
                     $openClName = Constants::RUSTICL_OPENCL_EXTRA_NAME;
                     $apiVersion = $matrix->getApiVersionByName($openClName, null);
@@ -428,8 +442,12 @@ class Parser
         "Khronos extensions that are not part of any Vulkan version:\n";
     private const CLOVER_OPENCL_EXTENSIONS =
         "Clover extensions that are not part of any OpenCL version:\n";
+    private const RUSTICL_OPENCL_CORE_OPTIONAL =
+        "Rusticl Optional Core Features:\n";
+    private const RUSTICL_OPENCL_CL2_OPTIONAL =
+        "Rusticl Optional OpenCL 2.x Features:\n";
     private const RUSTICL_OPENCL_EXTENSIONS =
-        "Rusticl extensions that are not part of any OpenCL version:\n";
+        "Rusticl extensions:\n";
 
     private const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
     private const RE_NOTE = "/^(\(.+\)) (.*)$/";
