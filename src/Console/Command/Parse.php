@@ -69,9 +69,9 @@ class Parse extends Command
         // Rusticl
         Constants::RUSTICL_OPENCL_NAME => [
             Constants::RUSTICL_OPENCL_NAME,
-            Constants::RUSTICL_OPENCL_OPTIONAL_NAME,
-            Constants::RUSTICL_OPENCL_CL2_OPTIONAL_NAME,
             Constants::RUSTICL_OPENCL_EXTRA_NAME,
+            Constants::RUSTICL_OPENCL_CL2_OPTIONAL_NAME,
+            Constants::RUSTICL_OPENCL_OPTIONAL_NAME,
         ],
     ];
 
