@@ -14,23 +14,23 @@
 
     "config": {
         "platform": {
-            "php": "7.4"
+            "php": "8.2"
         }
     },
 
     "require": {
-        "monolog/monolog": "^2",
+        "monolog/monolog": "^3",
         "suin/php-rss-writer": "^1",
-        "symfony/console": "^5",
-        "symfony/error-handler": "^5",
-        "symfony/http-kernel": "^5",
-        "symfony/monolog-bridge": "^5",
-        "symfony/process": "^5"
+        "symfony/console": "^7",
+        "symfony/error-handler": "^7",
+        "symfony/http-kernel": "^7",
+        "symfony/monolog-bridge": "^7",
+        "symfony/process": "^7"
     },
 
     "require-dev": {
         "squizlabs/php_codesniffer": "^3",
-        "phpunit/phpunit": "^9"
+        "phpunit/phpunit": "^11"
     },
 
     "autoload": {
