@@ -30,7 +30,12 @@ Jump into the directory and install the dependencies with Composer:
 
 ```sh
 cd mesamatrix
+
+# In development:
 composer install
+
+# In production:
+composer install --no-dev
 ```
 
 ### Configuration (optional)
