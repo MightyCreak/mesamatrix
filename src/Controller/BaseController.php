@@ -115,7 +115,7 @@ abstract class BaseController
         <meta property="og:type" content="website" />
         <meta property="og:image" content="//mesamatrix.net/images/mesamatrix-logo.png" />
 
-        <link rel="shortcut icon" href="images/gears.png" />
+        <link rel="icon" href="images/gears.png" type="image/png" />
         <link rel="alternate" type="application/rss+xml" title="rss feed" href="rss.php" />
 HTML;
 
