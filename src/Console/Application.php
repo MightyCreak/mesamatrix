@@ -54,15 +54,15 @@ class Application extends \Symfony\Component\Console\Application
         $this->setDispatcher($dispatcher);
     }
 
-    protected function configureIO(InputInterface $input, OutputInterface $output)
+    protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         // Set default output verbosity
         $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        return parent::configureIO($input, $output);
+        parent::configureIO($input, $output);
     }
 
-    protected function getDefaultCommands()
+    protected function getDefaultCommands(): array
     {
         return array_merge(parent::getDefaultCommands(), array(
             new Command\Parse(),
