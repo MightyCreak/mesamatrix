@@ -36,6 +36,7 @@ abstract class BaseController
 
     public function __construct()
     {
+        $this->addCssScript('css/gh-fork-ribbon.css');
         $this->addCssScript('css/style.css?v=' . (Mesamatrix::$config->getValue("info", "version")));
 
         $this->addJsScript('js/jquery-3.7.0.min.js');
@@ -189,9 +190,7 @@ HTML;
         echo <<<HTML
         </main>
         <footer>
-            <a id="github-ribbon" href="{$projectUrl}">
-                <img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" />
-            </a>
+            <a class="github-fork-ribbon" href="{$projectUrl}" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="checkbox">
                     <input type="checkbox" id="checkbox" />
