@@ -13,7 +13,6 @@ COPY config ./config/
 COPY public ./public/
 COPY scripts ./scripts/
 COPY src ./src/
-COPY vendor ./vendor/
 COPY \
     composer.json \
     composer.lock \
