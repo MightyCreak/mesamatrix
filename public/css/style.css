@@ -180,6 +180,7 @@ a:hover, a:active {
 header img.banner {
     width: 663px;
     height: 132px;
+    color: var(--text-color)
 }
 
 main p {
