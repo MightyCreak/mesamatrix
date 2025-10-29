@@ -63,7 +63,6 @@ class Parser
         $reTableHeader = "/^(Feature[ ]+)Status/";
         $reGlVersion = "/^(GL(ES)?) ?([[:digit:]]+\.[[:digit:]]+), (GLSL( ES)?) ([[:digit:]]+\.[[:digit:]]+)/";
         $reVkVersion = "/^Vulkan ([[:digit:]]+\.[[:digit:]]+)/";
-        $reCloverOpenClVersion = "/^Clover OpenCL ([[:digit:]]+\.[[:digit:]]+)/";
         $reRusticlOpenClVersion = "/^Rusticl OpenCL ([[:digit:]]+\.[[:digit:]]+)/";
 
         // Skip header lines.
@@ -110,20 +109,6 @@ class Parser
                     $apiVersion = $matrix->getApiVersionByName($vkName, null);
                     if (!$apiVersion) {
                         $apiVersion = new ApiVersion($vkName, null, null, null, $matrix->getHints());
-                        $matrix->addApiVersion($apiVersion);
-                    }
-                } elseif (preg_match($reCloverOpenClVersion, $line, $matches) === 1) {
-                    $openClName = Constants::CLOVER_OPENCL_NAME;
-                    $apiVersion = $matrix->getApiVersionByName($openClName, $matches[1]);
-                    if (!$apiVersion) {
-                        $apiVersion = new ApiVersion($openClName, $matches[1], null, null, $matrix->getHints());
-                        $matrix->addApiVersion($apiVersion);
-                    }
-                } elseif ($line === self::CLOVER_OPENCL_EXTENSIONS) {
-                    $openClName = Constants::CLOVER_OPENCL_EXTRA_NAME;
-                    $apiVersion = $matrix->getApiVersionByName($openClName, null);
-                    if (!$apiVersion) {
-                        $apiVersion = new ApiVersion($openClName, null, null, null, $matrix->getHints());
                         $matrix->addApiVersion($apiVersion);
                     }
                 } elseif (preg_match($reRusticlOpenClVersion, $line, $matches) === 1) {
@@ -440,8 +425,6 @@ class Parser
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
     private const OTHER_OFFICIAL_VK_EXTENSIONS =
         "Khronos extensions that are not part of any Vulkan version:\n";
-    private const CLOVER_OPENCL_EXTENSIONS =
-        "Clover extensions that are not part of any OpenCL version:\n";
     private const RUSTICL_OPENCL_CORE_OPTIONAL =
         "Rusticl Optional Core Features:\n";
     private const RUSTICL_OPENCL_CL2_OPTIONAL =
