@@ -100,22 +100,10 @@ abstract class Constants
     ];
 
     // OpenCL.
-    public const CLOVER_OPENCL_NAME = 'Clover OpenCL';
-    public const CLOVER_OPENCL_EXTRA_NAME = 'Clover Extensions that are not part of any OpenCL version';
-
-    public const CLOVER_OPENCL_ALL_DRIVERS = [
-        'nvc0',
-        'r600',
-        'radeonsi',
-    ];
-
-    public const CLOVER_OPENCL_ALL_DRIVERS_VENDORS = [
-        'AMD'       => [ 'r600', 'radeonsi' ],
-        'Nvidia'    => [ 'nvc0' ],
-    ];
-
     public const RUSTICL_OPENCL_NAME = 'Rusticl OpenCL';
-    public const RUSTICL_OPENCL_EXTRA_NAME = 'Rusticl Extensions that are not part of any OpenCL version';
+    public const RUSTICL_OPENCL_OPTIONAL_NAME = 'Rusticl Optional Core Features';
+    public const RUSTICL_OPENCL_CL2_OPTIONAL_NAME = 'Rusticl Optional OpenCL 2.x Features';
+    public const RUSTICL_OPENCL_EXTRA_NAME = 'Rusticl Extensions';
     public const RUSTICL_OPENCL_ALL_DRIVERS = [
         'asahi',
         'freedreno',
