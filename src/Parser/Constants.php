@@ -76,6 +76,7 @@ abstract class Constants
         'dzn',
         'hasvk',
         'hk',
+        'kk',
         'lvp',
         'nvk',
         'panvk',
@@ -88,7 +89,7 @@ abstract class Constants
 
     public const VK_ALL_DRIVERS_VENDORS = [
         'AMD'           => [ 'radv' ],
-        'Apple'         => [ 'hk' ],
+        'Apple'         => [ 'hk', 'kk' ],
         'Arm'           => [ 'panvk' ],
         'Broadcom'      => [ 'v3dv' ],
         'Intel'         => [ 'anv', 'hasvk' ],
