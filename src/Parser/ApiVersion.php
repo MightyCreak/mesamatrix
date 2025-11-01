@@ -108,11 +108,9 @@ class ApiVersion
             case Constants::VK_EXTRA_NAME:
                 return Constants::VK_ALL_DRIVERS;
 
-            case Constants::CLOVER_OPENCL_NAME:
-            case Constants::CLOVER_OPENCL_EXTRA_NAME:
-                return Constants::CLOVER_OPENCL_ALL_DRIVERS;
-
             case Constants::RUSTICL_OPENCL_NAME:
+            case Constants::RUSTICL_OPENCL_OPTIONAL_NAME:
+            case Constants::RUSTICL_OPENCL_CL2_OPTIONAL_NAME:
             case Constants::RUSTICL_OPENCL_EXTRA_NAME:
                 return Constants::RUSTICL_OPENCL_ALL_DRIVERS;
         }
