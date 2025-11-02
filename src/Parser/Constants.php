@@ -90,7 +90,7 @@ abstract class Constants
 
     public const VK_ALL_DRIVERS_VENDORS = [
         'AMD'           => [ 'radv' ],
-        'Apple'         => [ 'hk', 'kk' ],
+        'Apple'         => [ 'hk' ],
         'Arm'           => [ 'panvk' ],
         'Broadcom'      => [ 'v3dv' ],
         'Intel'         => [ 'anv', 'hasvk' ],
@@ -98,7 +98,7 @@ abstract class Constants
         'PowerVR'       => [ 'pvr' ],
         'Qualcomm'      => [ 'tu' ],
         'Software'      => [ 'lvp' ],
-        'Translation'   => [ 'dzn', 'vn' ],
+        'Translation'   => [ 'dzn', 'kk', 'vn' ],
     ];
 
     // OpenCL.
