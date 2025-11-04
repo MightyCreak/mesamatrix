@@ -46,3 +46,8 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
 # Copy Mesamatrix into /var/www/html/
 COPY --from=build /app/ /var/www/html/
+
+# Create private directory and make it www-data:www-data so that the PHP
+# scripts can write in it.
+RUN mkdir /var/www/html/private && \
+    chown www-data:www-data /var/www/html/private/
