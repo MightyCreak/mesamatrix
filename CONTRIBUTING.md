@@ -1,192 +1,181 @@
 # How to contribute
 
-So you want to contribute to this small project?
+You want to contribute to this project? Well thank you! That's very much
+appreciated! 🥰
 
-Well thank you! That's very much appreciated! :)
+In this page, we'll see how to setup the project so you can edit it in your IDE.
+
+If you have doubts, questions or suggestions, you can contact us on Matrix
+at [#mesamatrix:matrix.org](https://matrix.to/#/%23mesamatrix:matrix.org).
+
+* [Install locally](#install-locally)
+  * [Prerequisites](#prerequisites)
+  * [Install steps](#install-steps)
+  * [Configuration (optional)](#configuration-optional)
+  * [Initial setup](#initial-setup)
+  * [Update Mesa data](#update-mesa-data)
+  * [Run the PHP server](#run-the-php-server)
+* [How to use the CLI tool](#how-to-use-the-cli-tool)
+  * [`setup` command](#setup-command)
+  * [`fetch` command](#fetch-command)
+  * [`parse` command](#parse-command)
+* [Coding style](#coding-style)
+  * [PHP](#php)
+  * [Javascript](#javascript)
+  * [HTML](#html)
+  * [CSS](#css)
+* [IDE configuration](#ide-configuration)
+  * [VSCode](#vscode)
+
+## Install locally
+
+### Prerequisites
+
+Mesamatrix requires the following software:
+
+* [Composer](https://getcomposer.org/)
+* [Git](https://git-scm.com)
+* [PHP](https://www.php.net/) 8.2 or higher, with these packages:
+  * [php-json](https://www.php.net/manual/book.json.php)
+  * [php-xml](https://www.php.net/manual/book.simplexml.php)
+
+### Install steps
+
+Clone the Mesamatrix repository:
+
+```sh
+git clone git@github.com:MightyCreak/mesamatrix.git
+```
+
+Jump into the directory and install all the dependencies with Composer:
+
+```sh
+cd mesamatrix
+composer install
+```
+
+### Configuration (optional)
+
+There is a default config file in [`config/config.default.php`](./config/config.default.php).
+It provides default values for the application, but is overridden by the
+optional `config/config.php`.
+
+For instance, to change the log level: create a `config/config.php` file and
+copy this contents:
+
+```php
+<?php
+
+use Monolog\Logger as Log;
+
+$CONFIG = array(
+  "info" => array(
+    "log_level" => Log::DEBUG,
+  ),
+);
+```
+
+### Initial setup
+
+For the initial setup, run the `mesamatrixctl` tool to clone the Mesa Git
+repository and generate the XML file:
+
+```sh
+./mesamatrixctl setup
+```
+
+### Update Mesa data
+
+Once setup is done, you can run the two commands that are needed to get the
+latest information from Mesa:
+
+```sh
+./mesamatrixctl fetch
+./mesamatrixctl parse
+```
+
+These commands can be put into a crontab or similar scheduling facility, for
+automated operation of your Mesamatrix installation.
+
+### Run the PHP server
+
+As a developer, an easy way to spawn up a PHP server is by running this
+command:
+
+```sh
+php -S 0.0.0.0:8080 -t public
+```
+
+## How to use the CLI tool
+
+The `mesamatrixctl` tool can be used to administer your Mesamatrix
+installation. It outputs very little by default, but can become more verbose
+when passed `-v`, `-vv` or `-vvv` for normal output, verbose output or debug
+output respectively.
+
+Run `./mesamatrixctl list` to see the available commands, or
+`./mesamatrixctl help <command_name>` for more detailed help.
+
+### `setup` command
+
+Initializes Mesamatrix: clones the mesa repository. Must be called once.
+
+### `fetch` command
+
+Pulls the latest commits from the Mesa git repository. Call it regularly to
+always be up to date.
+
+### `parse` command
+
+Parses the latest commits and generates the XML used by the website.
+
+Options:
+
+* `-f`/`--force`: Force to parse all the commits again
+* `-r`/`--regenerate-xml`: Regenerate the XML based on the already parsed commits
 
 ## Coding style
 
 Following the coding style of a project is important. It allows to have a
 more readable and maintainable code base. It's also useful for code reviews
 since there is no preference here, you simply have to follow the guidelines.
-And remember, you control your IDE and not the other way around! ;)
-
-If you have doubts, questions or suggestions, you can contact us on
-[IRC](http://webchat.freenode.net/?channels=mesamatrix) or in some other
-ways.
-
-### Common style
-
-These rules are the base for all the languages used in the project (PHP,
-Javascript, HTML and CSS), unless specified otherwise later in the language
-section. Examples are written in PHP.
-
-#### Indentation
-
-- Use 4 spaces instead of tab for indentations
-
-#### Case
-
-- Use `PascalCase` for classes, structures and namespaces
-- Use `camelCase` for variables, members, functions and methods
-- No prefix and no suffix for the members
-
-Examples:
-
-```php
-namespace MyProject\Utils;                  // PascalCase for namespaces.
-
-$myVariable = 0;                            // camelCase for variables.
-
-function getSomething($a, $b) {             // camelCase for functions.
-    // code here...
-}
-
-class MyClass {                             // PascalCase for classes.
-    public function getSomething($a, $b) {  // camelCase for methods.
-        // code here...
-    }
-
-    private $awesomeMember;                 // camelCase for members.
-}
-```
-
-#### Functions and methods
-
-- Never put spaces after a `(` or before a `)`
-- Put a space after `,`
-- Put the `{` on the same line
-- Put a space before `{`
-- Start the body on a new line
-
-**Do**
-
-```php
-function doSomething($a, $b) {
-    // code here...
-}
-
-$c = getSomething($a, $b);
-```
-
-**Don't**
-
-```php
-function doSomething($a, $b){               // No space before '{'.
-    // code here...
-}
-function doSomething($a, $b)                // '{' is not on the same line.
-{
-    // code here...
-}
-function doSomething($a, $b) { /* code */ } // Definition on one line.
-
-$c = getSomething( $a, $b );                // Spaces after '(' and before ')'.
-$c = getSomething($a,$b);                   // No space after ','.
-```
-
-#### Control blocks
-
-Same as functions, plus:
-
-- Put a space after the control keyword (`if`, `for`, ...)
-- Put `else` in a new line
-- Put a space after `;`, but never before
-- Put `switch` and `case` on the same column
-
-**Do**
-
-```php
-if ($a === $b) {
-    // code here...
-}
-else {
-    // code here...
-}
-
-for ($i = 0; $i < 10; $i++) {
-    // code here...
-}
-
-switch ($condition) {
-case 1:
-    // action1
-    break;
-
-case 2:
-    // action2;
-    break;
-
-default:
-    // defaultaction;
-    break;
-}
-```
-
-**Don't**
-
-```php
-if($a === $b) {                     // No space after 'if'.
-    // code here...
-} else {                            // 'else' is not on a new line.
-    // code here...
-}
-
-for ($i=0;$i<10;$i++) {             // No spaces after ';',
-    // code here...                 // neither around operators.
-}
-for ($i = 0 ; $i < 10 ; $i++) {     // Spaces before ';'.
-    // code here...
-}
-
-switch ($condition) {
-    case 1:                         // 'case' is indented.
-        break;
-}
-```
-
-#### Operators
-
-- Always put spaces around the binary or ternary operators (`+`, `*`, `=`,
-  `?:`, ...)
-- Don't use spaces for unary operators (`-`, `++`, ...)
-
-**Do**
-
-```php
-$a = 10;
-$a = $a / 2 + 1;
-$a = $isUsed ? 1 : 2;
-$a = -$b;
-```
-
-**Don't**
-
-
-```php
-$a=10;                 // No spaces around '='.
-$a = 10 ;              // Space before ';'.
-$a = $a/2+1;           // No spaces around '/' and '+' operators.
-$a = $isUsed?1:2;      // No spaces around '?:' operators.
-$a = - $b;             // Space after unary '-'.
-```
+And remember, you control your IDE and not the other way around! 😉
 
 ### PHP
 
-- Use `<?php` at the beginning of the page but, at the end, **do not use**
-  `?>` since it can write undesirable white spaces to the output
-- Use `===` and `!==` instead of `==` and `!=`
-- Use `'` for strings
+For PHP the project follows the [PSR-12](https://www.php-fig.org/psr/psr-12/)
+coding style (except for the line limit, which was too constraining).
 
 ### Javascript
 
-- Always use `var` for your variables
-- Use `'` for strings
+* Always use `var` for your variables
+* Use `'` for strings
 
-## HTML
+### HTML
 
-- Use `"` for attributes
+* Use `"` for attributes
 
-## CSS
+### CSS
 
-- Don’t bind your CSS too much to your HTML structure and try to avoid IDs
+* Don’t bind your CSS too much to your HTML structure and try to avoid IDs
+
+## IDE configuration
+
+### VSCode
+
+The recommended extensions for this project are in `.vscode/extensions.json`.
+You don't have to install them all, it's simply recommended.
+
+List of recommended extensions:
+
+* [EditorConfig for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig):
+  the base to respect some common standards across the whole project
+* Linters:
+  * PHP: [phpcs](https://marketplace.visualstudio.com/items?itemName=shevaua.phpcs)
+  * Markdown: [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
+  * Shell script: [ShellCheck](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
+* [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker):
+  spelling checker to check for typos, even in the source code
+* [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one):
+  several extensions for Markdown, especially useful for the table of contents
+  generation
