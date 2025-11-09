@@ -1,0 +1,11 @@
+services:
+  webapp:
+    build: .
+    ports:
+      - "5000:80"
+    volumes:
+      - data:/var/www/html/private
+    restart: always
+
+volumes:
+  data:

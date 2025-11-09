@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "davidanson.vscode-markdownlint",
+        "editorconfig.editorconfig",
+        "shevaua.phpcs",
+        "streetsidesoftware.code-spell-checker",
+        "timonwong.shellcheck",
+        "yzhang.markdown-all-in-one"
+    ]
+}
