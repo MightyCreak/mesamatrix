@@ -1,5 +1,7 @@
 <?php
 
+//declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -18,8 +20,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-//declare(strict_types=1);
 
 use Mesamatrix\Mesamatrix;
 

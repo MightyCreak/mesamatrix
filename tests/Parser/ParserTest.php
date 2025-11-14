@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -19,14 +21,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace Mesamatrix\Tests\Parser;
 
 use Mesamatrix\Mesamatrix;
 use Mesamatrix\Parser\Constants;
 use Mesamatrix\Parser\Matrix;
 use Mesamatrix\Parser\Parser;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 final class ParserTest extends TestCase
@@ -40,9 +41,7 @@ final class ParserTest extends TestCase
         return $parser;
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanParseContent(Parser $parser): void
     {
         Mesamatrix::init();
@@ -56,9 +55,7 @@ final class ParserTest extends TestCase
         $this->assertInstanceOf('Mesamatrix\Parser\Matrix', $matrix);
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanParseFile(Parser $parser): Matrix
     {
         Mesamatrix::init();
@@ -71,9 +68,7 @@ final class ParserTest extends TestCase
         return $matrix;
     }
 
-    /**
-     * @depends testCanParseFile
-     */
+    #[Depends('testCanParseFile')]
     public function testCanSuccessfullyParseFeaturesFile(Matrix $matrix): void
     {
         // All Vulkan, OpenGL, OpenGL ES and Rusticl versions.

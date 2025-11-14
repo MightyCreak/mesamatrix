@@ -35,7 +35,7 @@ Mesamatrix requires the following software:
 
 * [Composer](https://getcomposer.org/)
 * [Git](https://git-scm.com)
-* [PHP](https://www.php.net/) 8.2 or higher, with these packages:
+* [PHP](https://www.php.net/) 8.3 or higher, with these packages:
   * [php-json](https://www.php.net/manual/book.json.php)
   * [php-xml](https://www.php.net/manual/book.simplexml.php)
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -19,12 +21,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace Mesamatrix\Tests\Parser;
 
 use Mesamatrix\Mesamatrix;
 use Mesamatrix\Parser\UrlCache;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 final class UrlCacheTest extends TestCase
@@ -38,41 +39,31 @@ final class UrlCacheTest extends TestCase
         return $parser;
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testReturnsFalseWhenUrlIsEmpty(UrlCache $urlCache): void
     {
         $this->assertFalse($urlCache->isValidResponse(""));
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testReturnsFalseWhenUrlIsInvalid(UrlCache $urlCache): void
     {
         $this->assertFalse($urlCache->isValidResponse("aslkjdf"));
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testReturnsFalseWhenStatusCodeIs404(UrlCache $urlCache): void
     {
         $this->assertFalse($urlCache->isValidResponse("HTTP/1.1 404 Not Found"));
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testReturnsTrueWhenStatusCodeIs200(UrlCache $urlCache): void
     {
         $this->assertTrue($urlCache->isValidResponse("HTTP/1.1 200 OK"));
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testReturnsTrueWhenStatusCodeIs202(UrlCache $urlCache): void
     {
         $this->assertTrue($urlCache->isValidResponse("HTTP/1.1 202 Accepted"));

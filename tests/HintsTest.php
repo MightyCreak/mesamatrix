@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -19,11 +21,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace Mesamatrix\Tests;
 
 use Mesamatrix\Hints;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 final class HintsTest extends TestCase
@@ -37,9 +38,7 @@ final class HintsTest extends TestCase
         return $hints;
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanAddHints(Hints $hints): Hints
     {
         $this->assertEquals(0, $hints->addHint('this is a hint'));
@@ -48,33 +47,25 @@ final class HintsTest extends TestCase
         return $hints;
     }
 
-    /**
-     * @depends testCanAddHints
-     */
+    #[Depends('testCanAddHints')]
     public function testCanFindExistingHint(Hints $hints): void
     {
         $this->assertEquals(0, $hints->findHint('this is a hint'));
     }
 
-    /**
-     * @depends testCanAddHints
-     */
+    #[Depends('testCanAddHints')]
     public function testCannotFindNonExistentHint(Hints $hints): void
     {
         $this->assertEquals(-1, $hints->findHint('this is not a hint'));
     }
 
-    /**
-     * @depends testCanAddHints
-     */
+    #[Depends('testCanAddHints')]
     public function testCanGetNumHints(Hints $hints): void
     {
         $this->assertEquals(2, $hints->getNumHints());
     }
 
-    /**
-     * @depends testCanAddHints
-     */
+    #[Depends('testCanAddHints')]
     public function testCanGetHint(Hints $hints): void
     {
         $this->assertEquals('this is another hint', $hints->getHint(1));

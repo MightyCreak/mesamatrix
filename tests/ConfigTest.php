@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -19,12 +21,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace Mesamatrix\Tests;
 
 use Mesamatrix\Config;
 use Mesamatrix\Mesamatrix;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 final class ConfigTest extends TestCase
@@ -41,41 +42,31 @@ final class ConfigTest extends TestCase
         return $config;
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanGetDefaultValue(Config $config): void
     {
         $this->assertEquals('test_value', $config->getValue('test_section1', 'key1'));
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanGetOverriddenValue(Config $config): void
     {
         $this->assertEquals('overridden_value', $config->getValue('test_section1', 'key2'));
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanReturnValueForUnknownKeyWithDefaultValue(Config $config): void
     {
         $this->assertEquals('not_found', $config->getValue('test_section1', 'key_unknown', 'not_found'));
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanReturnNullForUnknownKeyWithoutDefaultValue(Config $config): void
     {
         $this->assertNull($config->getValue('test_section1', 'key_unknown'));
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanReturnArray(Config $config): void
     {
         $expected = [ 'item1', 'item2' ];
@@ -90,9 +81,7 @@ final class ConfigTest extends TestCase
         }
     }
 
-    /**
-     * @depends testCanInstantiate
-     */
+    #[Depends('testCanInstantiate')]
     public function testCanReturnArrayWithUnknownKeyAndDefaultValue(Config $config): void
     {
         $expected = [ 'item1', 'item2' ];
