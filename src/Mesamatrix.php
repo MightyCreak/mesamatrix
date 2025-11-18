@@ -26,7 +26,6 @@ use Monolog\Logger;
 use Monolog\ErrorHandler;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\StreamHandler;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
 class Mesamatrix
 {
@@ -34,7 +33,6 @@ class Mesamatrix
     public static string $configDir; // Path to configuration directory
     public static Config $config;
     public static Logger $logger;
-    public static HttpRequest $request;
 
     public static function init()
     {
@@ -81,9 +79,6 @@ class Mesamatrix
             self::$logger->error('Could not find XML extension');
             exit(1);
         }
-
-        // Initialize request
-        self::$request = HttpRequest::createFromGlobals();
 
         self::$logger->debug('Base initialization complete');
 

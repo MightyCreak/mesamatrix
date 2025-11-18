@@ -6,10 +6,18 @@ use Mesamatrix\Mesamatrix;
 use Suin\RSSWriter\Feed as RSSFeed;
 use Suin\RSSWriter\Channel as RSSChannel;
 use Suin\RSSWriter\Item as RSSItem;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class RssController
 {
+    private readonly HttpRequest $request;
+
+    public function __construct()
+    {
+        $this->request = HttpRequest::createFromGlobals();
+    }
+
     public function run(): void
     {
         $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue("info", "xml_file"));
@@ -43,7 +51,7 @@ class RssController
             ['Content-Type' => 'text/xml']
         );
 
-        $response->prepare(Mesamatrix::$request);
+        $response->prepare($this->request);
         $response->send();
     }
 
@@ -79,8 +87,8 @@ class RssController
         // prepare RSS
         $rss = new RSSFeed();
 
-        $baseUrl = Mesamatrix::$request->getSchemeAndHttpHost()
-            . Mesamatrix::$request->getBasePath();
+        $baseUrl = $this->request->getSchemeAndHttpHost()
+            . $this->request->getBasePath();
 
         $channel = new RSSChannel();
         $channel
