@@ -21,11 +21,12 @@
 
 namespace Mesamatrix;
 
+use Monolog\Level;
 use Monolog\Logger;
 use Monolog\ErrorHandler;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\StreamHandler;
-use Symfony\Component\HttpFoundation\Request as HTTPRequest;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
 class Mesamatrix
 {
@@ -33,7 +34,7 @@ class Mesamatrix
     public static string $configDir; // Path to configuration directory
     public static Config $config;
     public static Logger $logger;
-    public static HTTPRequest $request;
+    public static HttpRequest $request;
 
     public static function init()
     {
@@ -44,7 +45,7 @@ class Mesamatrix
         self::$logger = new Logger('logger');
         self::$logger->pushHandler(new ErrorLogHandler(
             ErrorLogHandler::OPERATING_SYSTEM,
-            Logger::NOTICE
+            Level::Notice
         ));
         ErrorHandler::register(self::$logger);
 
@@ -58,7 +59,7 @@ class Mesamatrix
         }
 
         // register the log file
-        $logLevel = self::$config->getValue('info', 'log_level', Logger::WARNING);
+        $logLevel = self::$config->getValue('info', 'log_level', Level::Warning);
         $logPath = $privateDir . '/mesamatrix.log';
         if (!file_exists($logPath) && is_dir($privateDir)) {
             touch($logPath);
@@ -70,7 +71,7 @@ class Mesamatrix
             self::$logger->error('Error log ' . $logPath . ' is not writable!');
         }
 
-        if ($logLevel < Logger::INFO) {
+        if ($logLevel < Level::Info) {
             ini_set('display_errors', '1');
             error_reporting(E_ALL);
         }
@@ -82,11 +83,11 @@ class Mesamatrix
         }
 
         // Initialize request
-        self::$request = HTTPRequest::createFromGlobals();
+        self::$request = HttpRequest::createFromGlobals();
 
         self::$logger->debug('Base initialization complete');
 
-        self::$logger->debug('Log level: ' . self::$logger->getLevelName($logLevel));
+        self::$logger->debug('Log level: ' . Logger::toMonologLevel($logLevel)->getName());
         self::$logger->debug('PHP error_reporting: 0x' . dechex(ini_get('error_reporting')));
         self::$logger->debug('PHP display_errors: ' . ini_get('display_errors'));
     }

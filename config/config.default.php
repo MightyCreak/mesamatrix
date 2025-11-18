@@ -3,22 +3,22 @@
 // Default configuration for Mesamatrix.
 // Values can be overwritten in a user defined config/config.php file.
 
-use Monolog\Logger as Log;
+use Monolog\Level;
 
-/* available log levels:
- * Log::EMERGENCY
- * Log::ALERT
- * Log::CRITICAL
- * Log::ERROR
- * Log::WARNING (default)
- * Log::NOTICE
- * Log::INFO
- * Log::DEBUG
+/* Available log levels:
+ * Level::Emergency
+ * Level::Alert
+ * Level::Critical
+ * Level::Error
+ * Level::Warning (default)
+ * Level::Notice
+ * Level::Info
+ * Level::Debug
  */
 
 return [
     "info" => [
-        "log_level" => Log::WARNING,
+        "log_level" => Level::Warning,
         "version" => "3.0",
         "title" => "The Mesa drivers matrix",
         "description" => "Show Mesa progress for the OpenGL, OpenGL ES, Vulkan and OpenCL drivers implementations into an easy to read HTML page.",
