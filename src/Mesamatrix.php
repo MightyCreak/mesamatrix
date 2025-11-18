@@ -29,11 +29,11 @@ use Symfony\Component\HttpFoundation\Request as HTTPRequest;
 
 class Mesamatrix
 {
-    public static $serverRoot; // Path to root of installation
-    public static $configDir; // Path to configuration directory
-    public static $config; // Config object
-    public static $logger; // Logger
-    public static $request; // HTTP request object
+    public static string $serverRoot; // Path to root of installation
+    public static string $configDir; // Path to configuration directory
+    public static Config $config;
+    public static Logger $logger;
+    public static HTTPRequest $request;
 
     public static function init()
     {

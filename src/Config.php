@@ -27,32 +27,47 @@ class Config
 
     public function __construct(string $configDir)
     {
-        $this->readData($configDir . '/config.default.php');
+        if (!file_exists($configDir)) {
+            Mesamatrix::$logger->error(
+                "Could not load the config files: the config directory \"{$configDir}\" doesn't exist."
+            );
+            return;
+        }
+
+        if (!$this->readData($configDir . '/config.default.php')) {
+            Mesamatrix::$logger->warning(
+                "Could not load the default config file: the file \"{${$configDir . '/config.default.php'}}\" doesn't exist."
+            );
+        }
+
+        // Read optional overriding config file.
         $this->readData($configDir . '/config.php');
     }
 
-    public function getValue(string $section, string $key, $default = null)
+    public function getValue(string $section, string $key, mixed $default = null): mixed
     {
         if (isset($this->cache[$section])) {
             if (isset($this->cache[$section][$key])) {
                 return $this->cache[$section][$key];
             }
         }
-        $logMsg = 'Unable to find config value for ' . $section . '.' . $key;
+
         if (is_null($default)) {
-            Mesamatrix::$logger->error($logMsg);
+            Mesamatrix::$logger->error("Unable to find config value for {$section}.{$key}");
         }
 
         return $default;
     }
 
-    private function readData(string $configFile)
+    private function readData(string $configFile): bool
     {
         if (file_exists($configFile)) {
             Mesamatrix::$logger->info('Loading configuration file ' . $configFile);
-            @include $configFile;
-            if (isset($CONFIG) && is_array($CONFIG)) {
-                foreach ($CONFIG as $section => $sectionConfig) {
+
+            $config = require($configFile);
+
+            if (isset($config) && is_array($config)) {
+                foreach ($config as $section => $sectionConfig) {
                     if (array_key_exists($section, $this->cache)) {
                         $this->cache[$section] =
                           array_merge($this->cache[$section], $sectionConfig);

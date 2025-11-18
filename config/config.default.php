@@ -16,7 +16,7 @@ use Monolog\Logger as Log;
  * Log::DEBUG
  */
 
-$CONFIG = [
+return [
     "info" => [
         "log_level" => Log::WARNING,
         "version" => "3.0",
