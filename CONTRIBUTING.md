@@ -66,11 +66,11 @@ copy this contents:
 ```php
 <?php
 
-use Monolog\Logger as Log;
+use Monolog\Level;
 
 $CONFIG = array(
   "info" => array(
-    "log_level" => Log::DEBUG,
+    "log_level" => Level::Debug,
   ),
 );
 ```

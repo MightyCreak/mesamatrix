@@ -3,10 +3,10 @@
 namespace Mesamatrix\Controller;
 
 use Mesamatrix\Mesamatrix;
-use Symfony\Component\HttpFoundation\Response as HTTPResponse;
 use Suin\RSSWriter\Feed as RSSFeed;
 use Suin\RSSWriter\Channel as RSSChannel;
 use Suin\RSSWriter\Item as RSSItem;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class RssController
 {
@@ -37,9 +37,9 @@ class RssController
         }
 
         // Send response.
-        $response = new HTTPResponse(
+        $response = new HttpResponse(
             $rssContents,
-            HTTPResponse::HTTP_OK,
+            HttpResponse::HTTP_OK,
             ['Content-Type' => 'text/xml']
         );
 
@@ -61,7 +61,7 @@ class RssController
         return true;
     }
 
-    private function generateRss(string $featuresXmlFilepath): string
+    private function generateRss(string $featuresXmlFilepath): ?string
     {
         $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
