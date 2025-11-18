@@ -1,7 +1,7 @@
 <?php
 
-$CONFIG = array(
-    'test_section1' => array(
+return [
+    'test_section1' => [
         'key2' => 'overridden_value',
-    ),
-);
+    ],
+];
