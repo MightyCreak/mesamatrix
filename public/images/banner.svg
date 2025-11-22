@@ -336,7 +336,7 @@
      inkscape:groupmode="layer"
      transform="translate(0,42)">
     <g
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:var(--text-color);fill-opacity:1;stroke:none;font-family:Sans"
+       style="fill:var(--text-color);fill-opacity:1;stroke:none"
        id="text3094"
        transform="translate(-0.5,13.5)">
       <path
@@ -504,7 +504,7 @@
          style="fill:url(#linearGradient3959);fill-opacity:1;filter:url(#filter4024)" />
     </g>
     <g
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:var(--text-color);fill-opacity:1;stroke:none;font-family:Sans"
+       style="fill:var(--text-color);fill-opacity:1;stroke:none"
        id="text3098"
        transform="translate(-0.5,13.5)">
       <path
