@@ -19,57 +19,6 @@
    sodipodi:docname="banner.svg">
   <defs
      id="defs2987">
-    <marker
-       style="overflow:visible"
-       inkscape:stockid="InfiniteLineStart"
-       id="InfiniteLineStart"
-       refX="0"
-       refY="0"
-       orient="auto">
-      <g
-         id="g6078"
-         style="fill:#000000"
-         transform="translate(-13,0)">
-        <circle
-           d="M 3.8,0 C 3.8,0.44182781 3.4418278,0.80000001 3,0.80000001 2.5581722,0.80000001 2.2,0.44182781 2.2,0 c 0,-0.44182781 0.3581722,-0.80000001 0.8,-0.80000001 0.4418278,0 0.8,0.3581722 0.8,0.80000001 z"
-           id="circle6080"
-           r="0.80000001"
-           cy="0"
-           cx="3"
-           sodipodi:cx="3"
-           sodipodi:cy="0"
-           sodipodi:rx="0.80000001"
-           sodipodi:ry="0.80000001" />
-        <circle
-           d="M 7.3,0 C 7.3,0.44182781 6.9418278,0.80000001 6.5,0.80000001 6.0581722,0.80000001 5.7,0.44182781 5.7,0 c 0,-0.44182781 0.3581722,-0.80000001 0.8,-0.80000001 0.4418278,0 0.8,0.3581722 0.8,0.80000001 z"
-           id="circle6082"
-           r="0.80000001"
-           cy="0"
-           cx="6.5"
-           sodipodi:cx="6.5"
-           sodipodi:cy="0"
-           sodipodi:rx="0.80000001"
-           sodipodi:ry="0.80000001" />
-        <circle
-           d="M 10.8,0 C 10.8,0.44182781 10.441828,0.80000001 10,0.80000001 9.5581722,0.80000001 9.2,0.44182781 9.2,0 c 0,-0.44182781 0.3581722,-0.80000001 0.8,-0.80000001 0.441828,0 0.8,0.3581722 0.8,0.80000001 z"
-           id="circle6084"
-           r="0.80000001"
-           cy="0"
-           cx="10"
-           sodipodi:cx="10"
-           sodipodi:cy="0"
-           sodipodi:rx="0.80000001"
-           sodipodi:ry="0.80000001" />
-      </g>
-    </marker>
-    <linearGradient
-       id="linearGradient5792"
-       osb:paint="solid">
-      <stop
-         style="stop-color:#676767;stop-opacity:1;"
-         offset="0"
-         id="stop5794" />
-    </linearGradient>
     <linearGradient
        id="linearGradient4343"
        osb:paint="gradient">
@@ -111,15 +60,6 @@
          stdDeviation="9.5235639"
          id="feGaussianBlur4026" />
     </filter>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient4343"
-       id="linearGradient5816"
-       x1="301.65268"
-       y1="6.3835649"
-       x2="768.60065"
-       y2="6.3835649"
-       gradientUnits="userSpaceOnUse" />
     <filter
        inkscape:collect="always"
        id="filter5826"
