@@ -2,7 +2,6 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -17,8 +16,7 @@
   <defs
      id="defs2987">
     <linearGradient
-       id="linearGradient4343"
-       osb:paint="gradient">
+       id="linearGradient4343">
       <stop
          style="stop-color:#676767;stop-opacity:0.79411763;"
          offset="0"
@@ -29,8 +27,7 @@
          id="stop4347" />
     </linearGradient>
     <linearGradient
-       id="linearGradient3950"
-       osb:paint="gradient">
+       id="linearGradient3950">
       <stop
          id="stop3952"
          offset="0"
