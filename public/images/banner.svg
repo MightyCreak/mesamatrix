@@ -3,39 +3,12 @@
 <svg
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    width="663"
    height="132"
    id="svg2985"
    version="1.1">
   <defs
      id="defs2987">
-    <linearGradient
-       id="linearGradient4343">
-      <stop
-         style="stop-color:#676767;stop-opacity:0.79411763;"
-         offset="0"
-         id="stop4345" />
-      <stop
-         style="stop-color:#676767;stop-opacity:0.74264705;"
-         offset="1"
-         id="stop4347" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient3950">
-      <stop
-         id="stop3952"
-         offset="0"
-         style="stop-color:#2ca0d6;stop-opacity:0.66911763;" />
-      <stop
-         style="stop-color:#376dc8;stop-opacity:0.5;"
-         offset="0.51190478"
-         id="stop4004" />
-      <stop
-         id="stop4006"
-         offset="1"
-         style="stop-color:#2a2bdb;stop-opacity:0.25;" />
-    </linearGradient>
     <filter
        id="filter4024"
        x="-0.049526662"
@@ -55,15 +28,22 @@
          id="feGaussianBlur5828" />
     </filter>
     <linearGradient
-       xlink:href="#linearGradient4343"
        id="linearGradient39xx"
        gradientUnits="userSpaceOnUse"
        x1="301.65268"
        y1="6.3835649"
        x2="768.60065"
-       y2="6.3835649" />
+       y2="6.3835649">
+      <stop
+         style="stop-color:#676767;stop-opacity:0.79411763;"
+         offset="0"
+         id="stop4345" />
+      <stop
+         style="stop-color:#676767;stop-opacity:0.74264705;"
+         offset="1"
+         id="stop4347" />
+    </linearGradient>
     <linearGradient
-       xlink:href="#linearGradient3950"
        id="linearGradient3959"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(8,4.5)"
@@ -71,7 +51,20 @@
        x1="335.43372"
        y1="4.25"
        x2="808.56628"
-       y2="0.75" />
+       y2="0.75">
+      <stop
+         id="stop3952"
+         offset="0"
+         style="stop-color:#2ca0d6;stop-opacity:0.66911763;" />
+      <stop
+         style="stop-color:#376dc8;stop-opacity:0.5;"
+         offset="0.51190478"
+         id="stop4004" />
+      <stop
+         id="stop4006"
+         offset="1"
+         style="stop-color:#2a2bdb;stop-opacity:0.25;" />
+    </linearGradient>
   </defs>
   <g
      id="layer1"
