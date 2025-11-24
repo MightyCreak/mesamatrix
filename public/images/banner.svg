@@ -79,8 +79,7 @@
          filter="url(#matrix-grid-blur)">
         <path
            stroke-opacity="0.67605633"
-           d="M 337,38.5 364,156"
-           transform="translate(0,-90)" />
+           d="M 337,-51.5 364,66" />
         <path
            stroke-opacity="0.67605633"
            d="m 363,-51.25 27,117.5" />
