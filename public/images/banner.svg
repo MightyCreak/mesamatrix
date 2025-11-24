@@ -40,7 +40,6 @@
        id="matrix-background-gradient"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(8,4.5)"
-       spreadMethod="pad"
        x1="335.43372"
        y1="4.25"
        x2="808.56628"
