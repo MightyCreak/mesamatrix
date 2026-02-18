@@ -2,7 +2,7 @@
 ## Build image
 ##
 
-FROM alpine:3.22 AS build
+FROM alpine:3.23 AS build
 
 RUN apk add --no-cache composer
 
@@ -26,7 +26,7 @@ RUN composer install --no-dev
 ## Final image
 ##
 
-FROM php:8.3-apache
+FROM php:8.5-apache
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends git && \
