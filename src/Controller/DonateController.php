@@ -111,7 +111,7 @@ class DonateController extends BaseController
     ads. Free software is all about sharing and I strongly believe it is the only way to address important
     subjects such as privacy or learning.</p>
     <p>Although software shouldn't cost a thing, hardware and services rightfully have a price tag. My
-    server costs are CA$&nbsp;190/year and my goal is to cover these fees thanks to simple donations from you,
+    server costs are CA$&nbsp;90/year and my goal is to cover these fees thanks to simple donations from you,
     glorious visitors.</p>
     <p>If you find the project interesting enough, please consider making a donation. Even a small one would
     mean the world to me. More than a mere financial act, donate means that you simply believe in this
