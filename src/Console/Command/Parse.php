@@ -34,6 +34,7 @@ use Mesamatrix\Parser\UrlCache;
 use Mesamatrix\Parser\Hints;
 use SimpleXMLElement;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -229,7 +230,10 @@ class Parse extends Command
             'log', '--pretty=format:' . $logFormat, '--reverse', '-p',
             $oldestCommit . '..', '--', $filepath
         ));
-        $this->getHelper('process')->mustRun($this->output, $gitLog);
+        $processHelper = $this->getHelper('process');
+        if ($processHelper instanceof ProcessHelper) {
+            $processHelper->mustRun($this->output, $gitLog);
+        }
 
         $commitSections = explode($logSeparator . PHP_EOL, $gitLog->getOutput());
         if (empty($commitSections)) {
@@ -278,7 +282,10 @@ class Parse extends Command
         $filepath = $commit->getFilepath();
         $hash = $commit->getHash();
         $cat = new Process(array('show', $hash . ':' . $filepath));
-        $this->getHelper('process')->mustRun($this->output, $cat);
+        $processHelper = $this->getHelper('process');
+        if ($processHelper instanceof ProcessHelper) {
+            $processHelper->mustRun($this->output, $cat);
+        }
 
         // Parse the content.
         Mesamatrix::$logger->info('Parsing ' . (basename($filepath)) . ' for commit ' . $hash);

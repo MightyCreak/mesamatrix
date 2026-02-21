@@ -25,6 +25,7 @@ namespace Mesamatrix\Console\Command;
 use Mesamatrix\Mesamatrix;
 use Mesamatrix\Git\Process;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -46,7 +47,10 @@ class Setup extends Command
             Mesamatrix::$config->getValue('git', 'mesa_url'), '@gitDir@'
         ));
         $git->setTimeout(null);
-        $this->getHelper('process')->mustRun($output, $git);
+        $processHelper = $this->getHelper('process');
+        if ($processHelper instanceof ProcessHelper) {
+            $processHelper->mustRun($output, $git);
+        }
 
         return Command::SUCCESS;
     }
