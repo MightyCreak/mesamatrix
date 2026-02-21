@@ -25,6 +25,7 @@ namespace Mesamatrix\Console\Command;
 use Mesamatrix\Git\Process;
 use Mesamatrix\Mesamatrix;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -41,7 +42,10 @@ class Fetch extends Command
     {
         $branch = Mesamatrix::$config->getValue("git", "branch");
         $fetch = new Process(array('fetch', '-f', 'origin', "$branch:$branch"));
-        $this->getHelper('process')->mustRun($output, $fetch);
+        $processHelper = $this->getHelper('process');
+        if ($processHelper instanceof ProcessHelper) {
+            $processHelper->mustRun($output, $fetch);
+        }
 
         return Command::SUCCESS;
     }
