@@ -65,6 +65,7 @@ class Parse extends Command
         Constants::RUSTICL_OPENCL_NAME => [
             Constants::RUSTICL_OPENCL_NAME,
             Constants::RUSTICL_OPENCL_EXTRA_NAME,
+            Constants::RUSTICL_OPENCL_CL3_1_NAME,
             Constants::RUSTICL_OPENCL_CL2_OPTIONAL_NAME,
             Constants::RUSTICL_OPENCL_OPTIONAL_NAME,
         ],
@@ -529,6 +530,7 @@ class Parse extends Command
 
             case Constants::RUSTICL_OPENCL_NAME:
             case Constants::RUSTICL_OPENCL_OPTIONAL_NAME:
+            case Constants::RUSTICL_OPENCL_CL3_1_NAME:
             case Constants::RUSTICL_OPENCL_CL2_OPTIONAL_NAME:
             case Constants::RUSTICL_OPENCL_EXTRA_NAME:
                 $vendors = Constants::RUSTICL_OPENCL_ALL_DRIVERS_VENDORS;

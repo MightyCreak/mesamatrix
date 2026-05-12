@@ -104,6 +104,7 @@ abstract class Constants
     // OpenCL.
     public const RUSTICL_OPENCL_NAME = 'Rusticl OpenCL';
     public const RUSTICL_OPENCL_OPTIONAL_NAME = 'Rusticl Optional Core Features';
+    public const RUSTICL_OPENCL_CL3_1_NAME = 'Rusticl OpenCL 3.1 Features';
     public const RUSTICL_OPENCL_CL2_OPTIONAL_NAME = 'Rusticl Optional OpenCL 2.x Features';
     public const RUSTICL_OPENCL_EXTRA_NAME = 'Rusticl Extensions';
     public const RUSTICL_OPENCL_ALL_DRIVERS = [
