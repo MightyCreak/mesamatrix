@@ -236,7 +236,7 @@ details > summary {
     border-collapse: separate;
 }
 
-.hCellHeader {
+.matrix .hCellHeader {
     font-size: 85%;
     min-width: 4.1em;
     padding: 0.2em;
@@ -245,54 +245,51 @@ details > summary {
     cursor: default;
 }
 
-.hCellDriverScore {
+.matrix .hCellDriverScore {
     font-size: 85%;
     font-weight: bold;
     color: #DDDDDD;
     cursor: default;
 }
 
-.hCellDriverScore-done { color: #99D75F; }
-.hCellDriverScore-almost { color: #E1A25E; }
-.hCellDriverScore-notyet { color: #B94B3D; }
+.matrix .hCellVendor-default        { background-color: var(--matrix-ext-default-color); }
+.matrix .hCellVendor-amd            { background-color: var(--matrix-ext-amd-color); }
+.matrix .hCellVendor-apple          { background-color: var(--matrix-ext-apple-color); }
+.matrix .hCellVendor-arm            { background-color: var(--matrix-ext-arm-color); }
+.matrix .hCellVendor-broadcom       { background-color: var(--matrix-ext-broadcom-color); }
+.matrix .hCellVendor-intel          { background-color: var(--matrix-ext-intel-color); }
+.matrix .hCellVendor-nvidia         { background-color: var(--matrix-ext-nvidia-color); }
+.matrix .hCellVendor-powervr        { background-color: var(--matrix-ext-powervr-color); }
+.matrix .hCellVendor-qualcomm       { background-color: var(--matrix-ext-qualcomm-color); }
+.matrix .hCellVendor-software       { background-color: var(--matrix-ext-software-color); }
+.matrix .hCellVendor-translation    { background-color: var(--matrix-ext-translation-color); }
+.matrix .hCellVendor-vivante        { background-color: var(--matrix-ext-vivante-color); }
 
-.hCellVendor-default        { background-color: var(--matrix-ext-default-color); }
-.hCellVendor-amd            { background-color: var(--matrix-ext-amd-color); }
-.hCellVendor-apple          { background-color: var(--matrix-ext-apple-color); }
-.hCellVendor-arm            { background-color: var(--matrix-ext-arm-color); }
-.hCellVendor-broadcom       { background-color: var(--matrix-ext-broadcom-color); }
-.hCellVendor-intel          { background-color: var(--matrix-ext-intel-color); }
-.hCellVendor-nvidia         { background-color: var(--matrix-ext-nvidia-color); }
-.hCellVendor-powervr        { background-color: var(--matrix-ext-powervr-color); }
-.hCellVendor-qualcomm       { background-color: var(--matrix-ext-qualcomm-color); }
-.hCellVendor-software       { background-color: var(--matrix-ext-software-color); }
-.hCellVendor-translation    { background-color: var(--matrix-ext-translation-color); }
-.hCellVendor-vivante        { background-color: var(--matrix-ext-vivante-color); }
+.matrix .hCellSep {
+    width: 0px;
+}
 
-.hCellSep       { width: 0px; }
+.matrix .hCellDriverScore-done      { color: #99D75F; }
+.matrix .hCellDriverScore-almost    { color: #E1A25E; }
+.matrix .hCellDriverScore-notyet    { color: #B94B3D; }
 
-.permalink { margin-left: 0.3em; visibility: hidden; }
-.permalink:link { text-decoration: none; color: #DDDDDD; }
-.permalink:visited { text-decoration: none; color: #DDDDDD; }
-:hover > .permalink { visibility: visible; }
-
-.extension {
+.matrix .extension {
     font-size: 85%;
 }
-.extension > td.hover {
+.matrix .extension > td.hover {
     opacity: 0.75;
 }
-.extension > td:first-of-type {
+.matrix .extension > td:first-of-type {
     min-width: 32em;
 }
-.extension > td:first-of-type.hover {
+.matrix .extension > td:first-of-type.hover {
     background-color: var(--matrix-ext-hover-color);
     opacity: 1.0;
 }
 
-.extension-child { padding-left: 1em; }
+.matrix .extension-child { padding-left: 1em; }
 
-.task {
+.matrix .task {
     position: relative;
     padding-right: 4px;
     height: 1.3em;
@@ -300,7 +297,7 @@ details > summary {
     cursor: default;
     text-align: center;
 }
-.task span {
+.matrix .task span {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -309,23 +306,32 @@ details > summary {
     color: black;
 }
 
-.isDone { background-color: #A7E969; }
-.isInProgress { background-color: #E99D4A; }
-.isNotStarted { background-color: #D55E4F; }
+.matrix .isDone { background-color: #A7E969; }
+.matrix .isInProgress { background-color: #E99D4A; }
+.matrix .isNotStarted { background-color: #D55E4F; }
 
-.footnote.task {
+.matrix .footnote.task {
     padding: 0;
     cursor: help;
 }
-.footnote.isDone {
+.matrix .footnote.isDone {
     background: repeating-linear-gradient(45deg, #A7E969, #A7E969 10px, #97C86A 10px, #97C86A 20px);
 }
-.footnote.isInProgress {
+.matrix .footnote.isInProgress {
     background: repeating-linear-gradient(45deg, #E99D4A, #E99D4A 10px, #C9853F 10px, #C9853F 20px);
 }
-.footnote.isNotStarted {
+.matrix .footnote.isNotStarted {
     background: repeating-linear-gradient(45deg, #D86758, #D86758 10px, #AA574C 10px, #AA574C 20px);
 }
+
+/**
+ * Permalinks
+ */
+
+.permalink { margin-left: 0.3em; visibility: hidden; }
+.permalink:link { text-decoration: none; color: #DDDDDD; }
+.permalink:visited { text-decoration: none; color: #DDDDDD; }
+:hover > .permalink { visibility: visible; }
 
 /**
  * Menu
