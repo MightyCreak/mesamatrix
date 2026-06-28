@@ -330,7 +330,8 @@ HTML;
             echo <<<'HTML'
     <details>
         <summary>Drivers details</summary>
-        <table class="matrix">
+        <div class="matrix-container">
+            <table class="matrix">
 HTML;
 
             // Colgroups.
@@ -339,15 +340,69 @@ HTML;
                     $col = $this->matrix['columns'][$colIdx];
                     if ($col['type'] === 'driver') :
                         echo <<<'HTML'
-            <colgroup class="hl">
+                <colgroup class="hl">
 HTML;
                     else :
                         echo <<<'HTML'
-            <colgroup>
+                <colgroup>
 HTML;
                     endif;
                 endforeach;
             endforeach;
+
+            echo <<<'HTML'
+                <thead>
+                    <tr>
+HTML;
+
+            // Header (vendors).
+            foreach ($this->matrix['column_groups'] as $colgroup) :
+                if (empty($colgroup['name'])) :
+                    echo <<<'HTML'
+                        <th></th>
+HTML;
+                else :
+                    $colspan = count($colgroup['columns']);
+                    $colgroupName = $colgroup['name'];
+                    $vendorClass = "hCellVendor-" . $colgroup['vendor_class'];
+
+                    echo <<<HTML
+                        <th colspan="{$colspan}" class="hCellHeader hCellVendor-{$vendorClass}">{$colgroupName}</th>
+HTML;
+                endif;
+            endforeach;
+
+            echo <<<'HTML'
+                    </tr>
+                    <tr>
+HTML;
+
+            // Header (drivers).
+            foreach ($this->matrix['columns'] as $col) :
+                if ($col['type'] === 'extension') :
+                    echo <<<HTML
+                        <th class="hCellHeader hCellVendor-default">{$col['name']}</th>
+HTML;
+                elseif ($col['type'] === 'driver') :
+                    echo <<<HTML
+                        <th class="hCellHeader hCellVendor-{$col['vendor_class']}">{$col['name']}</th>
+HTML;
+                elseif ($col['type'] === 'separator') :
+                    echo <<<'HTML'
+                        <th class="hCellSep"></th>
+HTML;
+                else :
+                    echo <<<HTML
+                        <th>{$col['name']}</th>
+HTML;
+                endif;
+            endforeach;
+
+            echo <<<'HTML'
+                    </tr>
+                </thead>
+                <tbody>
+HTML;
 
             // Sub-sections.
             $numColumns = count($this->matrix['columns']);
@@ -357,88 +412,49 @@ HTML;
 
                 if (!empty($subsectionName)) :
                     echo <<<HTML
-            <tr>
-                <td colspan="{$numColumns}">
-                    <h2 id="{$subsectionId}">{$subsectionName}<a href="#{$subsectionId}" class="permalink">&para;</a></h2>
-                </td>
-            </tr>
+                    <tr>
+                        <td colspan="{$numColumns}">
+                            <h2 id="{$subsectionId}">{$subsectionName}<a href="#{$subsectionId}" class="permalink">&para;</a></h2>
+                        </td>
+                    </tr>
 HTML;
                 endif;
 
                 echo <<<'HTML'
-            <tr>
-HTML;
-
-                // Header (vendors).
-                foreach ($this->matrix['column_groups'] as $colgroup) :
-                    if (empty($colgroup['name'])) :
-                        echo <<<'HTML'
-                <td></td>
-HTML;
-                    else :
-                        $colspan = count($colgroup['columns']);
-                        $colgroupName = $colgroup['name'];
-                        $vendorClass = "hCellVendor-" . $colgroup['vendor_class'];
-
-                        echo <<<HTML
-                <td colspan="{$colspan}" class="hCellHeader hCellVendor-{$vendorClass}">{$colgroupName}</td>
-HTML;
-                    endif;
-                endforeach;
-
-                echo <<<'HTML'
-            </tr>
-            <tr>
-HTML;
-
-                // Header (drivers).
-                foreach ($this->matrix['columns'] as $col) :
-                    if ($col['type'] === 'extension') :
-                        echo <<<HTML
-                <td class="hCellHeader hCellVendor-default">{$col['name']}</td>
-HTML;
-                    elseif ($col['type'] === 'driver') :
-                        echo <<<HTML
-                <td class="hCellHeader hCellVendor-{$col['vendor_class']}">{$col['name']}</td>
-HTML;
-                    elseif ($col['type'] === 'separator') :
-                        echo <<<'HTML'
-                <td class="hCellSep"></td>
-HTML;
-                    else :
-                        echo <<<HTML
-                <td>{$col['name']}</td>
-HTML;
-                    endif;
-                endforeach;
-
-                echo <<<'HTML'
-            </tr>
-            <tr>
+                    <tr>
 HTML;
 
                 // Scores.
                 foreach ($this->matrix['columns'] as $col) :
                     if ($col['type'] === 'driver') :
-                        $scoreStr = sprintf('%.1f', $subsection['scores'][$col['name']] * 100);
+                        $score = $subsection['scores'][$col['name']];
+                        $scoreStr = sprintf('%.1f', $score * 100);
+                        $scoreClasses = "hCellDriverScore";
+                        if ($score == 1.0) :
+                            $scoreClasses .= " hCellDriverScore-done";
+                        elseif ($score >= 0.75) :
+                            $scoreClasses .= " hCellDriverScore-almost";
+                        else :
+                            $scoreClasses .= " hCellDriverScore-notyet";
+                        endif;
                         echo <<<HTML
-                <td class="hCellHeader hCellDriverScore" data-score="{$scoreStr}">{$scoreStr}%</td>
+                        <td class="{$scoreClasses}">{$scoreStr}%</td>
 HTML;
                     else :
                         echo <<<'HTML'
-                <td></td>
+                        <td></td>
 HTML;
                     endif;
                 endforeach;
 
                 echo <<<'HTML'
-            </tr>
+                    </tr>
 HTML;
 
                 // Extensions.
                 foreach ($subsection['extensions'] as $extension) :
                     echo <<<'HTML'
-            <tr class="extension">
+                    <tr class="extension">
 HTML;
                     foreach ($this->matrix['columns'] as $col) :
                         if ($col['type'] === 'extension') :
@@ -451,9 +467,9 @@ HTML;
                                 $cssClass = ' class="extension-child"';
                             endif;
                             echo <<<HTML
-                <td id="{$extension['target']}"{$cssClass}>
-                    {$extNameText}<a href="#{$extension['target']}" class="permalink">&para;</a>
-                </td>
+                        <td id="{$extension['target']}"{$cssClass}>
+                            {$extNameText}<a href="#{$extension['target']}" class="permalink">&para;</a>
+                        </td>
 HTML;
                         elseif ($col['type'] === 'driver') :
                             $driverTask = $extension['tasks'][$col['name']];
@@ -466,31 +482,33 @@ HTML;
 
                             $cssClassesStr = join(' ', $cssClasses);
                             echo <<<HTML
-                <td class="{$cssClassesStr}"{$title}>
+                        <td class="{$cssClassesStr}"{$title}>
 HTML;
                             if (isset($driverTask['timestamp'])) :
                                 $date = date('Y-m-d', $driverTask['timestamp']);
                                 echo <<<HTML
-                    <span data-timestamp="{$driverTask['timestamp']}">{$date}</span>
+                            <span data-timestamp="{$driverTask['timestamp']}">{$date}</span>
 HTML;
                             endif;
                             echo <<<'HTML'
-                </td>
+                        </td>
 HTML;
                         else :
                             echo <<<'HTML'
-                <td></td>
+                        <td></td>
 HTML;
                         endif;
                     endforeach;
                     echo <<<'HTML'
-            </tr>
+                    </tr>
 HTML;
                 endforeach;
             endforeach;
         endforeach;
         echo <<<'HTML'
-        </table>
+                </tbody>
+            </table>
+        </div>
     </details>
 HTML;
     }

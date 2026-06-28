@@ -116,22 +116,6 @@ function manageDates() {
     });
 }
 
-function manageScores() {
-    // Change mesa score color based on completion
-    $('.hCellDriverScore').each(function() {
-        var blend = Math.round($(this).data('score'));
-        if (blend == 100) {
-            $(this).addClass('hCellDriverScore-done');
-        }
-        else if (blend < 75) {
-            $(this).addClass('hCellDriverScore-notyet');
-        }
-        else {
-            $(this).addClass('hCellDriverScore-almost');
-        }
-    });
-}
-
 function manageMatrixCellsHighlight() {
     $('.matrix').delegate('td', 'mouseover mouseleave', function(e) {
         // Get cell, row and table elements
@@ -216,7 +200,6 @@ function manageTheme() {
 $(document).ready(function () {
     manageTheme();
     manageDates();
-    manageScores();
     manageMatrixCellsHighlight();
 
     // Add tipsy for the footnote.
