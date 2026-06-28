@@ -229,14 +229,35 @@ details > summary {
     border-radius: 0.2em;
     padding: 0 0.5em 0.5em 0.5em;
     overflow: auto; /* Enables both horizontal and vertical scrolling */
+    height: 90vh;
 }
 
 .matrix {
-    border-spacing: 1px;
+    border-spacing: 0;
     border-collapse: separate;
 }
 
+.matrix thead {
+    background-color: var(--bkg-color);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.matrix tr:first-child th {
+    padding-top: 0.7em;
+}
+
+.matrix th:first-child {
+    border-left: 0;
+}
+
+.matrix td:not(:first-child) {
+    border-left: 1px solid var(--bkg-color);
+}
+
 .matrix .hCellHeader {
+    border-left: 1px solid var(--bkg-color);
     font-size: 85%;
     min-width: 4.1em;
     padding: 0.2em;
@@ -248,7 +269,7 @@ details > summary {
 .matrix .hCellDriverScore {
     font-size: 85%;
     font-weight: bold;
-    color: #DDDDDD;
+    text-align: center;
     cursor: default;
 }
 
@@ -276,6 +297,9 @@ details > summary {
 .matrix .extension {
     font-size: 85%;
 }
+.matrix .extension td:not(:first-child) {
+    border-top: 1px solid var(--bkg-color);
+}
 .matrix .extension > td.hover {
     opacity: 0.75;
 }
@@ -291,7 +315,6 @@ details > summary {
 
 .matrix .task {
     position: relative;
-    padding-right: 4px;
     height: 1.3em;
     padding: 0;
     cursor: default;
