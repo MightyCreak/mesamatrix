@@ -427,9 +427,18 @@ HTML;
                 // Scores.
                 foreach ($this->matrix['columns'] as $col) :
                     if ($col['type'] === 'driver') :
-                        $scoreStr = sprintf('%.1f', $subsection['scores'][$col['name']] * 100);
+                        $score = $subsection['scores'][$col['name']];
+                        $scoreStr = sprintf('%.1f', $score * 100);
+                        $scoreClasses = "hCellDriverScore";
+                        if ($score == 1.0) :
+                            $scoreClasses .= " hCellDriverScore-done";
+                        elseif ($score >= 0.75) :
+                            $scoreClasses .= " hCellDriverScore-almost";
+                        else :
+                            $scoreClasses .= " hCellDriverScore-notyet";
+                        endif;
                         echo <<<HTML
-                        <td class="{$scoreClasses}" data-score="{$scoreStr}">{$scoreStr}%</td>
+                        <td class="{$scoreClasses}">{$scoreStr}%</td>
 HTML;
                     else :
                         echo <<<'HTML'
