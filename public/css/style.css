@@ -223,6 +223,14 @@ details > summary {
     cursor: pointer;
 }
 
+/* Scrollable container */
+.matrix-container {
+    border: 1px solid var(--text-color);
+    border-radius: 0.2em;
+    padding: 0 0.5em 0.5em 0.5em;
+    overflow: auto; /* Enables both horizontal and vertical scrolling */
+}
+
 .matrix {
     border-spacing: 1px;
     border-collapse: separate;
