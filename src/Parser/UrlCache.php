@@ -117,7 +117,7 @@ class UrlCache
             if ($valid) {
                 Mesamatrix::$logger->info("URL \"{$url}\" is valid");
             } else {
-                Mesamatrix::$logger->warning("URL \"{$url}\" is invalid");
+                Mesamatrix::$logger->warning("URL \"{$url}\" is invalid (reason: \"{$response}\"");
             }
         }
 
