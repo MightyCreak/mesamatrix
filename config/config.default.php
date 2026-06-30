@@ -19,7 +19,7 @@ use Monolog\Level;
 return [
     "info" => [
         "log_level" => Level::Warning,
-        "version" => "3.0",
+        "version" => "3.1",
         "title" => "The Mesa drivers matrix",
         "description" => "Show Mesa progress for the OpenGL, OpenGL ES, Vulkan and OpenCL drivers implementations into an easy to read HTML page.",
         "xml_file" => "public/features.xml",
