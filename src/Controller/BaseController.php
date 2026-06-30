@@ -33,6 +33,7 @@ abstract class BaseController
         "About" => "about.php",
         "Donate?" => "donate.php");
 
+    private bool $showMenu = true;
     private int $pageIdx = -1;
 
     /** @var string[] */
@@ -48,6 +49,11 @@ abstract class BaseController
 
         $this->addJsScript('js/jquery-3.7.0.min.js');
         $this->addJsScript('js/script.js');
+    }
+
+    final protected function setShowMenu(bool $showMenu): void
+    {
+        $this->showMenu = $showMenu;
     }
 
     /**
@@ -143,30 +149,36 @@ HTML;
     <body>
         <header>
             <a href="."><img src="images/banner.svg" class="banner" alt="Mesamatrix banner" /></a>
+HTML;
 
+        if ($this->showMenu) :
+            echo <<<'HTML'
             <div class="menu">
                 <ul class="menu-list">
 HTML;
-        $i = 0;
-        foreach ($this->pages as $page => $link) :
-            $item = "<a href=\"" . $link . "\">" . $page . "</a>";
-            if ($i === $this->pageIdx) :
-                echo <<<HTML
-                    <li class="menu-selected">{$item}</li>
+            $i = 0;
+            foreach ($this->pages as $page => $link) :
+                $item = "<a href=\"" . $link . "\">" . $page . "</a>";
+                if ($i === $this->pageIdx) :
+                    echo <<<HTML
+                        <li class="menu-selected">{$item}</li>
 HTML;
-            else :
-                echo <<<HTML
-                    <li><a href="{$link}">{$page}</a></li>
+                else :
+                    echo <<<HTML
+                        <li><a href="{$link}">{$page}</a></li>
 HTML;
-            endif;
-            ++$i;
-        endforeach;
+                endif;
+                ++$i;
+            endforeach;
 
-        echo <<<'HTML'
+            echo <<<'HTML'
                     <li><a href="rss.php" class="rss"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a></li>
                 </ul>
             </div>
+HTML;
+        endif;
 
+        echo <<<'HTML'
 <!-- Matomo -->
 <script>
   var _paq = window._paq = window._paq || [];
