@@ -186,13 +186,20 @@ main p {
     max-width: 1000px;
 }
 
-.commits th                         { text-align: left; }
-.commits td                         { vertical-align: top; }
-.commits .commitsAge                {
+.commits th {
+    text-align: left;
+}
+.commits td {
+    vertical-align: top;
+}
+.commits .commitsAge {
     white-space: nowrap;
     padding-right: 1em;
 }
-.commits .commitsAge::first-letter  { text-transform: uppercase; }
+.commits .commitsAge::first-letter
+{
+    text-transform: uppercase;
+}
 
 .lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; }
 .lb th, .lb td                  { padding: 0.25em 0.5em; }
@@ -417,14 +424,10 @@ details > summary {
     background-color: var(--donate-bg-color);
 }
 
-#github-ribbon > img {
-    position: fixed;
-    top: 0;
-    right: 0;
-    border: 0;
-}
+/**
+ * Theme switcher.
+ */
 
-/* Simple CSS for toggle switch */
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
@@ -480,6 +483,21 @@ input:checked + .slider::before {
 
 .slider.round::before {
     border-radius: 50%;
+}
+
+/**
+ * GitHub ribbon.
+ */
+
+.github-fork-ribbon:before {
+    background-color: #f80;
+}
+
+#github-ribbon > img {
+    position: fixed;
+    top: 0;
+    right: 0;
+    border: 0;
 }
 
 @media screen and (max-width: 1400px) {
@@ -572,8 +590,4 @@ input:checked + .slider::before {
 .donate > form .submit {
     margin-top: 1em;
     text-align: right;
-}
-
-.github-fork-ribbon:before {
-    background-color: #f80;
 }
