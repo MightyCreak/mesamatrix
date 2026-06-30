@@ -186,13 +186,20 @@ main p {
     max-width: 1000px;
 }
 
-.commits th                         { text-align: left; }
-.commits td                         { vertical-align: top; }
-.commits .commitsAge                {
+.commits th {
+    text-align: left;
+}
+.commits td {
+    vertical-align: top;
+}
+.commits .commitsAge {
     white-space: nowrap;
     padding-right: 1em;
 }
-.commits .commitsAge::first-letter  { text-transform: uppercase; }
+.commits .commitsAge::first-letter
+{
+    text-transform: uppercase;
+}
 
 .lb                             { font-size: 85%; border-collapse: collapse; border-spacing: 0; }
 .lb th, .lb td                  { padding: 0.25em 0.5em; }
@@ -212,12 +219,12 @@ main p {
  */
 
 details {
-    margin-top: 1em;
-    margin-bottom: 1em;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 details > summary {
-    margin-left: 0.3em;
+    margin-left: 0.3rem;
     font-size: x-large;
     font-weight: bold;
     cursor: pointer;
@@ -228,8 +235,12 @@ details > summary {
     border: 1px solid var(--text-color);
     border-radius: 0.2em;
     padding: 0 0.5em 0.5em 0.5em;
+    margin-right: 3rem;
     overflow: auto; /* Enables both horizontal and vertical scrolling */
-    height: 90vh;
+    scrollbar-color: var(--text-color) var(--bkg-color);
+    min-width: 700px;
+    max-height: 80vh;
+    height: fit-content;
 }
 
 .matrix {
@@ -304,7 +315,7 @@ details > summary {
     opacity: 0.75;
 }
 .matrix .extension > td:first-of-type {
-    min-width: 32em;
+    min-width: 25rem;
 }
 .matrix .extension > td:first-of-type.hover {
     background-color: var(--matrix-ext-hover-color);
@@ -417,14 +428,10 @@ details > summary {
     background-color: var(--donate-bg-color);
 }
 
-#github-ribbon > img {
-    position: fixed;
-    top: 0;
-    right: 0;
-    border: 0;
-}
+/**
+ * Theme switcher.
+ */
 
-/* Simple CSS for toggle switch */
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
@@ -482,9 +489,20 @@ input:checked + .slider::before {
     border-radius: 50%;
 }
 
-@media screen and (max-width: 1400px) {
-    #github-ribbon {
-        display: none;
+/**
+ * GitHub ribbon.
+ */
+
+.github-fork-ribbon {
+    transition: opacity .1s;
+}
+.github-fork-ribbon:before {
+    background-color: #f80;
+}
+
+@media screen and (max-width: 850px) {
+    .github-fork-ribbon {
+        opacity: 0;
     }
 }
 
@@ -572,8 +590,4 @@ input:checked + .slider::before {
 .donate > form .submit {
     margin-top: 1em;
     text-align: right;
-}
-
-.github-fork-ribbon:before {
-    background-color: #f80;
 }
