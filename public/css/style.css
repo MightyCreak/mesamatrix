@@ -489,20 +489,16 @@ input:checked + .slider::before {
  * GitHub ribbon.
  */
 
+.github-fork-ribbon {
+    transition: opacity .1s;
+}
 .github-fork-ribbon:before {
     background-color: #f80;
 }
 
-#github-ribbon > img {
-    position: fixed;
-    top: 0;
-    right: 0;
-    border: 0;
-}
-
-@media screen and (max-width: 1400px) {
-    #github-ribbon {
-        display: none;
+@media screen and (max-width: 850px) {
+    .github-fork-ribbon {
+        opacity: 0;
     }
 }
 
