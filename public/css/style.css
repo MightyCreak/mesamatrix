@@ -235,8 +235,12 @@ details > summary {
     border: 1px solid var(--text-color);
     border-radius: 0.2em;
     padding: 0 0.5em 0.5em 0.5em;
+    margin-right: 3rem;
     overflow: auto; /* Enables both horizontal and vertical scrolling */
-    height: 90vh;
+    scrollbar-color: var(--text-color) var(--bkg-color);
+    min-width: 700px;
+    max-height: 80vh;
+    height: fit-content;
 }
 
 .matrix {
