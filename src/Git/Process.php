@@ -44,7 +44,7 @@ class Process extends \Symfony\Component\Process\Process
         if (!is_dir($gitDir)) {
             if (!mkdir($gitDir)) {
                 Mesamatrix::$logger->critical('Couldn\'t create directory `' . $gitDir . '`.');
-                return 1;
+                exit(1);
             }
         }
 

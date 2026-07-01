@@ -60,11 +60,11 @@ class ApiSubController
         $this->createMatrixModel($xmlApi);
     }
 
-    private function loadMesamatrixXml(): ?SimpleXMLElement
+    private function loadMesamatrixXml(): SimpleXMLElement
     {
         $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'xml_file'));
         $xml = simplexml_load_file($featuresXmlFilepath);
-        if (!$xml) {
+        if ($xml === false) {
             Mesamatrix::$logger->critical('Can\'t read ' . $featuresXmlFilepath);
             exit();
         }
@@ -126,6 +126,7 @@ class ApiSubController
         );
 
         // Get all the vendors and all their drivers.
+        /** @var array<string, string[]> */
         $vendors = array();
         foreach ($xmlApi->vendors->vendor as $vendor) {
             $vendorName = (string) $vendor['name'];
@@ -141,8 +142,6 @@ class ApiSubController
                 }
             }
         }
-
-        unset($driverNames);
 
         foreach ($vendors as $vendorName => $driverNames) {
             // Add separator before each vendor.
@@ -188,11 +187,7 @@ class ApiSubController
         // Sort the versions descending.
         usort($xmlVersions, function ($a, $b) {
             $diff = (float) $b['version'] - (float) $a['version'];
-            if ($diff === 0) {
-                return 0;
-            } else {
-                return $diff < 0 ? -1 : 1;
-            }
+            return $diff <=> 0.0;
         });
 
         $api = array(
@@ -202,13 +197,19 @@ class ApiSubController
         );
 
         foreach ($xmlVersions as $xmlVersion) {
-            $this->addSection($api, $xmlVersion, $xmlApi->vendors);
+            $this->addSubsection($api, $xmlVersion, $xmlApi->vendors);
         }
 
         $this->matrix['sections'][] = $api;
     }
 
-    private function addSection(array &$section, SimpleXMLElement $xmlVersion, SimpleXMLElement $vendors): void
+    /** Adds a subsection.
+     *
+     * @param array<string, mixed> $section The section to add the subsection to.
+     * @param SimpleXMLElement $xmlVersion The XML element with the API version.
+     * @param SimpleXMLElement $vendors The XML element with the vendors.
+     */
+    private function addSubsection(array &$section, SimpleXMLElement $xmlVersion, SimpleXMLElement $vendors): void
     {
         $name = (string) $xmlVersion['name'];
         if (!empty((string) $xmlVersion['version'])) {
@@ -256,6 +257,14 @@ class ApiSubController
         $section['subsections'][] = $subsection;
     }
 
+    /**
+     * Add an extension (or a subextension).
+     *
+     * @param array<string, mixed> $subsection The subsection to add the extension to.
+     * @param SimpleXMLElement $xmlExt The XML element with the extension (or subextension).
+     * @param bool $isSubExt Whether $xmlExt is a subextension or not.
+     * @param SimpleXMLElement $vendors The XML element with the vendors.
+     */
     private function addExtension(
         array &$subsection,
         SimpleXMLElement $xmlExt,

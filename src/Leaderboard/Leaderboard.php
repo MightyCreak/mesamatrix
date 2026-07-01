@@ -55,11 +55,7 @@ class Leaderboard
             // Sort by API name, then API version descending.
             if ($a->getName() === $b->getName()) {
                 $diff = (float) $b->getVersion() - (float) $a->getVersion();
-                if ($diff === 0) {
-                    return 0;
-                } else {
-                    return $diff < 0 ? -1 : 1;
-                }
+                return $diff <=> 0.0;
             } elseif (
                 $a->getName() === Constants::GL_NAME ||
                 $a->getName() === Constants::VK_NAME ||
