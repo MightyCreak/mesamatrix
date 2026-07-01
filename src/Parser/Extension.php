@@ -67,14 +67,14 @@ class Extension
 
         $this->supportedDrivers = array();
         foreach ($supportedDrivers as $driverNameAndHint) {
-            list($driverName, $driverHint) = self::splitDriverNameAndHint($driverNameAndHint, $apiDrivers);
-            if ($driverName === null) {
-                // Driver unknown (may have been removed from mesa).
+            $driver = self::splitDriverNameAndHint($driverNameAndHint, $apiDrivers);
+            if ($driver === null) {
+                // Unknown driver (may have been removed from mesa).
                 continue;
             }
 
-            $supportedDriver = new SupportedDriver($driverName, $this->hints);
-            $supportedDriver->setHint($driverHint);
+            $supportedDriver = new SupportedDriver($driver['name'], $this->hints);
+            $supportedDriver->setHint($driver['hint']);
             $this->addSupportedDriver($supportedDriver);
         }
     }
@@ -85,9 +85,10 @@ class Extension
      * @param string $driverNameAndHint The whole string containing the driver and its hint.
      * @param string[] $apiDrivers All the possible drivers for the API.
      *
-     * @return string[] An array of two string; 0: the driver name, 1: its hint.
+     * @return array{name: string, hint: string}|null An array of two string: the driver name and its hint;
+*                                                     NULL if driver wasn't found.
      */
-    private static function splitDriverNameAndHint($driverNameAndHint, array $apiDrivers): array
+    private static function splitDriverNameAndHint($driverNameAndHint, array $apiDrivers): ?array
     {
         $driverName = null;
         $driverHint = "";
@@ -104,7 +105,7 @@ class Extension
             ++$i;
         }
 
-        return array($driverName, $driverHint);
+        return $driverName !== null ? ['name' => $driverName, 'hint' => $driverHint] : null;
     }
 
     // name
@@ -229,6 +230,7 @@ class Extension
                         if ($supportedDriverNames !== null) {
                             foreach ($supportedDriverNames as $supportedDriverName) {
                                 $supportedDriver = new SupportedDriver($supportedDriverName, $this->hints);
+                                // @phpstan-ignore if.alwaysTrue (could be false one day)
                                 if ($setHint) {
                                     $supportedDriver->setHint($hint);
                                 }

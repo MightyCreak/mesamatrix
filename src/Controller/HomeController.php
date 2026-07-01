@@ -76,7 +76,7 @@ class HomeController extends BaseController
         $xml = simplexml_load_file($featuresXmlFilepath);
         if (!$xml) {
             Mesamatrix::$logger->critical('Can\'t read ' . $featuresXmlFilepath);
-            exit();
+            exit(1);
         }
 
         return $xml;

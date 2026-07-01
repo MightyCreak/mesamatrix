@@ -86,7 +86,7 @@ class LbDriverScore
     /**
      * Set the API version.
      */
-    public function setApiVersion(?string $apiVersion)
+    public function setApiVersion(?string $apiVersion): void
     {
         $this->apiVersion = $apiVersion;
     }

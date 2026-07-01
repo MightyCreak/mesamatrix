@@ -24,16 +24,17 @@ namespace Mesamatrix\Parser;
 abstract class Constants
 {
     // Extension statuses.
-    public const STATUS_NOT_STARTED = 'incomplete';
-    public const STATUS_IN_PROGRESS = 'started';
-    public const STATUS_DONE = 'complete';
+    public const string STATUS_NOT_STARTED = 'incomplete';
+    public const string STATUS_IN_PROGRESS = 'started';
+    public const string STATUS_DONE = 'complete';
 
     // OpenGL and OpenGL ES.
-    public const GL_NAME = 'OpenGL';
-    public const GLES_NAME = 'OpenGL ES';
-    public const GL_OR_ES_EXTRA_NAME = 'Extensions that are not part of any OpenGL or OpenGL ES version';
+    public const string GL_NAME = 'OpenGL';
+    public const string GLES_NAME = 'OpenGL ES';
+    public const string GL_OR_ES_EXTRA_NAME = 'Extensions that are not part of any OpenGL or OpenGL ES version';
 
-    public const GL_ALL_DRIVERS = [
+    /** @var string[] */
+    public const array GL_ALL_DRIVERS = [
         'asahi',
         'crocus',
         'd3d12',
@@ -55,7 +56,8 @@ abstract class Constants
         'zink',
     ];
 
-    public const GL_ALL_DRIVERS_VENDORS = [
+    /** @var array<string, string[]> */
+    public const array GL_ALL_DRIVERS_VENDORS = [
         'AMD'           => [ 'r600', 'radeonsi' ],
         'Apple'         => [ 'asahi' ],
         'Arm'           => [ 'lima', 'panfrost' ],
@@ -69,10 +71,11 @@ abstract class Constants
     ];
 
     // Vulkan.
-    public const VK_NAME = 'Vulkan';
-    public const VK_EXTRA_NAME = 'Extensions that are not part of any Vulkan version';
+    public const string VK_NAME = 'Vulkan';
+    public const string VK_EXTRA_NAME = 'Extensions that are not part of any Vulkan version';
 
-    public const VK_ALL_DRIVERS = [
+    /** @var string[] */
+    public const array VK_ALL_DRIVERS = [
         'anv',
         'dzn',
         'hasvk',
@@ -88,7 +91,8 @@ abstract class Constants
         'vn',
     ];
 
-    public const VK_ALL_DRIVERS_VENDORS = [
+    /** @var array<string, string[]> */
+    public const array VK_ALL_DRIVERS_VENDORS = [
         'AMD'           => [ 'radv' ],
         'Apple'         => [ 'hk' ],
         'Arm'           => [ 'panvk' ],
@@ -102,11 +106,13 @@ abstract class Constants
     ];
 
     // OpenCL.
-    public const RUSTICL_OPENCL_NAME = 'Rusticl OpenCL';
-    public const RUSTICL_OPENCL_OPTIONAL_NAME = 'Rusticl Optional Core Features';
-    public const RUSTICL_OPENCL_CL2_OPTIONAL_NAME = 'Rusticl Optional OpenCL 2.x Features';
-    public const RUSTICL_OPENCL_EXTRA_NAME = 'Rusticl Extensions';
-    public const RUSTICL_OPENCL_ALL_DRIVERS = [
+    public const string RUSTICL_OPENCL_NAME = 'Rusticl OpenCL';
+    public const string RUSTICL_OPENCL_OPTIONAL_NAME = 'Rusticl Optional Core Features';
+    public const string RUSTICL_OPENCL_CL2_OPTIONAL_NAME = 'Rusticl Optional OpenCL 2.x Features';
+    public const string RUSTICL_OPENCL_EXTRA_NAME = 'Rusticl Extensions';
+
+    /** @var string[] */
+    public const array RUSTICL_OPENCL_ALL_DRIVERS = [
         'asahi',
         'freedreno',
         'iris',
@@ -116,7 +122,9 @@ abstract class Constants
         'radeonsi',
         'zink',
     ];
-    public const RUSTICL_OPENCL_ALL_DRIVERS_VENDORS = [
+
+    /** @var array<string, string[]> */
+    public const array RUSTICL_OPENCL_ALL_DRIVERS_VENDORS = [
         'AMD'         => [ 'radeonsi' ],
         'Apple'       => [ 'asahi' ],
         'Arm'         => [ 'panfrost' ],
@@ -130,7 +138,8 @@ abstract class Constants
     // Hints enabling for all drivers.
     // 0: regexp
     // 1: use hint?
-    public const RE_ALL_DRIVERS_HINTS = [
+    /** @var array<array{string, bool}> */
+    public const array RE_ALL_DRIVERS_HINTS = [
         [ '/^all drivers$/i', false ],
         [ '/^all drivers that support GLSL( \d+\.\d+\+?)?$/i', true ],
         [ '/^all - but needs GLX\/EGL extension to be useful$/i', true ],
@@ -141,7 +150,8 @@ abstract class Constants
     // 1: use hint?
     // 2: dependency type
     // 3: dependency match index
-    public const RE_DEP_DRIVERS_HINTS = [
+    /** @var array<array{string, bool, int, int}> */
+    public const array RE_DEP_DRIVERS_HINTS = [
         [ '/^all drivers that support (GL_[_[:alnum:]]+)$/i', true, DependsOn::EXTENSION, 1 ],
         [ '/^all drivers that support GLES (\d+\.\d+)?\+?$/i', true, DependsOn::GLES_VERSION, 1 ],
     ];

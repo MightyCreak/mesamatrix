@@ -92,7 +92,8 @@ class DonateController extends BaseController
             foreach ($this->yearsContributors as &$yearContributor) {
                 $contributors = &$yearContributor->contributors;
                 usort($contributors, function ($a, $b) {
-                    return $b->donation - $a->donation;
+                    $diff = $b->donation - $a->donation;
+                    return $diff <=> 0.0;
                 });
             }
 

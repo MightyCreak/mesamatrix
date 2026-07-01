@@ -147,19 +147,17 @@ class Parser
                     continue;
                 }
 
-                if ($apiVersion) {
-                    // Get all the drivers for this API.
-                    $this->apiDrivers = $apiVersion->getAllApiDrivers();
+                // Get all the drivers for this API.
+                $this->apiDrivers = $apiVersion->getAllApiDrivers();
 
-                    // Set "all DONE" drivers.
-                    $allSupportedDrivers = array();
-                    if (preg_match(self::RE_ALL_DONE, $line, $matches) === 1) {
-                        $this->mergeDrivers($allSupportedDrivers, explode(", ", $matches[1]));
-                    }
-
-                    // Parse section.
-                    $line = $this->parseSection($apiVersion, $matrix, $handle, $allSupportedDrivers);
+                // Set "all DONE" drivers.
+                $allSupportedDrivers = array();
+                if (preg_match(self::RE_ALL_DONE, $line, $matches) === 1) {
+                    $this->mergeDrivers($allSupportedDrivers, explode(", ", $matches[1]));
                 }
+
+                // Parse section.
+                $line = $this->parseSection($apiVersion, $matrix, $handle, $allSupportedDrivers);
             }
         }
 
@@ -423,7 +421,8 @@ class Parser
                     $re = $reDepDriversHint[0];
                     $setHint = $reDepDriversHint[1];
                     if (preg_match($re, $hintItem) === 1) {
-                        if ($setHint === true) {
+                        // @phpstan-ignore if.alwaysTrue (could be false one day)
+                        if ($setHint) {
                             if ($useHint !== null) {
                                 Mesamatrix::$logger->warning('Unhandled situation: more than one extension dependency');
                             }
