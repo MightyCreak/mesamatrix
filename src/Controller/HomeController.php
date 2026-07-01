@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -23,12 +25,14 @@ namespace Mesamatrix\Controller;
 
 use Mesamatrix\Mesamatrix;
 use Mesamatrix\Parser\Constants;
-use Mesamatrix\Leaderboard\Leaderboard;
 use SimpleXMLElement;
 
 class HomeController extends BaseController
 {
+    /** @var array<int, array{url: string, timestamp: int, subject: string}> */
     private $commits = array();
+
+    /** @var ApiSubController[] */
     private $apiControllers = array();
 
     public function __construct()
@@ -89,16 +93,9 @@ class HomeController extends BaseController
             $this->commits[] = array(
                 'url' => Mesamatrix::$config->getValue('git', 'mesa_commit_url') . $xmlCommit['hash'],
                 'timestamp' => (int) $xmlCommit['timestamp'],
-                'subject' => $xmlCommit['subject']
+                'subject' => (string) $xmlCommit['subject']
             );
         }
-    }
-
-    private function createLeaderboard(SimpleXMLElement $xml, array $apis): Leaderboard
-    {
-        $leaderboard = new Leaderboard();
-        $leaderboard->load($xml, $apis);
-        return $leaderboard;
     }
 
     protected function writeHtmlPage(): void

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Default configuration for Mesamatrix.
 // Values can be overwritten in a user defined config/config.php file.
 

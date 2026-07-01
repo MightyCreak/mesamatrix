@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,8 +27,13 @@ use Mesamatrix\Mesamatrix;
 
 class UrlCache
 {
-    private const EXPIRATION_DELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
-    private const RE_VALID_HTTP_RESPONSE = '/^HTTP\/[^ ]+? 2[0-9]{2}/';
+    private const int EXPIRATION_DELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
+    private const string RE_VALID_HTTP_RESPONSE = '/^HTTP\/[^ ]+? 2[0-9]{2}/';
+
+    private int $instanceTime;
+
+    /** @var array<string, mixed> */
+    private array $cachedUrls;
 
     /**
      * Default constructor.
@@ -136,7 +143,4 @@ class UrlCache
     {
         return preg_match(self::RE_VALID_HTTP_RESPONSE, $response) !== 0;
     }
-
-    private $instanceTime;
-    private $cachedUrls;
 }

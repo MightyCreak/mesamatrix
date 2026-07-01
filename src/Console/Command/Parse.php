@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -208,7 +210,7 @@ class Parse extends Command
      * @param string[] $excludedCommits The commits to exclude from the list.
      * @return Commit[]|null Array of commits.
      */
-    protected function fetchCommits($filepath, array $excludedCommits): ?array
+    protected function fetchCommits(string $filepath, array $excludedCommits): ?array
     {
         $branch = Mesamatrix::$config->getValue("git", "branch");
         $gitCommitGet = new Process(array(
@@ -324,7 +326,7 @@ class Parse extends Command
     /**
      * Take all the parsed commits and merged them to generate the final XML.
      *
-     * @param array Commit $commits The commits to merge.
+     * @param Commit[] $commits The commits to merge.
      */
     protected function generateMergedXml(array $commits): void
     {
@@ -375,7 +377,7 @@ class Parse extends Command
             $fetchHeadPath = $gitDir . '/HEAD';
         }
         $updated = filemtime($fetchHeadPath);
-        $xml->addAttribute('updated', $updated);
+        $xml->addAttribute('updated', (string) $updated);
 
         // Generate statuses.
         $statuses = $xml->addChild("statuses");
@@ -485,12 +487,18 @@ class Parse extends Command
         }
     }
 
+    /**
+     * Generates the commits log.
+     *
+     * @param SimpleXMLElement $xml The XML element.
+     * @param Commit[] $commits The commit list.
+     */
     protected function generateCommitsLog(SimpleXMLElement $xml, array $commits): void
     {
         foreach (array_reverse($commits) as $commit) {
             $commitNode = $xml->addChild("commit", htmlspecialchars($commit->getData()));
             $commitNode->addAttribute("hash", $commit->getHash());
-            $commitNode->addAttribute("timestamp", $commit->getCommitterDate()->getTimestamp());
+            $commitNode->addAttribute("timestamp", (string) ($commit->getCommitterDate()->getTimestamp()));
             $commitNode->addAttribute("subject", $commit->getSubject());
         }
     }
@@ -632,7 +640,7 @@ class Parse extends Command
         if ($commit = $ext->getModifiedAt()) {
             $modified = $mesaStatus->addChild("modified");
             $modified->addChild("commit", $commit->getHash());
-            $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
+            $modified->addChild("date", (string) ($commit->getCommitterDate()->getTimestamp()));
             $modified->addChild("author", $commit->getAuthor());
         }
 
@@ -647,7 +655,7 @@ class Parse extends Command
             if ($commit = $supportedDriver->getModifiedAt()) {
                 $modified = $xmlDriver->addChild("modified");
                 $modified->addChild("commit", $commit->getHash());
-                $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
+                $modified->addChild("date", (string) ($commit->getCommitterDate()->getTimestamp()));
                 $modified->addChild("author", $commit->getAuthor());
             }
         }

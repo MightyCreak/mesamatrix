@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,14 +27,19 @@ use Mesamatrix\Mesamatrix;
 
 abstract class BaseController
 {
+    /** @var array<string, string> */
     public $pages = array(
         "Home" => ".",
         "About" => "about.php",
         "Donate?" => "donate.php");
 
-    private $pageIdx = -1;
-    private $cssScripts = [];
-    private $jsScripts = [];
+    private int $pageIdx = -1;
+
+    /** @var string[] */
+    private array $cssScripts = [];
+
+    /** @var string[] */
+    private array $jsScripts = [];
 
     public function __construct()
     {
@@ -49,7 +56,7 @@ abstract class BaseController
      * The page must be one of the page in $this->pages.
      * @param string $page The name of the page.
      */
-    final protected function setPage($page): void
+    final protected function setPage(string $page): void
     {
         $this->pageIdx = array_search($page, array_keys($this->pages));
     }
@@ -58,7 +65,7 @@ abstract class BaseController
      * Add a CSS script to include in the HTML page header.
      * @param string $script The script path.
      */
-    final public function addCssScript($script): void
+    final public function addCssScript(string $script): void
     {
         $this->cssScripts[] = $script;
     }
@@ -67,7 +74,7 @@ abstract class BaseController
      * Add a JS script to include in the HTML page header.
      * @param string $script The script path.
      */
-    final public function addJsScript($script): void
+    final public function addJsScript(string $script): void
     {
         $this->jsScripts[] = $script;
     }

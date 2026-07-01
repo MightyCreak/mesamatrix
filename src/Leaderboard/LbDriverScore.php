@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -23,18 +25,18 @@ namespace Mesamatrix\Leaderboard;
 
 class LbDriverScore
 {
-    private $numExtsDone;
-    private $numExts;
-    private $apiVersion;
+    private int $numExtsDone;
+    private int $numExts;
+    private ?string $apiVersion;
 
     /**
      * LbDriver constructor.
      *
      * @param int $numExtsDone Number of extensions done.
      * @param int $numExts Total number of extensions.
-     * @param float $apiVersion API version (e.g. 3.1, 4.0).
+     * @param string|null $apiVersion API version (e.g. 3.1, 4.0).
      */
-    public function __construct(int $numExtsDone, int $numExts, float $apiVersion)
+    public function __construct(int $numExtsDone, int $numExts, ?string $apiVersion)
     {
         $this->setNumExtensionsDone($numExtsDone);
         $this->setNumExtensions($numExts);
@@ -44,7 +46,7 @@ class LbDriverScore
     /**
      * Set the number of extensions done.
      */
-    public function setNumExtensionsDone($num)
+    public function setNumExtensionsDone(int $num): void
     {
         $this->numExtsDone = $num;
     }
@@ -52,7 +54,7 @@ class LbDriverScore
     /**
      * Get the number of extensions done.
      */
-    public function getNumExtensionsDone()
+    public function getNumExtensionsDone(): int
     {
         return $this->numExtsDone;
     }
@@ -60,7 +62,7 @@ class LbDriverScore
     /**
      * Set the total number of extensions.
      */
-    public function setNumExtensions($num)
+    public function setNumExtensions(int $num): void
     {
         $this->numExts = $num;
     }
@@ -68,7 +70,7 @@ class LbDriverScore
     /**
      * Get the total number of extensions.
      */
-    public function getNumExtensions()
+    public function getNumExtensions(): int
     {
         return $this->numExts;
     }
@@ -76,7 +78,7 @@ class LbDriverScore
     /**
      * Get the score.
      */
-    public function getScore()
+    public function getScore(): float
     {
         return $this->numExts !== 0 ? $this->numExtsDone / $this->numExts : 0;
     }
@@ -84,7 +86,7 @@ class LbDriverScore
     /**
      * Set the API version.
      */
-    public function setApiVersion($apiVersion)
+    public function setApiVersion(?string $apiVersion)
     {
         $this->apiVersion = $apiVersion;
     }
@@ -92,7 +94,7 @@ class LbDriverScore
     /**
      * Get the API version.
      */
-    public function getApiVersion()
+    public function getApiVersion(): ?string
     {
         return $this->apiVersion;
     }

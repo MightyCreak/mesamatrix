@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -23,7 +25,7 @@ namespace Mesamatrix\Donation;
 
 class Contributor
 {
-    public $name;
-    public $date;
-    public $donation;
+    public string $name;
+    public \DateTime $date;
+    public float $donation;
 }

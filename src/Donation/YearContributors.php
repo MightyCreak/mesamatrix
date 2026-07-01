@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -23,7 +25,10 @@ namespace Mesamatrix\Donation;
 
 class YearContributors
 {
-    public $year;
+    public string $year;
+
+    /** @var Contributor[] */
     public $contributors = array();
-    public $total = 0.0;
+
+    public float $total = 0.0;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,7 +27,9 @@ use SimpleXMLElement;
 
 class Matrix
 {
+    /** @var ApiVersion[] */
     private array $apiVersions;
+
     private Hints $hints;
 
     public function __construct()
@@ -55,7 +59,7 @@ class Matrix
      * @param string $name The API name.
      * @param string|null $version The API version.
      *
-     * @return ApiVersion The API version is found; NULL otherwise.
+     * @return ApiVersion|null The API version is found; NULL otherwise.
      */
     public function getApiVersionByName(string $name, ?string $version): ?ApiVersion
     {
@@ -75,7 +79,7 @@ class Matrix
      *
      * @param string $substr The substring to find.
      *
-     * @return Extension The extension if found; NULL otherwise.
+     * @return Extension|null The extension if found; NULL otherwise.
      */
     public function getExtensionBySubstr(string $substr): ?Extension
     {
@@ -94,8 +98,8 @@ class Matrix
      *
      * @param string $version The GL ES version to look for.
      *
-     * @return string[] The list of drivers that supports
-     *         the OpenGL ES; NULL otherwise.
+     * @return string[]|null The list of drivers that supports the OpenGL ES;
+     *                       NULL otherwise.
      */
     public function getDriversSupportingGlesVersion(string $version): ?array
     {
