@@ -28,9 +28,13 @@ use Mesamatrix\Mesamatrix;
 class UrlCache
 {
     private const int EXPIRATION_DELAY = 7776000; // 90 * 24 * 60 * 60 = 90 days.
-    private const string RE_VALID_HTTP_RESPONSE = '/^HTTP\/[^ ]+? 2[0-9]{2}/';
+    private const string RE_VALID_HTTP_RESPONSE = '#^HTTP/\d+\.\d+\s+(\d+)#';
+    private const string USER_AGENT = 'Mesamatrix-LinkChecker/1.0 (+https://mesamatrix.net/bot.php)';
 
     private int $instanceTime;
+
+    /** @var resource */
+    private $streamContext;
 
     /** @var array<string, mixed> */
     private array $cachedUrls;
@@ -42,6 +46,16 @@ class UrlCache
     {
         $this->instanceTime = time();
         $this->cachedUrls = array();
+
+        $ctxOpts = [
+            'https' => [
+                'method' => 'HEAD',
+                'user_agent' => self::USER_AGENT,
+                'timeout' => 5,
+                'ignore_errors' => true,
+            ],
+        ];
+        $this->streamContext = stream_context_create($ctxOpts);
     }
 
     /**
@@ -116,7 +130,8 @@ class UrlCache
      */
     private function updateUrl(string $url): void
     {
-        $urlHeader = get_headers($url);
+        $urlHeader = @get_headers($url, false, $this->streamContext);
+
         $valid = false;
         if ($urlHeader !== false) {
             $response = $urlHeader[0];
@@ -124,7 +139,7 @@ class UrlCache
             if ($valid) {
                 Mesamatrix::$logger->info("URL \"{$url}\" is valid");
             } else {
-                Mesamatrix::$logger->warning("URL \"{$url}\" is invalid (reason: \"{$response}\"");
+                Mesamatrix::$logger->warning("URL \"{$url}\" is invalid (reason: \"{$response}\")");
             }
         }
 
@@ -141,6 +156,11 @@ class UrlCache
      */
     public function isValidResponse(string $response): bool
     {
-        return preg_match(self::RE_VALID_HTTP_RESPONSE, $response) !== 0;
+        if (!preg_match(self::RE_VALID_HTTP_RESPONSE, $response, $matches)) {
+            return false;
+        }
+
+        $statusCode = (int) $matches[1];
+        return $statusCode >= 200 && $statusCode < 300;
     }
 }
