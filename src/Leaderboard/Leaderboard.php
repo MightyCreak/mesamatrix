@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,7 +27,9 @@ use Mesamatrix\Parser\Constants;
 
 class Leaderboard
 {
+    /** @var LbApiVersion[] */
     private array $apiVersions;
+
     private bool $useVersions;
 
     /**
@@ -40,9 +44,9 @@ class Leaderboard
     /**
      * Load leaderboard from data.
      *
-     * @param SimpleXMLElement $xmlApi The XML element of the API.
+     * @param \SimpleXMLElement $xmlApi The XML element of the API.
      */
-    public function load(\SimpleXMLElement $xmlApi)
+    public function load(\SimpleXMLElement $xmlApi): void
     {
         $this->loadApi($xmlApi);
 
@@ -71,9 +75,9 @@ class Leaderboard
     /**
      * Load all the versions from a given API.
      *
-     * @param SimpleXMLElement $xmlApi The XML tag for the wanted API.
+     * @param \SimpleXMLElement $xmlApi The XML tag for the wanted API.
      */
-    private function loadApi(\SimpleXMLElement $xmlApi)
+    private function loadApi(\SimpleXMLElement $xmlApi): void
     {
         foreach ($xmlApi->versions->version as $xmlVersion) {
             // Count total extensions and sub-extensions.
@@ -144,9 +148,9 @@ class Leaderboard
      * Find the leaderboard for a specific API version.
      *
      * @param string $id API ID (format example: OpenGL4.5, Vulkan1.1, ...).
-     * @return LbApiVersion The leaderboard for the given API version.
+     * @return LbApiVersion|null The leaderboard for the given API version.
      */
-    public function findApiVersion($id)
+    public function findApiVersion(string $id): ?LbApiVersion
     {
         $i = 0;
         $numApiVersions = count($this->apiVersions);
@@ -160,7 +164,7 @@ class Leaderboard
     /**
      * Get the total number of extensions.
      */
-    public function getNumTotalExts()
+    public function getNumTotalExts(): int
     {
         $numExts = 0;
         foreach ($this->apiVersions as &$apiVersion) {
@@ -178,28 +182,28 @@ class Leaderboard
      * @return LbDriverScore[] An associative array: the key is the driver name, the
      *                         value is an LbDriverScore.
      */
-    public function getDriversSortedByExtsDone(string $api)
+    public function getDriversSortedByExtsDone(string $api): array
     {
         $sortedDriversScores = array();
         $numTotalExts = $this->getNumTotalExts();
         foreach ($this->apiVersions as &$apiVersion) {
             $apiVersionDrivers = $apiVersion->getDriverScores();
-            foreach ($apiVersionDrivers as $drivername => $driverScore) {
-                if (!array_key_exists($drivername, $sortedDriversScores)) {
+            foreach ($apiVersionDrivers as $driverName => $driverScore) {
+                if (!array_key_exists($driverName, $sortedDriversScores)) {
                     // Add new driver.
-                    $sortedDriversScores[$drivername] = new LbDriverScore(0, $numTotalExts, 0);
+                    $sortedDriversScores[$driverName] = new LbDriverScore(0, $numTotalExts, null);
                 }
 
                 // Add up the number of extensions done for this driver.
-                $numExtsDone = $sortedDriversScores[$drivername]->getNumExtensionsDone() +
+                $numExtsDone = $sortedDriversScores[$driverName]->getNumExtensionsDone() +
                     $driverScore->getNumExtensionsDone();
-                $sortedDriversScores[$drivername]->setNumExtensionsDone($numExtsDone);
+                $sortedDriversScores[$driverName]->setNumExtensionsDone($numExtsDone);
             }
         }
 
         // Keep last max API version fully implemented.
-        foreach (array_keys($sortedDriversScores) as $drivername) {
-            $sortedDriversScores[$drivername]->setApiVersion($this->getDriverApiVersion($api, $drivername));
+        foreach (array_keys($sortedDriversScores) as $driverName) {
+            $sortedDriversScores[$driverName]->setApiVersion($this->getDriverApiVersion($api, $driverName));
         }
 
         // Sort by number of extensions and then by API version.
@@ -222,10 +226,10 @@ class Leaderboard
      * Get latest valid API version for a driver.
      *
      * @param string $api Name of the API (OpenGL, OpenGL ES, Vulkan, ...).
-     * @param string $drivername Name of the driver (mesa, r600, ...).
-     * @return string The API version string; NULL otherwise.
+     * @param string $driverName Name of the driver (mesa, r600, ...).
+     * @return string|null The API version string; NULL otherwise.
      */
-    public function getDriverApiVersion(string $api, string $drivername)
+    public function getDriverApiVersion(string $api, string $driverName): ?string
     {
         $apiVersionNbr = null;
 
@@ -236,7 +240,7 @@ class Leaderboard
         while ($i > 0) {
             $apiVersion = $this->apiVersions[--$i];
             if ($apiVersion->getName() === $api) {
-                if ($apiVersion->getDriverScore($drivername)->getNumExtensionsDone() !== $apiVersion->getNumExts()) {
+                if ($apiVersion->getDriverScore($driverName)->getNumExtensionsDone() !== $apiVersion->getNumExts()) {
                     break;
                 }
 
@@ -255,7 +259,7 @@ class Leaderboard
      * @param integer $numExts Total number of extensions.
      * @return LbApiVersion The new item.
      */
-    private function createApiVersion(string $name, string $version, int $numExts)
+    private function createApiVersion(string $name, string $version, int $numExts): LbApiVersion
     {
         $apiVersion = new LbApiVersion($name, $version, $numExts);
         $this->apiVersions[] = $apiVersion;

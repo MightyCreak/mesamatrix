@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -23,6 +25,9 @@ namespace Mesamatrix;
 
 class Hints
 {
+    /** @var string[] */
+    private array $list;
+
     public function __construct()
     {
         $this->list = array();
@@ -64,6 +69,4 @@ class Hints
     {
         return $this->list[$idx];
     }
-
-    private $list;
 }

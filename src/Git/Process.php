@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -26,6 +28,9 @@ use Mesamatrix\Mesamatrix;
 
 class Process extends \Symfony\Component\Process\Process
 {
+    /**
+     * @param string[] $arguments The list of arguments.
+     */
     public function __construct(array $arguments = array())
     {
         // Replace '@gitDir@' by Mesa Git directory.

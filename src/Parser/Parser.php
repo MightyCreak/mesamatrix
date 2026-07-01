@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,7 +27,7 @@ use Mesamatrix\Mesamatrix;
 
 class Parser
 {
-    public function parseFile($filename): Matrix
+    public function parseFile(string $filename): ?Matrix
     {
         $handle = fopen($filename, "r");
         if ($handle === false) {
@@ -52,7 +54,7 @@ class Parser
     /**
      * Parse a stream of features.txt.
      *
-     * @param $handle The stream handle.
+     * @param resource $handle The stream handle.
      * @return Matrix The matrix.
      */
     public function parseStream($handle): Matrix
@@ -176,17 +178,17 @@ class Parser
      *
      * @param ApiVersion $apiVersion The version section to feed during parsing.
      * @param Matrix $matrix The matrix to feed during parsing.
-     * @param $handle The file handle.
-     * @param array() $allSupportedDrivers Drivers that already support all the extension in the section.
+     * @param resource $handle The file handle.
+     * @param string[] $allSupportedDrivers Drivers that already support all the extension in the section.
      *
-     * @return The next line unparsed.
+     * @return string The next line unparsed.
      */
     private function parseSection(
         ApiVersion $apiVersion,
         Matrix $matrix,
         $handle,
-        $allSupportedDrivers = array()
-    ) {
+        array $allSupportedDrivers = array()
+    ): string {
         $line = $this->skipEmptyLines(fgets($handle), $handle);
 
         // Verify the line is indented.
@@ -310,7 +312,13 @@ class Parser
         return $line;
     }
 
-    private function skipEmptyLines($curLine, $handle)
+    /**
+     * Skips empty lines.
+     *
+     * @param string|bool $curLine The current line.
+     * @param resource $handle The file handle.
+     */
+    private function skipEmptyLines(string|bool $curLine, $handle): string|false
     {
         while ($curLine !== false && $curLine === "\n") {
             $curLine = fgets($handle);
@@ -342,6 +350,14 @@ class Parser
         return null;
     }
 
+    /**
+     * Merges the drivers.
+     *
+     * @param string[] $dst The base array of drivers.
+     * @param string[] $src The array to merge into $dst.
+     *
+     * @return string[] The $dst parameter.
+     */
     private function mergeDrivers(array &$dst, array $src): array
     {
         foreach ($src as $srcDriver) {
@@ -369,12 +385,12 @@ class Parser
     /**
      * Parse the hint and extract the drivers from it.
      *
-     * @param string $hint The hint to test.
-     * @param string $useHint[out] Hint to use; null otherwise.
+     * @param string $hintStr The hint to test.
+     * @param-out string|null $useHint Hint to use; null otherwise.
      *
-     * @return array|null The drivers list, or null.
+     * @return string[]|null The drivers list, or null.
      */
-    private function getDriversFromHint($hintStr, &$useHint): ?array
+    private function getDriversFromHint(string $hintStr, string|null &$useHint): ?array
     {
         if (empty($hintStr)) {
             return null;
@@ -384,8 +400,10 @@ class Parser
 
         // Is the hint saying it's supporting all drivers?
         foreach (Constants::RE_ALL_DRIVERS_HINTS as $reAllDriversHint) {
-            if (preg_match($reAllDriversHint[0], $hintStr) === 1) {
-                if ($reAllDriversHint[1] === true) {
+            $re = $reAllDriversHint[0];
+            $setHint = $reAllDriversHint[1];
+            if (preg_match($re, $hintStr) === 1) {
+                if ($setHint === true) {
                     $useHint = $hintStr;
                 }
 
@@ -402,8 +420,10 @@ class Parser
             } else {
                 // Is the hint saying it depends on something else?
                 foreach (Constants::RE_DEP_DRIVERS_HINTS as $reDepDriversHint) {
-                    if (preg_match($reDepDriversHint[0], $hintItem) === 1) {
-                        if ($reAllDriversHint[1] === true) {
+                    $re = $reDepDriversHint[0];
+                    $setHint = $reDepDriversHint[1];
+                    if (preg_match($re, $hintItem) === 1) {
+                        if ($setHint === true) {
                             if ($useHint !== null) {
                                 Mesamatrix::$logger->warning('Unhandled situation: more than one extension dependency');
                             }
@@ -418,20 +438,22 @@ class Parser
         return !empty($drivers) ? $drivers : null;
     }
 
-    private $reExtension = "";
-    private $apiDrivers = null;
+    private string $reExtension = "";
 
-    private const OTHER_OFFICIAL_GL_EXTENSIONS =
+    /** @var string[]|null */
+    private ?array $apiDrivers = null;
+
+    private const string OTHER_OFFICIAL_GL_EXTENSIONS =
         "Khronos, ARB, and OES extensions that are not part of any OpenGL or OpenGL ES version:\n";
-    private const OTHER_OFFICIAL_VK_EXTENSIONS =
+    private const string OTHER_OFFICIAL_VK_EXTENSIONS =
         "Khronos extensions that are not part of any Vulkan version:\n";
-    private const RUSTICL_OPENCL_CORE_OPTIONAL =
+    private const string RUSTICL_OPENCL_CORE_OPTIONAL =
         "Rusticl Optional Core Features:\n";
-    private const RUSTICL_OPENCL_CL2_OPTIONAL =
+    private const string RUSTICL_OPENCL_CL2_OPTIONAL =
         "Rusticl Optional OpenCL 2.x Features:\n";
-    private const RUSTICL_OPENCL_EXTENSIONS =
+    private const string RUSTICL_OPENCL_EXTENSIONS =
         "Rusticl extensions:\n";
 
-    private const RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
-    private const RE_NOTE = "/^(\(.+\)) (.*)$/";
+    private const string RE_ALL_DONE = "/ -+ all DONE: (.*)/i";
+    private const string RE_NOTE = "/^(\(.+\)) (.*)$/";
 }

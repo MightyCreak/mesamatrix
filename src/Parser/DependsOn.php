@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -26,6 +28,6 @@ namespace Mesamatrix\Parser;
  */
 abstract class DependsOn
 {
-    public const EXTENSION = 0;
-    public const GLES_VERSION = 1;
+    public const int EXTENSION = 0;
+    public const int GLES_VERSION = 1;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -22,10 +24,22 @@
 namespace Mesamatrix\Parser;
 
 use Mesamatrix\Git\Commit;
-use Mesamatrix\Mesamatrix;
 
 class Extension
 {
+    private string $name;
+    private string $status;
+    private Hints $hints;
+    private int $hintIdx;
+
+    /** @var SupportedDriver[] */
+    private array $supportedDrivers;
+
+    private ?Commit $modifiedAt;
+
+    /** @var Extension[] */
+    private array $subextensions;
+
     /**
      * Extension constructor.
      *
@@ -73,7 +87,7 @@ class Extension
      *
      * @return string[] An array of two string; 0: the driver name, 1: its hint.
      */
-    private static function splitDriverNameAndHint($driverNameAndHint, array $apiDrivers)
+    private static function splitDriverNameAndHint($driverNameAndHint, array $apiDrivers): array
     {
         $driverName = null;
         $driverHint = "";
@@ -94,35 +108,35 @@ class Extension
     }
 
     // name
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     // status
-    public function setStatus($status)
+    public function setStatus(string $status): void
     {
         $this->status = $status;
     }
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->status;
     }
 
     // hint
-    public function setHint($hint)
+    public function setHint(string $hint): void
     {
         $this->hintIdx = $this->hints->addToHints($hint);
     }
-    public function getHintIdx()
+    public function getHintIdx(): int
     {
         return $this->hintIdx;
     }
-    public function getHint()
+    public function getHint(): ?string
     {
         if ($this->hintIdx === -1) {
             return null;
@@ -132,18 +146,25 @@ class Extension
     }
 
     // supported drivers
-    public function addSupportedDriver(SupportedDriver $driver)
+    public function addSupportedDriver(SupportedDriver $driver): void
     {
         $existingDriver = $this->getSupportedDriverByName($driver->getName());
         if ($existingDriver === null) {
             $this->supportedDrivers[] = $driver;
         }
     }
-    public function getSupportedDrivers()
+
+    /**
+     * Gets all the supported drivers
+     *
+     * @return SupportedDriver[] The supported drivers.
+     */
+    public function getSupportedDrivers(): array
     {
         return $this->supportedDrivers;
     }
-    public function getSupportedDriverByName($driverName)
+
+    public function getSupportedDriverByName(string $driverName): ?SupportedDriver
     {
         foreach ($this->supportedDrivers as $supportedDriver) {
             $matchName = $supportedDriver->getName();
@@ -156,11 +177,11 @@ class Extension
     }
 
     // modified at
-    public function setModifiedAt(?Commit $commit)
+    public function setModifiedAt(?Commit $commit): void
     {
         $this->modifiedAt = $commit;
     }
-    public function getModifiedAt()
+    public function getModifiedAt(): ?Commit
     {
         return $this->modifiedAt;
     }
@@ -170,7 +191,7 @@ class Extension
      *
      * @param Extension $extension The extension to add.
      */
-    public function addSubExtension(Extension $extension)
+    public function addSubExtension(Extension $extension): void
     {
         $this->subextensions[] = $extension;
     }
@@ -180,7 +201,7 @@ class Extension
      *
      * @param Matrix $matrix The entire matrix.
      */
-    public function solveExtensionDependencies($matrix)
+    public function solveExtensionDependencies(Matrix $matrix): void
     {
         $hint = $this->getHint();
         if ($hint === null) {
@@ -188,10 +209,14 @@ class Extension
         }
 
         foreach (Constants::RE_DEP_DRIVERS_HINTS as $reDepDriversHint) {
-            if (preg_match($reDepDriversHint[0], $hint, $matches) === 1) {
-                switch ($reDepDriversHint[2]) {
+            $re = $reDepDriversHint[0];
+            $setHint = $reDepDriversHint[1];
+            $dependsOn = $reDepDriversHint[2];
+            $matchIdx = $reDepDriversHint[3];
+            if (preg_match($re, $hint, $matches) === 1) {
+                switch ($dependsOn) {
                     case DependsOn::EXTENSION:
-                        $depExt = $matrix->getExtensionBySubstr($matches[$reDepDriversHint[3]]);
+                        $depExt = $matrix->getExtensionBySubstr($matches[$matchIdx]);
                         if ($depExt !== null) {
                             foreach ($depExt->supportedDrivers as $supportedDriver) {
                                 $this->addSupportedDriver($supportedDriver);
@@ -200,11 +225,11 @@ class Extension
                         break;
 
                     case DependsOn::GLES_VERSION:
-                        $supportedDriverNames = $matrix->getDriversSupportingGlesVersion($matches[$reDepDriversHint[3]]);
+                        $supportedDriverNames = $matrix->getDriversSupportingGlesVersion($matches[$matchIdx]);
                         if ($supportedDriverNames !== null) {
                             foreach ($supportedDriverNames as $supportedDriverName) {
                                 $supportedDriver = new SupportedDriver($supportedDriverName, $this->hints);
-                                if ($reDepDriversHint[2]) {
+                                if ($setHint) {
                                     $supportedDriver->setHint($hint);
                                 }
 
@@ -217,7 +242,7 @@ class Extension
         }
     }
 
-    public function loadXml(\SimpleXMLElement $xmlExt)
+    public function loadXml(\SimpleXMLElement $xmlExt): void
     {
         $xmlSubExts = $xmlExt->xpath('./subextensions/subextension');
 
@@ -249,7 +274,7 @@ class Extension
      *
      * @return Extension[] All the sub-extensions.
      */
-    public function getSubExtensions()
+    public function getSubExtensions(): array
     {
         return $this->subextensions;
     }
@@ -259,9 +284,9 @@ class Extension
      *
      * @param string $name The name of the extension to find.
      *
-     * @return Extension The extension or null if not found.
+     * @return Extension|null The extension or null if not found.
      */
-    public function findSubExtensionByName($name)
+    public function findSubExtensionByName($name): ?Extension
     {
         foreach ($this->subextensions as $subext) {
             if ($subext->getName() === $name) {
@@ -271,12 +296,4 @@ class Extension
 
         return null;
     }
-
-    private string $name;
-    private string $status;
-    private Hints $hints;
-    private int $hintIdx;
-    private array $supportedDrivers;
-    private ?Commit $modifiedAt;
-    private array $subextensions;
 }

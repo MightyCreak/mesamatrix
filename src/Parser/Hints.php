@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -24,9 +26,10 @@ namespace Mesamatrix\Parser;
 // Hints gathered during the parsing.
 class Hints
 {
-    public $allHints = array();
+    /** @var string[] */
+    public array $allHints = array();
 
-    public function addToHints($hint)
+    public function addToHints(string $hint): int
     {
         $idx = -1;
         if (!empty($hint)) {

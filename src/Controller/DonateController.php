@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -28,6 +30,7 @@ use Mesamatrix\Donation\YearContributors;
 
 class DonateController extends BaseController
 {
+    /** @var array<string, YearContributors> */
     private $yearsContributors = array();
 
     public function __construct()
@@ -44,7 +47,7 @@ class DonateController extends BaseController
      *
      * Sorted by year and by donation descending.
      */
-    private function loadContributors()
+    private function loadContributors(): void
     {
         $contribsPath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'private_dir') .
             "/contributors.json");
@@ -66,15 +69,15 @@ class DonateController extends BaseController
                 $contributor->donation = $jsonContributor->donation;
 
                 if (!array_key_exists($year, $this->yearsContributors)) {
-                    $yearContributor = new YearContributors();
-                    $yearContributor->year = $year;
-                    $this->yearsContributors[$year] = $yearContributor;
+                    $yearContributors = new YearContributors();
+                    $yearContributors->year = $year;
+                    $this->yearsContributors[$year] = $yearContributors;
                 } else {
-                    $yearContributor = $this->yearsContributors[$year];
+                    $yearContributors = $this->yearsContributors[$year];
                 }
 
-                $yearContributor->contributors[] = $contributor;
-                $yearContributor->total += $contributor->donation;
+                $yearContributors->contributors[] = $contributor;
+                $yearContributors->total += $contributor->donation;
             }
 
             // Add current year, if not there yet.
