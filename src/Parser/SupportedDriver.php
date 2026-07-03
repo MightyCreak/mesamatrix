@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,7 +27,12 @@ use Mesamatrix\Git\Commit;
 
 class SupportedDriver
 {
-    public function __construct($name, $hints)
+    private string $name;
+    private Hints $hints;
+    private int $hintIdx;
+    private ?Commit $modifiedAt;
+
+    public function __construct(string $name, Hints $hints)
     {
         $this->name = $name;
         $this->hints = $hints;
@@ -34,25 +41,25 @@ class SupportedDriver
     }
 
     // name
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     // hints
-    public function setHint($hint)
+    public function setHint(string $hint): void
     {
         $this->hintIdx = $this->hints->addToHints($hint);
     }
-    public function getHintIdx()
+    public function getHintIdx(): int
     {
         return $this->hintIdx;
     }
-    public function getHint()
+    public function getHint(): ?string
     {
         if ($this->hintIdx === -1) {
             return null;
@@ -62,17 +69,12 @@ class SupportedDriver
     }
 
     // modified at
-    public function setModifiedAt($commit)
+    public function setModifiedAt(?Commit $commit): void
     {
         $this->modifiedAt = $commit;
     }
-    public function getModifiedAt()
+    public function getModifiedAt(): ?Commit
     {
         return $this->modifiedAt;
     }
-
-    private $name;
-    private $hints;
-    private $hintIdx;
-    private $modifiedAt;
 }

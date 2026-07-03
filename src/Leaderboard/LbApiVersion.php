@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -27,7 +29,8 @@ class LbApiVersion
     private string $name;
     private string $version;
     private int $numExts;
-    private array $drivers;
+
+    /** @var array<string, LbDriverScore> */
     private array $driverScores;
 
     /**
@@ -35,7 +38,7 @@ class LbApiVersion
      *
      * @param string $name API name (e.g. OpenGL, Vulkan, ...).
      * @param string $version API version (e.g. 4.5, 1.1, ...).
-     * @param integer $numExts Total number of extensions.
+     * @param int $numExts Total number of extensions.
      * @remark Versions are identified by `id` which is the concatenation of
      *         the name and the version (examples: OpenGL4.5, Vulkan1.1, ...).
      */
@@ -45,13 +48,12 @@ class LbApiVersion
         $this->name = $name;
         $this->version = $version;
         $this->numExts = $numExts;
-        $this->drivers = array();
     }
 
     /**
      * Get the API ID for this version.
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -59,7 +61,7 @@ class LbApiVersion
     /**
      * Get the API name.
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -67,7 +69,7 @@ class LbApiVersion
     /**
      * Get the API version.
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
@@ -75,24 +77,24 @@ class LbApiVersion
     /**
      * Replace or add a new driver and set it's number of extensions done.
      *
-     * @param string $drivername Name of the driver.
-     * @param integer $numExtsDone Number of extensions done.
+     * @param string $driverName Name of the driver.
+     * @param int $numExtsDone Number of extensions done.
      */
-    public function addDriver(string $drivername, int $numExtsDone)
+    public function addDriver(string $driverName, int $numExtsDone): void
     {
-        $this->driverScores[$drivername] = new LbDriverScore(
+        $this->driverScores[$driverName] = new LbDriverScore(
             $numExtsDone,
             $this->getNumExts(),
-            (float) $this->getVersion()
+            $this->getVersion()
         );
     }
 
     /**
      * Set the number of extensions for this API version.
      *
-     * @param integer $num Number of extensions.
+     * @param int $num Number of extensions.
      */
-    public function setNumExts($num)
+    public function setNumExts(int $num): void
     {
         $this->numExts = $num;
     }
@@ -100,7 +102,7 @@ class LbApiVersion
     /**
      * Get the number of extensions for this API version.
      */
-    public function getNumExts()
+    public function getNumExts(): int
     {
         return $this->numExts;
     }
@@ -108,21 +110,21 @@ class LbApiVersion
     /**
      * Get the number of extension done for a given driver.
      *
-     * @param string $drivername Name of the driver.
+     * @param string $driverName Name of the driver.
      * @return LbDriverScore The driver score.
      */
-    public function getDriverScore($drivername)
+    public function getDriverScore($driverName): LbDriverScore
     {
-        return $this->driverScores[$drivername];
+        return $this->driverScores[$driverName];
     }
 
     /**
      * Get all the drivers scores for this API version.
      *
-     * @return mixed[] An associative array: the key is the driver name, the
-     *                 value is an LbDriverScore.
+     * @return LbDriverScore[] An associative array: the key is the driver name, the
+     *                         value is an LbDriverScore.
      */
-    public function getDriverScores()
+    public function getDriverScores(): array
     {
         return $this->driverScores;
     }

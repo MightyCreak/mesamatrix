@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Default configuration for Mesamatrix.
 // Values can be overwritten in a user defined config/config.php file.
 
@@ -19,7 +21,7 @@ use Monolog\Level;
 return [
     "info" => [
         "log_level" => Level::Warning,
-        "version" => "3.0",
+        "version" => "3.2",
         "title" => "The Mesa drivers matrix",
         "description" => "Show Mesa progress for the OpenGL, OpenGL ES, Vulkan and OpenCL drivers implementations into an easy to read HTML page.",
         "xml_file" => "public/features.xml",

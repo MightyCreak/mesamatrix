@@ -30,7 +30,8 @@
 
     "require-dev": {
         "squizlabs/php_codesniffer": "^4",
-        "phpunit/phpunit": "^12"
+        "phpunit/phpunit": "^12",
+        "phpstan/phpstan": "^2.2"
     },
 
     "autoload": {
@@ -40,7 +41,8 @@
     },
 
     "scripts": {
-        "lint": "./vendor/bin/phpcs --standard=ruleset.xml",
-        "tests": "./vendor/bin/phpunit tests"
+        "analyze": "phpstan analyse",
+        "lint": "phpcs --standard=ruleset.xml",
+        "tests": "phpunit tests"
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -21,8 +23,6 @@
 
 namespace Mesamatrix\Parser;
 
-use Mesamatrix\Mesamatrix;
-
 class ApiVersion
 {
     public function __construct(
@@ -41,41 +41,41 @@ class ApiVersion
     }
 
     // API name
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     // API version
-    public function setVersion(?string $version)
+    public function setVersion(?string $version): void
     {
         $this->version = $version;
     }
-    public function getVersion()
+    public function getVersion(): ?string
     {
         return $this->version;
     }
 
     // GLSL name
-    public function setGlslName(?string $name)
+    public function setGlslName(?string $name): void
     {
         $this->glslName = $name;
     }
-    public function getGlslName()
+    public function getGlslName(): ?string
     {
         return $this->glslName;
     }
 
     // GLSL version
-    public function setGlslVersion(?string $version)
+    public function setGlslVersion(?string $version): void
     {
         $this->glslVersion = $version;
     }
-    public function getGlslVersion()
+    public function getGlslVersion(): ?string
     {
         return $this->glslVersion;
     }
@@ -85,7 +85,7 @@ class ApiVersion
      *
      * @param Extension $extension The extension to add.
      */
-    public function addExtension(Extension $extension)
+    public function addExtension(Extension $extension): void
     {
         $this->extensions[] = $extension;
     }
@@ -93,9 +93,9 @@ class ApiVersion
     /**
      * Get all the drivers for this API.
      *
-     * @return string[] The list of supported drivers names; null if API not recognized.
+     * @return string[]|null The list of supported drivers names; null if API not recognized.
      */
-    public function getAllApiDrivers()
+    public function getAllApiDrivers(): ?array
     {
         $apiName = $this->getName();
         switch ($apiName) {
@@ -123,7 +123,7 @@ class ApiVersion
      *
      * @return string[] The list of supported drivers names.
      */
-    public function getSupportedDrivers()
+    public function getSupportedDrivers(): array
     {
         $supportedDrivers = [];
 
@@ -150,14 +150,14 @@ class ApiVersion
      *
      * @param Matrix $matrix The entire matrix.
      */
-    public function solveExtensionDependencies($matrix)
+    public function solveExtensionDependencies(Matrix $matrix): void
     {
         foreach ($this->getExtensions() as $ext) {
             $ext->solveExtensionDependencies($matrix);
         }
     }
 
-    public function loadXml(\SimpleXMLElement $xmlSection)
+    public function loadXml(\SimpleXMLElement $xmlSection): void
     {
         $xmlExts = $xmlSection->extensions->extension;
 
@@ -199,7 +199,7 @@ class ApiVersion
      *
      * @return Extension[] All the extensions.
      */
-    public function getExtensions()
+    public function getExtensions(): array
     {
         return $this->extensions;
     }
@@ -209,7 +209,7 @@ class ApiVersion
      *
      * @return int The number of extensions.
      */
-    public function getNumExtensions()
+    public function getNumExtensions(): int
     {
         return count($this->extensions);
     }
@@ -219,9 +219,9 @@ class ApiVersion
      *
      * @param string $name The name of the extension to find.
      *
-     * @return Extension The extension or null if not found.
+     * @return Extension|null The extension or null if not found.
      */
-    public function getExtensionByName($name)
+    public function getExtensionByName(string $name): ?Extension
     {
         foreach ($this->extensions as $extension) {
             if ($extension->getName() === $name) {
@@ -234,11 +234,11 @@ class ApiVersion
     /**
      * Find the extensions with the given substring.
      *
-     * @param string $str The substring to find in the extension name.
+     * @param string $substr The substring to find in the extension name.
      *
-     * @return Extension The extension or null if not found.
+     * @return Extension|null The extension or null if not found.
      */
-    public function getExtensionBySubstr($substr)
+    public function getExtensionBySubstr(string $substr): ?Extension
     {
         foreach ($this->extensions as $extension) {
             if (strstr($extension->getName(), $substr) !== false) {
@@ -253,5 +253,7 @@ class ApiVersion
     private ?string $glslName;
     private ?string $glslVersion;
     private Hints $hints;
+
+    /** @var Extension[] */
     private array $extensions;
 }

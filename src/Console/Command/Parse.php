@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -47,7 +49,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Parse extends Command
 {
-    private const API_INFOS = [
+    /** @var array<string, string[]> */
+    private const array API_INFOS = [
         // OpenGL.
         Constants::GL_NAME => [ Constants::GL_NAME ],
 
@@ -71,6 +74,8 @@ class Parse extends Command
     ];
 
     protected OutputInterface $output;
+
+    /** @var array{complete: string, incomplete: string, started: string} */
     protected array $statuses;
     protected ?UrlCache $urlCache;
 
@@ -208,7 +213,7 @@ class Parse extends Command
      * @param string[] $excludedCommits The commits to exclude from the list.
      * @return Commit[]|null Array of commits.
      */
-    protected function fetchCommits($filepath, array $excludedCommits): ?array
+    protected function fetchCommits(string $filepath, array $excludedCommits): ?array
     {
         $branch = Mesamatrix::$config->getValue("git", "branch");
         $gitCommitGet = new Process(array(
@@ -226,28 +231,33 @@ class Parse extends Command
 
         $logSeparator = uniqid('mesamatrix_separator_');
         $logFormat = implode(PHP_EOL, [$logSeparator, '%H', '%at', '%aN', '%cN', '%ct', '%s']);
-        $gitLog = new Process(array(
+        $gitProcess = new Process(array(
             'log', '--pretty=format:' . $logFormat, '--reverse', '-p',
             $oldestCommit . '..', '--', $filepath
         ));
         $processHelper = $this->getHelper('process');
         if ($processHelper instanceof ProcessHelper) {
-            $processHelper->mustRun($this->output, $gitLog);
+            $processHelper->mustRun($this->output, $gitProcess);
         }
 
-        $commitSections = explode($logSeparator . PHP_EOL, $gitLog->getOutput());
-        if (empty($commitSections)) {
+        $gitLog = $gitProcess->getOutput();
+        if (empty($gitLog)) {
             // No commit? There must be a problem.
             Mesamatrix::$logger->error("No commit found.");
             return null;
         }
+
+        // Get each commit (remove first item as it is always an empty string).
+        $commitSections = explode($logSeparator . PHP_EOL, $gitLog);
+        array_shift($commitSections);
+        unset($gitLog);
 
         // Create commit list.
         $commits = array();
         foreach ($commitSections as $commitSection) {
             $commitData = explode(PHP_EOL, $commitSection, 7);
 
-            if ($commitData !== false && isset($commitData[1])) {
+            if (count($commitData) === 7) {
                 $commitHash = $commitData[0];
 
                 // Skip excluded commits.
@@ -324,7 +334,7 @@ class Parse extends Command
     /**
      * Take all the parsed commits and merged them to generate the final XML.
      *
-     * @param array Commit $commits The commits to merge.
+     * @param Commit[] $commits The commits to merge.
      */
     protected function generateMergedXml(array $commits): void
     {
@@ -375,7 +385,7 @@ class Parse extends Command
             $fetchHeadPath = $gitDir . '/HEAD';
         }
         $updated = filemtime($fetchHeadPath);
-        $xml->addAttribute('updated', $updated);
+        $xml->addAttribute('updated', (string) $updated);
 
         // Generate statuses.
         $statuses = $xml->addChild("statuses");
@@ -485,16 +495,31 @@ class Parse extends Command
         }
     }
 
+    /**
+     * Generates the commits log.
+     *
+     * @param SimpleXMLElement $xml The XML element.
+     * @param Commit[] $commits The commit list.
+     */
     protected function generateCommitsLog(SimpleXMLElement $xml, array $commits): void
     {
         foreach (array_reverse($commits) as $commit) {
             $commitNode = $xml->addChild("commit", htmlspecialchars($commit->getData()));
             $commitNode->addAttribute("hash", $commit->getHash());
-            $commitNode->addAttribute("timestamp", $commit->getCommitterDate()->getTimestamp());
+            $commitNode->addAttribute("timestamp", (string) ($commit->getCommitterDate()->getTimestamp()));
             $commitNode->addAttribute("subject", $commit->getSubject());
         }
     }
 
+    /**
+     * Adds an API.
+     *
+     * @param Matrix $matrix The matrix.
+     * @param SimpleXMLElement $xmlParent The parent XML element.
+     * @param string $apiName The API name.
+     * @param string[] $apiVersions The API versions.
+     * @param bool $populateVendors Whether to populate the vendors or not.
+     */
     protected function addApi(
         Matrix $matrix,
         SimpleXMLElement $xmlParent,
@@ -535,10 +560,18 @@ class Parse extends Command
                 break;
         }
 
-        $xmlVendors = $xmlParent->addChild("vendors");
-        $this->populateDrivers($xmlVendors, $vendors);
+        if ($vendors !== null) {
+            $xmlVendors = $xmlParent->addChild("vendors");
+            $this->populateDrivers($xmlVendors, $vendors);
+        }
     }
 
+    /**
+     * Populates the drivers.
+     *
+     * @param SimpleXMLElement $xmlVendors The XML element with the vendors.
+     * @param array<string, string[]> $vendors The known vendors.
+     */
     protected function populateDrivers(SimpleXMLElement $xmlVendors, array $vendors): void
     {
         foreach ($vendors as $vendor => $drivers) {
@@ -552,10 +585,17 @@ class Parse extends Command
         }
     }
 
-    protected function generateApiVersions(SimpleXMLElement $api, Matrix $matrix, array $names): void
+    /**
+     * Generates the API versions.
+     *
+     * @param SimpleXMLElement $api The XML element with the API.
+     * @param Matrix $matrix The matrix.
+     * @param string[] $apiNames The API versions.
+     */
+    protected function generateApiVersions(SimpleXMLElement $api, Matrix $matrix, array $apiNames): void
     {
         $xmlVersions = $api->addChild("versions");
-        foreach ($names as $name) {
+        foreach ($apiNames as $name) {
             foreach ($matrix->getApiVersions() as $apiVersion) {
                 if ($apiVersion->getName() === $name) {
                     $xmlVersion = $xmlVersions->addChild('version');
@@ -632,7 +672,7 @@ class Parse extends Command
         if ($commit = $ext->getModifiedAt()) {
             $modified = $mesaStatus->addChild("modified");
             $modified->addChild("commit", $commit->getHash());
-            $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
+            $modified->addChild("date", (string) ($commit->getCommitterDate()->getTimestamp()));
             $modified->addChild("author", $commit->getAuthor());
         }
 
@@ -647,7 +687,7 @@ class Parse extends Command
             if ($commit = $supportedDriver->getModifiedAt()) {
                 $modified = $xmlDriver->addChild("modified");
                 $modified->addChild("commit", $commit->getHash());
-                $modified->addChild("date", $commit->getCommitterDate()->getTimestamp());
+                $modified->addChild("date", (string) ($commit->getCommitterDate()->getTimestamp()));
                 $modified->addChild("author", $commit->getAuthor());
             }
         }

@@ -2,9 +2,11 @@
     "recommendations": [
         "davidanson.vscode-markdownlint",
         "editorconfig.editorconfig",
+        "sanderronde.phpstan-vscode",
         "shevaua.phpcs",
         "streetsidesoftware.code-spell-checker",
         "timonwong.shellcheck",
+        "xdebug.php-debug",
         "yzhang.markdown-all-in-one"
     ]
 }

@@ -1,5 +1,7 @@
 <?php
 
+//declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -32,6 +34,8 @@ class ApiSubController
     private bool $showLbVersion;
     private ?SimpleXMLElement $xml = null;
     private ?Leaderboard $leaderboard = null;
+
+    /** @var array<string, mixed> */
     private array $matrix = array();
 
     public function __construct(string $api, bool $showLbVersion)
@@ -56,11 +60,11 @@ class ApiSubController
         $this->createMatrixModel($xmlApi);
     }
 
-    private function loadMesamatrixXml(): ?SimpleXMLElement
+    private function loadMesamatrixXml(): SimpleXMLElement
     {
         $featuresXmlFilepath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'xml_file'));
         $xml = simplexml_load_file($featuresXmlFilepath);
-        if (!$xml) {
+        if ($xml === false) {
             Mesamatrix::$logger->critical('Can\'t read ' . $featuresXmlFilepath);
             exit();
         }
@@ -76,10 +80,10 @@ class ApiSubController
 
     public function createMatrixModel(SimpleXMLElement $xmlApi): void
     {
-        $this->createColumns($this->matrix, $xmlApi);
+        $this->createColumns($xmlApi);
 
         $this->matrix['sections'] = array();
-        $this->addApiSection($this->matrix, $xmlApi);
+        $this->addApiSection($xmlApi);
 
         $this->matrix['last_updated'] = (int) $this->xml['updated'];
     }
@@ -89,32 +93,32 @@ class ApiSubController
         return $this->matrix['last_updated'];
     }
 
-    private function createColumns(array &$matrix, SimpleXMLElement $xmlApi): void
+    private function createColumns(SimpleXMLElement $xmlApi): void
     {
-        $matrix['column_groups'] = array();
-        $matrix['columns'] = array();
+        $this->matrix['column_groups'] = array();
+        $this->matrix['columns'] = array();
 
         $columnIdx = 0;
 
         // Add "extension" column.
-        $matrix['column_groups'][] = array(
+        $this->matrix['column_groups'][] = array(
             'name' => '',
             'vendor_class' => 'default',
             'columns' => array($columnIdx++)
         );
-        $matrix['columns'][] = array(
+        $this->matrix['columns'][] = array(
             'name' => 'Extension',
             'type' => 'extension',
             'vendor_class' => 'default'
         );
 
         // Add "mesa" column.
-        $matrix['column_groups'][] = array(
+        $this->matrix['column_groups'][] = array(
             'name' => '',
             'vendor_class' => 'default',
             'columns' => array($columnIdx++)
         );
-        $matrix['columns'][] = array(
+        $this->matrix['columns'][] = array(
             'name' => 'mesa',
             'type' => 'driver',
             'vendor_class' => 'default'
@@ -122,6 +126,7 @@ class ApiSubController
         );
 
         // Get all the vendors and all their drivers.
+        /** @var array<string, string[]> */
         $vendors = array();
         foreach ($xmlApi->vendors->vendor as $vendor) {
             $vendorName = (string) $vendor['name'];
@@ -137,16 +142,15 @@ class ApiSubController
                 }
             }
         }
-
         unset($driverNames);
 
         foreach ($vendors as $vendorName => $driverNames) {
             // Add separator before each vendor.
-            $matrix['column_groups'][] = array(
+            $this->matrix['column_groups'][] = array(
                 'name' => '',
                 'columns' => array($columnIdx++)
             );
-            $matrix['columns'][] = array(
+            $this->matrix['columns'][] = array(
                 'name' => '',
                 'type' => 'separator',
             );
@@ -159,18 +163,18 @@ class ApiSubController
             );
             foreach ($driverNames as $driverName) {
                 $colgroup['columns'][] = $columnIdx++;
-                $matrix['columns'][] = array(
+                $this->matrix['columns'][] = array(
                     'name' => $driverName,
                     'type' => 'driver',
                     'vendor_class' => $colgroup['vendor_class']
                 );
             }
 
-            $matrix['column_groups'][] = $colgroup;
+            $this->matrix['column_groups'][] = $colgroup;
         }
     }
 
-    private function addApiSection(array &$matrix, SimpleXMLElement $xmlApi): void
+    private function addApiSection(SimpleXMLElement $xmlApi): void
     {
         $xmlVersions = array();
         foreach ($xmlApi->versions->version as $xmlVersion) {
@@ -184,29 +188,31 @@ class ApiSubController
         // Sort the versions descending.
         usort($xmlVersions, function ($a, $b) {
             $diff = (float) $b['version'] - (float) $a['version'];
-            if ($diff === 0) {
-                return 0;
-            } else {
-                return $diff < 0 ? -1 : 1;
-            }
+            return $diff <=> 0.0;
         });
 
         $api = array(
             'name' => $xmlApi['name'],
-            'target' => urlencode(str_replace(' ', '', $xmlApi['name'])),
+            'target' => urlencode(str_replace(' ', '', (string) $xmlApi['name'])),
             'subsections' => array()
         );
 
         foreach ($xmlVersions as $xmlVersion) {
-            $this->addSection($api, $xmlVersion, $xmlApi->vendors);
+            $this->addSubsection($api, $xmlVersion, $xmlApi->vendors);
         }
 
-        $matrix['sections'][] = $api;
+        $this->matrix['sections'][] = $api;
     }
 
-    private function addSection(array &$section, SimpleXMLElement $xmlVersion, SimpleXMLElement $vendors): void
+    /** Adds a subsection.
+     *
+     * @param array<string, mixed> $section The section to add the subsection to.
+     * @param SimpleXMLElement $xmlVersion The XML element with the API version.
+     * @param SimpleXMLElement $vendors The XML element with the vendors.
+     */
+    private function addSubsection(array &$section, SimpleXMLElement $xmlVersion, SimpleXMLElement $vendors): void
     {
-        $name = $xmlVersion['name'];
+        $name = (string) $xmlVersion['name'];
         if (!empty((string) $xmlVersion['version'])) {
             $name .= ' ' . $xmlVersion['version'];
         }
@@ -252,6 +258,14 @@ class ApiSubController
         $section['subsections'][] = $subsection;
     }
 
+    /**
+     * Add an extension (or a subextension).
+     *
+     * @param array<string, mixed> $subsection The subsection to add the extension to.
+     * @param SimpleXMLElement $xmlExt The XML element with the extension (or subextension).
+     * @param bool $isSubExt Whether $xmlExt is a subextension or not.
+     * @param SimpleXMLElement $vendors The XML element with the vendors.
+     */
     private function addExtension(
         array &$subsection,
         SimpleXMLElement $xmlExt,
@@ -262,15 +276,15 @@ class ApiSubController
             'name' => $xmlExt['name'],
         );
 
-        $extUrlId = str_replace(' ', '_', $xmlExt['name']);
+        $extUrlId = str_replace(' ', '_', (string) $xmlExt['name']);
         $extUrlId = preg_replace('/[^A-Za-z0-9_]/', '', $extUrlId);
         $extUrlId = $subsection['target'] . '_Extension_' . $extUrlId;
         $extension['target'] = $extUrlId;
         $extension['is_subext'] = $isSubExt;
 
         if (isset($xmlExt->link)) {
-            $extension['url_href'] = $xmlExt->link['href'];
-            $extension['url_text'] = $xmlExt->link;
+            $extension['url_href'] = (string) $xmlExt->link['href'];
+            $extension['url_text'] = (string) $xmlExt->link;
         }
 
         $extTask = array();
@@ -312,7 +326,7 @@ class ApiSubController
 
     public function writeMatrix(): void
     {
-        if (array_key_exists('sections', $this->matrix) == 0) {
+        if (!array_key_exists('sections', $this->matrix)) {
             return;
         }
 
@@ -460,7 +474,11 @@ HTML;
                         if ($col['type'] === 'extension') :
                             $extNameText = $extension['name'];
                             if (isset($extension['url_text'])) :
-                                $extNameText = str_replace($extension['url_text'], '<a href="' . $extension['url_href'] . '">' . $extension['url_text'] . '</a>', $extNameText);
+                                $extNameText = str_replace(
+                                    $extension['url_text'],
+                                    '<a href="' . $extension['url_href'] . '">' . $extension['url_text'] . '</a>',
+                                    $extNameText
+                                );
                             endif;
                             $cssClass = '';
                             if ($extension['is_subext']) :

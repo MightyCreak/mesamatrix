@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -34,7 +36,7 @@ class Mesamatrix
     public static Config $config;
     public static Logger $logger;
 
-    public static function init()
+    public static function init(): void
     {
         date_default_timezone_set('UTC');
 
@@ -83,11 +85,11 @@ class Mesamatrix
         self::$logger->debug('Base initialization complete');
 
         self::$logger->debug('Log level: ' . Logger::toMonologLevel($logLevel)->getName());
-        self::$logger->debug('PHP error_reporting: 0x' . dechex(ini_get('error_reporting')));
+        self::$logger->debug('PHP error_reporting: 0x' . dechex((int) ini_get('error_reporting')));
         self::$logger->debug('PHP display_errors: ' . ini_get('display_errors'));
     }
 
-    public static function path($path)
+    public static function path(string $path): string
     {
         return self::$serverRoot . DIRECTORY_SEPARATOR . $path;
     }

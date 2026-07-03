@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -25,14 +27,20 @@ use Mesamatrix\Mesamatrix;
 
 abstract class BaseController
 {
+    /** @var array<string, string> */
     public $pages = array(
         "Home" => ".",
         "About" => "about.php",
         "Donate?" => "donate.php");
 
-    private $pageIdx = -1;
-    private $cssScripts = [];
-    private $jsScripts = [];
+    private bool $showMenu = true;
+    private int $pageIdx = -1;
+
+    /** @var string[] */
+    private array $cssScripts = [];
+
+    /** @var string[] */
+    private array $jsScripts = [];
 
     public function __construct()
     {
@@ -43,13 +51,18 @@ abstract class BaseController
         $this->addJsScript('js/script.js');
     }
 
+    final protected function setShowMenu(bool $showMenu): void
+    {
+        $this->showMenu = $showMenu;
+    }
+
     /**
      * Set the page to highlight in the menu.
      *
      * The page must be one of the page in $this->pages.
      * @param string $page The name of the page.
      */
-    final protected function setPage($page): void
+    final protected function setPage(string $page): void
     {
         $this->pageIdx = array_search($page, array_keys($this->pages));
     }
@@ -58,7 +71,7 @@ abstract class BaseController
      * Add a CSS script to include in the HTML page header.
      * @param string $script The script path.
      */
-    final public function addCssScript($script): void
+    final public function addCssScript(string $script): void
     {
         $this->cssScripts[] = $script;
     }
@@ -67,7 +80,7 @@ abstract class BaseController
      * Add a JS script to include in the HTML page header.
      * @param string $script The script path.
      */
-    final public function addJsScript($script): void
+    final public function addJsScript(string $script): void
     {
         $this->jsScripts[] = $script;
     }
@@ -136,30 +149,36 @@ HTML;
     <body>
         <header>
             <a href="."><img src="images/banner.svg" class="banner" alt="Mesamatrix banner" /></a>
+HTML;
 
+        if ($this->showMenu) :
+            echo <<<'HTML'
             <div class="menu">
                 <ul class="menu-list">
 HTML;
-        $i = 0;
-        foreach ($this->pages as $page => $link) :
-            $item = "<a href=\"" . $link . "\">" . $page . "</a>";
-            if ($i === $this->pageIdx) :
-                echo <<<HTML
-                    <li class="menu-selected">{$item}</li>
+            $i = 0;
+            foreach ($this->pages as $page => $link) :
+                $item = "<a href=\"" . $link . "\">" . $page . "</a>";
+                if ($i === $this->pageIdx) :
+                    echo <<<HTML
+                        <li class="menu-selected">{$item}</li>
 HTML;
-            else :
-                echo <<<HTML
-                    <li><a href="{$link}">{$page}</a></li>
+                else :
+                    echo <<<HTML
+                        <li><a href="{$link}">{$page}</a></li>
 HTML;
-            endif;
-            ++$i;
-        endforeach;
+                endif;
+                ++$i;
+            endforeach;
 
-        echo <<<'HTML'
+            echo <<<'HTML'
                     <li><a href="rss.php" class="rss"><img class="rss" src="images/feed.svg" alt="RSS feed" /></a></li>
                 </ul>
             </div>
+HTML;
+        endif;
 
+        echo <<<'HTML'
 <!-- Matomo -->
 <script>
   var _paq = window._paq = window._paq || [];

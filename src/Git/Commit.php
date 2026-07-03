@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -23,32 +25,32 @@ namespace Mesamatrix\Git;
 
 class Commit
 {
-    private $filepath;
-    private $hash;
-    private $date;
-    private $author;
-    private $committer;
-    private $committerDate;
-    private $subject;
-    private $data;
+    private string $filepath;
+    private string $hash;
+    private \DateTime $date;
+    private string $author;
+    private string $committer;
+    private \DateTime $committerDate;
+    private string $subject;
+    private string $data;
 
-    public function getFilepath()
+    public function getFilepath(): string
     {
         return $this->filepath;
     }
 
-    public function setFilepath($filepath)
+    public function setFilepath(string $filepath): static
     {
         $this->filepath = $filepath;
         return $this;
     }
 
-    public function getHash()
+    public function getHash(): string
     {
         return $this->hash;
     }
 
-    public function setHash($hash)
+    public function setHash(string $hash): static
     {
         $this->hash = $hash;
         return $this;
@@ -59,12 +61,12 @@ class Commit
      *
      * @return \DateTime The commit date.
      */
-    public function getDate()
+    public function getDate(): \DateTime
     {
         return $this->date;
     }
 
-    public function setDate($date)
+    public function setDate(int|string|\DateTime $date): static
     {
         if (is_numeric($date)) {
             $this->setDateString('@' . $date);
@@ -77,40 +79,40 @@ class Commit
         return $this;
     }
 
-    public function setDateString($date, $timezone = null)
+    private function setDateString(string $date): static
     {
-        $this->setDate(new \DateTime($date, $timezone));
+        $this->date = new \DateTime($date);
         return $this;
     }
 
-    public function getAuthor()
+    public function getAuthor(): string
     {
         return $this->author;
     }
 
-    public function setAuthor($author)
+    public function setAuthor(string $author): static
     {
         $this->author = $author;
         return $this;
     }
 
-    public function getCommitter()
+    public function getCommitter(): string
     {
         return $this->committer;
     }
 
-    public function setCommitter($committer)
+    public function setCommitter(string $committer): static
     {
         $this->committer = $committer;
         return $this;
     }
 
-    public function getCommitterDate()
+    public function getCommitterDate(): \DateTime
     {
         return $this->committerDate;
     }
 
-    public function setCommitterDate($date)
+    public function setCommitterDate(string|\DateTime $date): static
     {
         if (is_numeric($date)) {
             $this->setCommitterDateString('@' . $date);
@@ -123,29 +125,29 @@ class Commit
         return $this;
     }
 
-    public function setCommitterDateString($date, $timezone = null)
+    private function setCommitterDateString(string $date): static
     {
-        $this->setCommitterDate(new \DateTime($date, $timezone));
+        $this->committerDate = new \DateTime($date);
         return $this;
     }
 
-    public function getSubject()
+    public function getSubject(): string
     {
         return $this->subject;
     }
 
-    public function setSubject($subject)
+    public function setSubject(string $subject): static
     {
         $this->subject = $subject;
         return $this;
     }
 
-    public function getData()
+    public function getData(): string
     {
         return $this->data;
     }
 
-    public function setData($data)
+    public function setData(string $data): static
     {
         $this->data = $data;
         return $this;

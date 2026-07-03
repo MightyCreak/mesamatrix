@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of mesamatrix.
  *
@@ -22,6 +24,7 @@
 namespace Mesamatrix\Console;
 
 use Mesamatrix\Mesamatrix;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\ConsoleEvents;
@@ -62,6 +65,11 @@ class Application extends \Symfony\Component\Console\Application
         parent::configureIO($input, $output);
     }
 
+    /**
+     * Gets the default commands.
+     *
+     * @return SymfonyCommand[] All the commands.
+     */
     protected function getDefaultCommands(): array
     {
         return array_merge(parent::getDefaultCommands(), array(

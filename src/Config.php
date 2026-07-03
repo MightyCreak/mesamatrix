@@ -23,7 +23,8 @@ namespace Mesamatrix;
 
 class Config
 {
-    protected $cache = array();
+    /** @var array<string, mixed> */
+    protected array $cache = array();
 
     public function __construct(string $configDir)
     {
