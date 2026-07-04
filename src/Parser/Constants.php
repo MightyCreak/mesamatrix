@@ -60,13 +60,13 @@ abstract class Constants
         'AMD'           => [ 'r600', 'radeonsi' ],
         'Apple'         => [ 'asahi' ],
         'Arm'           => [ 'lima', 'panfrost' ],
-        'Broadcom'      => [ 'v3d', 'vc4' ],
+        'Broadcom'      => [ 'vc4', 'v3d' ],
         'Intel'         => [ 'crocus', 'iris' ],
         'Nvidia'        => [ 'nv50', 'nvc0' ],
         'Qualcomm'      => [ 'freedreno' ],
         'Vivante'       => [ 'etnaviv' ],
-        '[Software]'    => [ 'llvmpipe', 'softpipe' ],
-        '[Translation]' => [ 'd3d12', 'virgl', 'zink' ],
+        'Translation' => [ 'd3d12', 'virgl', 'zink' ],
+        'Software'    => [ 'llvmpipe', 'softpipe' ],
     ];
 
     // Vulkan.
@@ -96,12 +96,12 @@ abstract class Constants
         'Apple'         => [ 'hk' ],
         'Arm'           => [ 'panvk' ],
         'Broadcom'      => [ 'v3dv' ],
-        'Intel'         => [ 'anv', 'hasvk' ],
+        'Intel'         => [ 'hasvk', 'anv' ],
         'Nvidia'        => [ 'nvk' ],
         'PowerVR'       => [ 'pvr' ],
         'Qualcomm'      => [ 'tu' ],
-        '[Software]'    => [ 'lvp' ],
-        '[Translation]' => [ 'dzn', 'kk', 'vn' ],
+        'Translation'   => [ 'dzn', 'kk', 'vn' ],
+        'Software'      => [ 'lvp' ],
     ];
 
     // OpenCL.
@@ -130,8 +130,8 @@ abstract class Constants
         'Intel'         => [ 'iris' ],
         'Nvidia'        => [ 'nvc0' ],
         'Qualcomm'      => [ 'freedreno' ],
-        '[Software]'    => [ 'llvmpipe' ],
-        '[Translation]' => [ 'zink' ],
+        'Translation'   => [ 'zink' ],
+        'Software'      => [ 'llvmpipe' ],
     ];
 
     // Hints enabling for all drivers.
