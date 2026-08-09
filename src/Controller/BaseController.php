@@ -30,6 +30,7 @@ abstract class BaseController
     /** @var array<string, string> */
     public $pages = array(
         "Home" => ".",
+        "CI Quality" => "ci.php",
         "About" => "about.php",
         "Donate?" => "donate.php");
 

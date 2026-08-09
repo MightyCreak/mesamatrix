@@ -21,10 +21,11 @@ use Monolog\Level;
 return [
     "info" => [
         "log_level" => Level::Warning,
-        "version" => "3.2",
+        "version" => "3.2.1",
         "title" => "The Mesa drivers matrix",
         "description" => "Show Mesa progress for the OpenGL, OpenGL ES, Vulkan and OpenCL drivers implementations into an easy to read HTML page.",
         "xml_file" => "public/features.xml",
+        "ci_xml_file" => "public/ci-expectations.xml",
         "project_url" => "https://github.com/MightyCreak/mesamatrix",
         "commitlog_length" => 10,
         "authors" => array(

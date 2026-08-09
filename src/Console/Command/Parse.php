@@ -34,6 +34,7 @@ use Mesamatrix\Parser\ApiVersion;
 use Mesamatrix\Parser\Extension;
 use Mesamatrix\Parser\UrlCache;
 use Mesamatrix\Parser\Hints;
+use Mesamatrix\Parser\CiExpectationsParser;
 use SimpleXMLElement;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProcessHelper;
@@ -154,6 +155,7 @@ class Parse extends Command
         if ($lastCommitFetched === $lastCommitParsed) {
             Mesamatrix::$logger->info("No new commit, no need to parse.");
             if (!$regenXml) {
+                $this->generateCiExpectationsXml();
                 return Command::SUCCESS;
             }
         }
@@ -203,7 +205,81 @@ class Parse extends Command
             fclose($h);
         }
 
+        $this->generateCiExpectationsXml();
+
         return Command::SUCCESS;
+    }
+
+    /**
+     * Parse tip-of-tree CI expectation files and write public/ci-expectations.xml.
+     */
+    protected function generateCiExpectationsXml(): void
+    {
+        $branch = Mesamatrix::$config->getValue('git', 'branch');
+        $xmlPath = Mesamatrix::path(Mesamatrix::$config->getValue('info', 'ci_xml_file', 'public/ci-expectations.xml'));
+
+        $hashProc = new Process(['rev-parse', $branch]);
+        $hashProc->mustRun();
+        $commitHash = trim($hashProc->getOutput());
+
+        if (file_exists($xmlPath)) {
+            $existing = simplexml_load_file($xmlPath);
+            if ($existing instanceof SimpleXMLElement && (string) $existing->commit->hash === $commitHash) {
+                Mesamatrix::$logger->info('CI expectations XML already up to date.');
+                return;
+            }
+        }
+
+        $listProc = new Process(['ls-tree', '-r', '--name-only', $branch]);
+        $listProc->mustRun();
+
+        $parser = new CiExpectationsParser();
+        $paths = [];
+        foreach (preg_split("/\r\n|\n|\r/", $listProc->getOutput()) as $path) {
+            $path = trim($path);
+            if ($path !== '' && $parser->isExpectationPath($path)) {
+                $paths[] = $path;
+            }
+        }
+
+        Mesamatrix::$logger->info('CI expectation files found: ' . count($paths) . '.');
+
+        $tsProc = new Process(['log', '-1', '--format=%ct', $commitHash]);
+        $tsProc->mustRun();
+        $commitTimestamp = trim($tsProc->getOutput());
+
+        $entries = $parser->parseFiles($paths, static function (string $path) use ($commitHash): string {
+            $show = new Process(['show', $commitHash . ':' . $path]);
+            $show->mustRun();
+
+            return $show->getOutput();
+        });
+
+        $xml = $parser->buildXml(
+            $entries,
+            $commitHash,
+            $commitTimestamp,
+            Mesamatrix::$config->getValue('git', 'mesa_web'),
+            $branch,
+        );
+
+        $node = dom_import_simplexml($xml);
+        if ($node === false || $node->ownerDocument === null) {
+            Mesamatrix::$logger->error('Unable to serialize CI expectations XML.');
+            return;
+        }
+
+        $dom = $node->ownerDocument;
+        $dom->formatOutput = true;
+
+        if (file_put_contents($xmlPath, $dom->saveXML()) === false) {
+            Mesamatrix::$logger->error('Unable to write ' . $xmlPath);
+            return;
+        }
+
+        Mesamatrix::$logger->info(
+            'CI expectations XML saved to ' . $xmlPath . ' (' . count($entries) . ' configs).'
+        );
     }
 
     /**
