@@ -1,6 +1,7 @@
 # App files
 /config/config.php
 /public/features.xml
+/public/ci-expectations.xml
 /private/
 
 # Composer files
@@ -10,3 +11,6 @@ composer.phar
 # Editors files
 *.swp
 *~
+
+# Local tooling
+.tools/

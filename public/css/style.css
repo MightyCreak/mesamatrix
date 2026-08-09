@@ -214,6 +214,39 @@ main p {
 .lbCol-2nd td                   { background-color: var(--lb-2nd-color); }
 .lbCol-3rd td                   { background-color: var(--lb-3rd-color); }
 
+.ci-quality .ci-num             { text-align: right; font-variant-numeric: tabular-nums; }
+.ci-quality .lbCol-driver       { min-width: 8em; }
+.ci-quality tr.ci-summary       { cursor: pointer; }
+.ci-quality tr.ci-summary:hover td { background-color: var(--matrix-ext-hover-color); }
+.ci-quality .ci-expander::before {
+    content: "▸";
+    display: inline-block;
+    width: 1em;
+    margin-right: 0.25em;
+    transition: transform 0.15s ease;
+}
+.ci-quality tr.ci-summary.is-expanded .ci-expander::before {
+    transform: rotate(90deg);
+}
+.ci-quality tr.ci-detail td {
+    background-color: color-mix(in srgb, var(--lb-bkg-color) 35%, transparent);
+    font-weight: normal;
+}
+.ci-quality tr.ci-detail .ci-detail-target {
+    padding-left: 2.25em;
+    color: var(--lb-pct-score-color);
+}
+.ci-quality tr.ci-summary.ci-empty {
+    cursor: default;
+    opacity: 0.75;
+}
+.ci-quality tr.ci-summary.ci-empty:hover td {
+    background-color: transparent;
+}
+.ci-quality tr.ci-summary.ci-empty .ci-expander::before {
+    content: "";
+}
+
 /**
  * Matrix table
  */
